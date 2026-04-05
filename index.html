@@ -1,0 +1,167 @@
+﻿// 1. 設定區：請確保 GAS_URL 正確
+const GAS_URL = "https://script.google.com/macros/s/AKfycby631ke1ObiC6BfKBvsU3yFU1BNHVdraEYUbX2aN_RGWufbLfndKR_WxTJmh7fnsdJC/exec";
+
+// 狀態對照表 (對應你 Sheet 裡的中文狀態)
+const statusMap = {
+  "未送修": { label: '已完成報到', cls: 's-checked_in' },
+  "OK_成功": { label: '✅ 維修成功', cls: 's-done_success' },
+  "NO_失敗": { label: '❌ 維修失敗', cls: 's-done_fail' },
+  "轉診或退回不受理": { label: '退回不受理', cls: 's-in_repair' }
+};
+
+let repairData = [];
+let lastUpdated = new Date();
+let activeNames = {};
+
+// 初始化：自動載入資料
+window.onload = () => {
+  reloadData();
+  setLang('zh');
+};
+
+// 從 Google Sheets 獲取資料
+async function fetchFromGoogleSheets() {
+  try {
+    const response = await fetch(GAS_URL);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("讀取失敗:", error);
+    showToast("❌ 無法連線至雲端資料庫");
+    return [];
+  }
+}
+
+// 儲存更新至 Google Sheets
+async function saveToGoogleSheets(updateObj) {
+  try {
+    const response = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(updateObj)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("儲存失敗:", error);
+    showToast("❌ 雲端同步失敗");
+  }
+}
+
+// 重新整理資料
+async function reloadData() {
+  const btn = document.getElementById('reloadBtn');
+  btn.classList.add('spinning');
+  
+  const freshData = await fetchFromGoogleSheets();
+  if (freshData.length > 0) {
+    repairData = freshData;
+    lastUpdated = new Date();
+    updateLastUpdated();
+    if (document.getElementById('phoneInput').value.trim()) doSearch();
+    showToast('🔄 資料已同步更新');
+  }
+  
+  setTimeout(() => btn.classList.remove('spinning'), 700);
+}
+
+// 搜尋功能
+function doSearch() {
+  const raw = document.getElementById('phoneInput').value.trim();
+  if (!raw) { showToast('請輸入電話後三碼'); return; }
+  
+  const codes = raw.split(',').map(s => s.trim()).filter(s => /^\d{1,4}$/.test(s));
+  const matched = repairData.filter(r => codes.some(c => String(r.phone).endsWith(c)));
+  
+  if (!matched.length) {
+    document.getElementById('nameSelectWrap').style.display = 'none';
+    document.getElementById('searchResults').innerHTML = '<div class="empty-state">查無資料，請確認號碼</div>';
+    return;
+  }
+
+  // 處理多人同號碼邏輯 (簡化處理)
+  renderResults(matched);
+}
+
+// 渲染卡片
+function renderResults(items) {
+  document.getElementById('searchResults').innerHTML = items.map(item => {
+    const s = statusMap[item.status] || { label: item.status, cls: 's-checked_in' };
+    return `
+      <div class="repair-card" id="card-${item.id}">
+        <div class="rc-header" onclick="toggleCard(${item.id})">
+          <div class="rc-seq">#${item.id}</div>
+          <div class="rc-main">
+            <div class="rc-name">${item.item}</div>
+            <div class="rc-owner">${item.name}</div>
+          </div>
+          <div class="rc-right">
+            <span class="status-badge ${s.cls}">${s.label}</span>
+          </div>
+        </div>
+        <div class="rc-details">
+          <div class="rc-details-inner">
+            <div class="detail-grid">
+              <div><div class="d-label">維修備註</div><div class="d-value">${item.notes || '無'}</div></div>
+              <div><div class="d-label">費用</div><div class="d-value">NT$ ${item.cost || 0}</div></div>
+            </div>
+            <div class="edit-section">
+              <div class="edit-label">🛠️ 更新資料</div>
+              <div class="edit-grid-2">
+                <div class="edit-field">
+                  <label>狀態</label>
+                  <select id="status-${item.id}">
+                    <option value="未送修" ${item.status==='未送修'?'selected':''}>未送修</option>
+                    <option value="OK_成功" ${item.status==='OK_成功'?'selected':''}>OK_成功</option>
+                    <option value="NO_失敗" ${item.status==='NO_失敗'?'selected':''}>NO_失敗</option>
+                    <option value="轉診或退回不受理" ${item.status==='轉診或退回不受理'?'selected':''}>轉診或退回不受理</option>
+                  </select>
+                </div>
+                <div class="edit-field">
+                  <label>費用</label>
+                  <input type="number" id="cost-${item.id}" value="${item.cost || ''}">
+                </div>
+              </div>
+              <div class="edit-field">
+                <label>備註</label>
+                <input type="text" id="notes-${item.id}" value="${item.notes || ''}">
+              </div>
+              <button class="save-btn" onclick="saveCard(${item.id})">💾 儲存並同步到雲端</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// 儲存卡片資料
+async function saveCard(id) {
+  const status = document.getElementById('status-' + id).value;
+  const cost = document.getElementById('cost-' + id).value;
+  const notes = document.getElementById('notes-' + id).value;
+  
+  showToast('💾 同步中...');
+  
+  const res = await saveToGoogleSheets({ id, status, cost, notes });
+  if (res && res.result === "success") {
+    // 同步本地資料
+    const idx = repairData.findIndex(r => r.id == id);
+    repairData[idx].status = status;
+    repairData[idx].cost = cost;
+    repairData[idx].notes = notes;
+    
+    showToast('✅ 雲端同步成功');
+    reloadData(); // 重新整理畫面
+  }
+}
+
+// 其他輔助函數
+function toggleCard(id) { document.getElementById('card-' + id).classList.toggle('open'); }
+function updateLastUpdated() {
+  const t = lastUpdated;
+  document.getElementById('lastUpdated').textContent = `🕐 資料更新：${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}`;
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
