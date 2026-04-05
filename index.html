@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>小家電維修所 | 送修查詢</title>
+    <title>小家電維修所 送修查詢</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<style>
+    <style>
         /* 這裡放您原本提供的 CSS 樣式語法 ... */
         :root { --orange: #FF7F4E; --yellow: #FFD801; --blue: #88CFEB; --green: #2F8B58; --light-bg: #F5F4F0; --white: #FFFFFF; --text-dark: #1A1A2E; --border: #E6E4DF; --shadow: 0 2px 14px rgba(0,0,0,0.07); --circle-size: 32px; }
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -56,10 +56,10 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycby631ke1ObiC6BfKBvsU3yFU1BNHVdraEYUbX2aN_RGWufbLfndKR_WxTJmh7fnsdJC/exec";
 
     const statusMap = {
-      "未送修": { label: '未報到', cls: 's-checked_in' },
+      "未送修": { label: '已完成報到', cls: 's-checked_in' },
       "OK_成功": { label: '✅ 維修成功', cls: 's-done_success' },
       "NO_失敗": { label: '❌ 維修失敗', cls: 's-done_fail' },
-      "轉診或退回不受理": { label: '轉診或退回不受理', cls: 's-in_repair' }
+      "轉診或退回不受理": { label: '退回不受理', cls: 's-in_repair' }
     };
 
     let repairData = [];
@@ -134,30 +134,20 @@
       }).join('');
     }
 
-async function saveCard(id) {
+    async function saveCard(id) {
       const status = document.getElementById('status-' + id).value;
       const cost = document.getElementById('cost-' + id).value;
       const notes = document.getElementById('notes-' + id).value;
-      
-      showToast('正在同步雲端...');
-      
+      showToast('💾 同步中...');
       try {
-        // 使用 no-cors 或忽略回應報錯，因為 GAS POST 常因 redirect 導致 fetch 拋出 error
-        await fetch(GAS_URL, {
+        const res = await fetch(GAS_URL, {
           method: "POST",
-          mode: "no-cors", 
           body: JSON.stringify({ id, status, cost, notes })
         });
-        
-        // 既然是 no-cors，我們直接假設成功（因為您提到 Sheet 確實有更新）
-        showToast('✅ 雲端更新成功');
-        
-        // 延遲一秒後重新讀取最新資料以刷新畫面
-        setTimeout(reloadData, 1000);
+        showToast('✅ 同步成功');
+        reloadData();
       } catch (e) {
-        // 如果連發送都失敗（斷網等情況）才報錯
-        showToast('❌ 網路連線異常，請稍後再試');
-        console.error(e);
+        showToast('❌ 更新失敗');
       }
     }
 
