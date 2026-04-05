@@ -260,6 +260,11 @@ body {
   background:var(--green-light); padding:2px 7px; border-radius:20px;
   white-space:nowrap;
 }
+.rc-result-tag {
+  font-size:10px; font-weight:700; color:var(--text-mid);
+  margin-top:2px; text-align:right;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px;
+}
 
 .rc-details {
   max-height:0; overflow:hidden; transition:max-height 0.4s ease;
@@ -725,6 +730,21 @@ function renderCard(item) {
       'OK 維修但原有部分功能失效',
       'OK 改裝&升級代替原有零件',
     ],
+    'NO_失敗': [
+      'No 沒有零件',
+      'No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)',
+      'No 沒有解釋說明',
+      'No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)',
+      'No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)',
+      'No 物主放棄維修 (破損疑慮/費用疑慮等)',
+      'No 已更換零件或清潔但無法正常使用',
+      'No 功能疑慮 不建議維修 (影響防水或精準)',
+    ],
+    '轉診或退回不受理': [
+      '考量活動當下時間與資源轉介至專業維修店',
+      '保固期內建議送至原廠或經銷中心',
+      '配件不齊全無法檢測',
+    ],
   };
 
   function buildDetailOpts(currentResult, currentNotes) {
@@ -747,7 +767,11 @@ function renderCard(item) {
     +   '<div class="rc-seq">#' + item.id + '</div>'
     +   '<div class="rc-main"><div class="rc-name">' + (item.item || '—') + '</div>'
     +     '<div class="rc-owner">' + item.name + '</div></div>'
-    +   '<div class="rc-right"><span class="status-badge ' + s.cls + '">' + s.label + '</span>' + co2Tag + '</div>'
+    +   '<div class="rc-right">'
+    +     '<span class="status-badge ' + s.cls + '">' + s.label + '</span>'
+    +     (item.result ? '<div class="rc-result-tag">' + item.result + '</div>' : '')
+    +     (item.co2   ? '<div class="co2-mini">🌿 ' + item.co2 + ' kg</div>' : '')
+    +   '</div>'
     + '</div>'
     + '<div class="rc-details"><div class="rc-details-inner">'
 
@@ -819,7 +843,7 @@ function toggleCard(id) {
   document.getElementById('card-' + id)?.classList.toggle('open');
 }
 
-// 維修結果說明子選項
+// 維修結果說明子選項（依維修結果對應）
 const resultDetailOpts = {
   'OK_成功': [
     'OK 更換零件',
@@ -829,6 +853,21 @@ const resultDetailOpts = {
     'OK 物主自行購買更換零件',
     'OK 維修但原有部分功能失效',
     'OK 改裝&升級代替原有零件',
+  ],
+  'NO_失敗': [
+    'No 沒有零件',
+    'No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)',
+    'No 沒有解釋說明',
+    'No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)',
+    'No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)',
+    'No 物主放棄維修 (破損疑慮/費用疑慮等)',
+    'No 已更換零件或清潔但無法正常使用',
+    'No 功能疑慮 不建議維修 (影響防水或精準)',
+  ],
+  '轉診或退回不受理': [
+    '考量活動當下時間與資源轉介至專業維修店',
+    '保固期內建議送至原廠或經銷中心',
+    '配件不齊全無法檢測',
   ],
 };
 
@@ -843,6 +882,7 @@ function onResultChange(id) {
     s += '</select>';
     wrap.innerHTML = s;
   } else {
+    // 未送修 → 自由輸入
     wrap.innerHTML = '<input type="text" id="notes-' + id + '" placeholder="請輸入維修結果說明">';
   }
 }
