@@ -232,18 +232,29 @@ body {
 .repair-card:last-child { margin-bottom:0; }
 
 .rc-header {
-  display:flex; align-items:center; gap:10px;
-  padding:12px 13px; cursor:pointer; user-select:none;
+  display:flex; align-items:flex-start; gap:10px;
+  padding:13px 13px; cursor:pointer; user-select:none;
 }
 .rc-seq {
   width:28px; height:28px; background:var(--text-dark); color:white;
   border-radius:7px; display:flex; align-items:center; justify-content:center;
-  font-size:11px; font-weight:900; flex-shrink:0;
+  font-size:11px; font-weight:900; flex-shrink:0; margin-top:2px;
 }
 .rc-main { flex:1; min-width:0; }
 .rc-name  { font-size:15px; font-weight:700; color:var(--text-dark); }
-.rc-owner { font-size:13px; color:var(--text-light); margin-top:1px; }
-.rc-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; max-width:120px; }
+.rc-owner { font-size:13px; color:var(--text-light); margin-top:2px; }
+
+/* 右側：垂直排列 — 狀態徽章 / 維修結果 / 減碳 */
+.rc-right {
+  display:flex; flex-direction:column; align-items:flex-end;
+  gap:3px; flex-shrink:0; max-width:140px;
+}
+
+/* 狀態 + 維修結果 + CO2 並排在同一行 */
+.rc-right-row {
+  display:flex; flex-direction:row; align-items:center;
+  gap:5px; flex-wrap:wrap; justify-content:flex-end;
+}
 
 .status-badge {
   padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700;
@@ -258,12 +269,12 @@ body {
 .co2-mini {
   font-size:10px; font-weight:700; color:var(--green);
   background:var(--green-light); padding:2px 7px; border-radius:20px;
-  white-space:nowrap;
+  white-space:nowrap; display:inline-flex; align-items:center;
 }
 .rc-result-tag {
   font-size:10px; font-weight:700; color:var(--text-mid);
-  margin-top:2px; text-align:right;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px;
+  background:var(--light-bg); padding:2px 7px; border-radius:20px;
+  white-space:nowrap; display:inline-flex; align-items:center;
 }
 
 .rc-details {
@@ -274,14 +285,15 @@ body {
 .rc-details-inner { padding:11px 13px; }
 
 .detail-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:11px;
+  display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:11px;
 }
-/* 顯示區：左右兩格在同一行 */
+/* 顯示區：左右兩格在同一行，右欄靠左 */
 .detail-pair {
-  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  display:grid; grid-template-columns:1fr 1.6fr; gap:12px; margin-bottom:14px;
 }
-.d-label { font-size:11px; color:var(--text-light); font-weight:700; letter-spacing:0.3px; margin-bottom:2px; }
-.d-value { font-size:14px; color:var(--text-dark); font-weight:500; word-break:break-word; }
+.detail-pair:last-child { margin-bottom:4px; }
+.d-label { font-size:11px; color:var(--text-light); font-weight:700; letter-spacing:0.3px; margin-bottom:3px; }
+.d-value { font-size:14px; color:var(--text-dark); font-weight:500; word-break:break-word; line-height:1.4; }
 
 .edit-section {
   background:var(--light-bg); border-radius:10px; padding:10px; margin-top:2px;
@@ -768,9 +780,11 @@ function renderCard(item) {
     +   '<div class="rc-main"><div class="rc-name">' + (item.item || '—') + '</div>'
     +     '<div class="rc-owner">' + item.name + '</div></div>'
     +   '<div class="rc-right">'
-    +     '<span class="status-badge ' + s.cls + '">' + s.label + '</span>'
-    +     (item.result ? '<div class="rc-result-tag">' + item.result + '</div>' : '')
-    +     (item.co2   ? '<div class="co2-mini">🌿 ' + item.co2 + ' kg</div>' : '')
+    +     '<div class="rc-right-row">'
+    +       '<span class="status-badge ' + s.cls + '">' + s.label + '</span>'
+    +       (item.result ? '<span class="rc-result-tag">' + item.result + '</span>' : '')
+    +       (item.co2   ? '<span class="co2-mini">🌿 ' + item.co2 + ' kg</span>' : '')
+    +     '</div>'
     +   '</div>'
     + '</div>'
     + '<div class="rc-details"><div class="rc-details-inner">'
@@ -782,12 +796,12 @@ function renderCard(item) {
     +     '<div><div class="d-label">型號</div><div class="d-value">' + (item.model || '—') + '</div></div>'
     +   '</div>'
     // 第2列：維修結果（左）+ 維修結果說明（右）
-    +   '<div class="detail-pair" style="margin-top:8px">'
+    +   '<div class="detail-pair">'
     +     '<div><div class="d-label">維修結果</div><div class="d-value">' + (item.result || '—') + '</div></div>'
     +     '<div><div class="d-label">維修結果說明</div><div class="d-value">' + (item.notes || '—') + '</div></div>'
     +   '</div>'
-    // 第3列：費用（左）
-    +   '<div class="detail-pair" style="margin-top:8px">'
+    // 第3列：費用（左）+ 減碳（右）
+    +   '<div class="detail-pair">'
     +     '<div><div class="d-label">費用</div><div class="d-value">' + (item.cost === null ? '待確認' : item.cost === 0 ? '免費 🎉' : 'NT$ ' + item.cost) + '</div></div>'
     +     (item.co2 ? '<div><div class="d-label">減碳貢獻</div><div class="d-value" style="color:var(--green)">🌿 ' + item.co2 + ' kg CO₂</div></div>' : '<div></div>')
     +   '</div>'
