@@ -271,14 +271,19 @@ body {
 .detail-grid {
   display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:11px;
 }
+/* 顯示區：左右兩格在同一行 */
+.detail-pair {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+}
 .d-label { font-size:11px; color:var(--text-light); font-weight:700; letter-spacing:0.3px; margin-bottom:2px; }
-.d-value { font-size:14px; color:var(--text-dark); font-weight:500; }
+.d-value { font-size:14px; color:var(--text-dark); font-weight:500; word-break:break-word; }
 
 .edit-section {
   background:var(--light-bg); border-radius:10px; padding:10px; margin-top:2px;
 }
 .edit-label { font-size:11px; font-weight:700; color:var(--text-mid); margin-bottom:7px; }
 .edit-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.edit-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
 .edit-field { display:flex; flex-direction:column; gap:3px; margin-bottom:7px; }
 .edit-field label { font-size:10px; color:var(--text-light); font-weight:700; }
 .edit-field input,
@@ -341,7 +346,6 @@ body {
 .toast.show { transform:translateX(-50%) translateY(0); }
 
 @media (min-width:500px) {
-  .detail-grid { grid-template-columns:repeat(3,1fr); }
 }
 </style>
 </head>
@@ -510,7 +514,7 @@ body {
 
 
 // ── Google Apps Script URL ──────────────────────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzZ6rYzyJOxnnqs94ntbsYWwh6zJFBwz-j5PjEhtAG1gr9JwErlVO7X4Pye_sgt13S9/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxgqSwZnMgNNRi0KCtFMyhn07bwcoZVYzNE1XN2HPV7bXXVpPoPtuY0wa9Z4gMNzzC3/exec';
 
 // ── 欄位對應 ─────────────────────────────────────────────────────
 // GAS doGet 已直接回傳 {id, name, phone, item, status, notes, cost, co2}
@@ -604,25 +608,31 @@ async function saveToGoogleSheets(u) {
 
   // 寫回 Sheet（欄位反向對應）
   const payload = {
-    action: 'update',
-    編號:         u.id,
-    分類:         u.status,
-    當天修理狀況: u.notes,
-    零件費:       u.cost !== null ? u.cost : '',
-    減碳貢獻:     u.co2  !== null ? u.co2  : '',
+    action:   'update',
+    編號:     u.id,
+    分類:     u.status,
+    品牌:     u.brand  || '',
+    型號:     u.model  || '',
+    維修結果: u.result || '',
+    維修結果說明: u.notes || '',
+    零件費:   u.cost !== null ? u.cost : '',
+    減碳貢獻: u.co2  !== null ? u.co2  : '',
   };
 
   try {
-    // 用 JSONP GET 方式傳送更新（GAS 需支援 GET update）
+    // 用 JSONP GET 方式傳送更新
     const cbName = 'gasSave_' + Date.now();
     const params = new URLSearchParams({
-      action: 'update',
+      action:   'update',
       callback: cbName,
-      id:     payload['編號'],
-      status: payload['分類'],
-      notes:  payload['當天修理狀況'],
-      cost:   payload['零件費'],
-      co2:    payload['減碳貢獻'],
+      id:       payload['編號'],
+      status:   payload['分類'],
+      brand:    payload['品牌'],
+      model:    payload['型號'],
+      result:   payload['維修結果'],
+      notes:    payload['維修結果說明'],
+      cost:     payload['零件費'],
+      co2:      payload['減碳貢獻'],
     });
     await new Promise((res) => {
       const timer = setTimeout(res, 6000);
@@ -694,17 +704,43 @@ function renderResults(items) {
 }
 
 function renderCard(item) {
-  // status 是表單「分類」的文字值，直接對應 statusMap key
   const s = statusMap[item.status] || { label: item.status || '—', cls: 's-checked_in' };
   const isSuccess = item.status === '已取件';
   const co2Tag = isSuccess && item.co2
     ? '<div class="co2-mini">🌿 減碳 ' + item.co2 + ' kg</div>' : '';
 
-  // 品牌型號：有值才顯示，避免出現「undefined undefined」
-  const brandModel = [item.brand, item.model].filter(Boolean).join(' ') || '—';
+  // ── 輔助：selected 判斷 ──
+  function sel(field, val) {
+    return item[field] === val ? ' selected' : '';
+  }
 
-  // 選項 selected 輔助函式
-  function sel(val) { return item.status === val ? ' selected' : ''; }
+  // ── 維修結果說明子選項（依維修結果動態產生） ──
+  const resultDetailOpts = {
+    'OK_成功': [
+      'OK 更換零件',
+      'OK 無更換零件: 清潔/重新組裝或固定',
+      'OK 非故障/不熟悉或不當操作',
+      'OK 沒有解釋說明',
+      'OK 物主自行購買更換零件',
+      'OK 維修但原有部分功能失效',
+      'OK 改裝&升級代替原有零件',
+    ],
+  };
+
+  function buildDetailOpts(currentResult, currentNotes) {
+    const opts = resultDetailOpts[currentResult];
+    if (!opts) {
+      // 無子選項時顯示文字輸入
+      return '<input type="text" id="notes-' + item.id + '" value="' + (currentNotes || '') + '" placeholder="請輸入維修結果說明">';
+    }
+    let s = '<select id="notes-' + item.id + '">';
+    s += '<option value="">— 請選擇 —</option>';
+    opts.forEach(function(o) {
+      s += '<option value="' + o + '"' + (currentNotes === o ? ' selected' : '') + '>' + o + '</option>';
+    });
+    s += '</select>';
+    return s;
+  }
 
   return '<div class="repair-card" id="card-' + item.id + '">'
     + '<div class="rc-header" onclick="toggleCard(' + item.id + ')">'
@@ -714,29 +750,65 @@ function renderCard(item) {
     +   '<div class="rc-right"><span class="status-badge ' + s.cls + '">' + s.label + '</span>' + co2Tag + '</div>'
     + '</div>'
     + '<div class="rc-details"><div class="rc-details-inner">'
-    +   '<div class="detail-grid">'
-    +     '<div><div class="d-label">品牌型號</div><div class="d-value">' + brandModel + '</div></div>'
+
+    // ── 顯示區：3 列 ──────────────────────────────────────────
+    // 第1列：品牌（左）+ 型號（右）
+    +   '<div class="detail-pair">'
+    +     '<div><div class="d-label">品牌</div><div class="d-value">' + (item.brand || '—') + '</div></div>'
+    +     '<div><div class="d-label">型號</div><div class="d-value">' + (item.model || '—') + '</div></div>'
+    +   '</div>'
+    // 第2列：維修結果（左）+ 維修結果說明（右）
+    +   '<div class="detail-pair" style="margin-top:8px">'
     +     '<div><div class="d-label">維修結果</div><div class="d-value">' + (item.result || '—') + '</div></div>'
     +     '<div><div class="d-label">維修結果說明</div><div class="d-value">' + (item.notes || '—') + '</div></div>'
-    +     '<div><div class="d-label">維修費用</div><div class="d-value">' + (item.cost === null ? '待確認' : item.cost === 0 ? '免費 🎉' : 'NT$ ' + item.cost) + '</div></div>'
-    +     (item.co2 ? '<div><div class="d-label">減碳貢獻</div><div class="d-value" style="color:var(--green)">🌿 ' + item.co2 + ' kg CO₂</div></div>' : '')
     +   '</div>'
+    // 第3列：費用（左）
+    +   '<div class="detail-pair" style="margin-top:8px">'
+    +     '<div><div class="d-label">費用</div><div class="d-value">' + (item.cost === null ? '待確認' : item.cost === 0 ? '免費 🎉' : 'NT$ ' + item.cost) + '</div></div>'
+    +     (item.co2 ? '<div><div class="d-label">減碳貢獻</div><div class="d-value" style="color:var(--green)">🌿 ' + item.co2 + ' kg CO₂</div></div>' : '<div></div>')
+    +   '</div>'
+
+    // ── 編輯區 ────────────────────────────────────────────────
     +   '<div class="edit-section"><div class="edit-label">🛠️ 維修團隊更新資料</div>'
-    +     '<div class="edit-grid-2">'
-    +       '<div class="edit-field"><label>分類</label>'
+
+    // 第1列：看診進度（左）+ 維修費用（右）
+    +     '<div class="edit-grid-2" style="margin-bottom:0">'
+    +       '<div class="edit-field"><label>看診進度（分類）</label>'
     +         '<select id="status-' + item.id + '">'
-    +           '<option value="已報到"' +    sel('已報到')    + '>已報到</option>'
-    +           '<option value="取消&無送修"' + sel('取消&無送修') + '>取消／無送修</option>'
-    +           '<option value="待領取"' +    sel('待領取')    + '>待領取</option>'
-    +           '<option value="候補"' +      sel('候補')      + '>候補</option>'
-    +           '<option value="已取件"' +    sel('已取件')    + '>已取件</option>'
-    +           '<option value="轉診&退回"' + sel('轉診&退回') + '>轉診／退回</option>'
+    +           '<option value="已報到"'      + sel('status','已報到')      + '>已報到</option>'
+    +           '<option value="取消&無送修"'  + sel('status','取消&無送修') + '>取消／無送修</option>'
+    +           '<option value="待領取"'      + sel('status','待領取')      + '>待領取</option>'
+    +           '<option value="候補"'        + sel('status','候補')        + '>候補</option>'
+    +           '<option value="已取件"'      + sel('status','已取件')      + '>已取件</option>'
+    +           '<option value="轉診&退回"'   + sel('status','轉診&退回')   + '>轉診／退回</option>'
     +         '</select></div>'
-    +       '<div class="edit-field"><label>維修費用 (NT$)</label>'
+    +       '<div class="edit-field"><label>費用 (NT$)</label>'
     +         '<input type="number" id="cost-' + item.id + '" value="' + (item.cost !== null ? item.cost : '') + '" placeholder="輸入費用" inputmode="numeric"></div>'
     +     '</div>'
-    +     '<div class="edit-field"><label>維修結果說明</label>'
-    +       '<input type="text" id="notes-' + item.id + '" value="' + (item.notes || '') + '" placeholder="請輸入維修結果說明"></div>'
+
+    // 第2列：品牌（左）+ 型號（右）
+    +     '<div class="edit-grid-2" style="margin-bottom:0">'
+    +       '<div class="edit-field"><label>品牌</label>'
+    +         '<input type="text" id="brand-' + item.id + '" value="' + (item.brand || '') + '" placeholder="品牌"></div>'
+    +       '<div class="edit-field"><label>型號</label>'
+    +         '<input type="text" id="model-' + item.id + '" value="' + (item.model || '') + '" placeholder="型號"></div>'
+    +     '</div>'
+
+    // 第3列：維修結果（左）+ 維修結果說明（右，連動）
+    +     '<div class="edit-grid-2" style="margin-bottom:0">'
+    +       '<div class="edit-field"><label>維修結果</label>'
+    +         '<select id="result-' + item.id + '" onchange="onResultChange(' + item.id + ')">'
+    +           '<option value="">— 請選擇 —</option>'
+    +           '<option value="OK_成功"'          + sel('result','OK_成功')          + '>OK_成功</option>'
+    +           '<option value="NO_失敗"'          + sel('result','NO_失敗')          + '>NO_失敗</option>'
+    +           '<option value="未送修"'            + sel('result','未送修')            + '>未送修</option>'
+    +           '<option value="轉診或退回不受理"'  + sel('result','轉診或退回不受理')  + '>轉診或退回不受理</option>'
+    +         '</select></div>'
+    +       '<div class="edit-field"><label>維修結果說明</label>'
+    +         '<div id="noteswrap-' + item.id + '">' + buildDetailOpts(item.result, item.notes) + '</div>'
+    +       '</div>'
+    +     '</div>'
+
     +     '<button class="save-btn" onclick="saveCard(' + item.id + ')" type="button">💾 儲存並同步</button>'
     +     '<div class="save-ok" id="saveMsg-' + item.id + '">✅ 已儲存成功！</div>'
     +   '</div>'
@@ -747,11 +819,42 @@ function toggleCard(id) {
   document.getElementById('card-' + id)?.classList.toggle('open');
 }
 
+// 維修結果說明子選項
+const resultDetailOpts = {
+  'OK_成功': [
+    'OK 更換零件',
+    'OK 無更換零件: 清潔/重新組裝或固定',
+    'OK 非故障/不熟悉或不當操作',
+    'OK 沒有解釋說明',
+    'OK 物主自行購買更換零件',
+    'OK 維修但原有部分功能失效',
+    'OK 改裝&升級代替原有零件',
+  ],
+};
+
+function onResultChange(id) {
+  const resultVal = document.getElementById('result-' + id).value;
+  const wrap = document.getElementById('noteswrap-' + id);
+  if (!wrap) return;
+  const opts = resultDetailOpts[resultVal];
+  if (opts) {
+    let s = '<select id="notes-' + id + '"><option value="">— 請選擇說明 —</option>';
+    opts.forEach(function(o) { s += '<option value="' + o + '">' + o + '</option>'; });
+    s += '</select>';
+    wrap.innerHTML = s;
+  } else {
+    wrap.innerHTML = '<input type="text" id="notes-' + id + '" placeholder="請輸入維修結果說明">';
+  }
+}
+
 async function saveCard(id) {
   const status = document.getElementById('status-' + id).value;
   const cost   = document.getElementById('cost-' + id).value;
-  const notes  = document.getElementById('notes-' + id).value;
-  await saveToGoogleSheets({ id, status, cost: cost !== '' ? Number(cost) : null, notes });
+  const brand  = (document.getElementById('brand-'  + id) || {}).value || '';
+  const model  = (document.getElementById('model-'  + id) || {}).value || '';
+  const result = (document.getElementById('result-' + id) || {}).value || '';
+  const notes  = (document.getElementById('notes-'  + id) || {}).value || '';
+  await saveToGoogleSheets({ id, status, cost: cost !== '' ? Number(cost) : null, brand, model, result, notes });
   const msg = document.getElementById('saveMsg-' + id);
   if (msg) { msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2500); }
   showToast('✅ 資料已儲存');
