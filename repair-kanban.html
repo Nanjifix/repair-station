@@ -4,384 +4,351 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>小家電維修所</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #F5F2ED;
-  --surface: #FFFFFF;
-  --surface2: #F0EDE8;
-  --border: #E2DDD6;
-  --text: #1A1814;
-  --text-muted: #8A8278;
-  --accent: #D4521A;
-  --accent-light: #FFF0EA;
-  --green: #2A7A4B;
-  --green-light: #E8F5EE;
-  --blue: #1A5FA8;
-  --blue-light: #E8F0FA;
-  --yellow: #B8860B;
-  --yellow-light: #FFF8E0;
-  --purple: #6B3FA0;
-  --purple-light: #F3EEFF;
-  --red: #C0392B;
-  --red-light: #FDECEA;
-  --gray: #6B6560;
-  --gray-light: #F0EDE8;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+:root{
+  --white:#FFFFFF;
+  --bg:#F4F6F9;
+  --border:#E8ECF0;
+  --border2:#D0D7E0;
+  --text:#1A2332;
+  --text2:#5A6A7E;
+  --text3:#9AA5B4;
+  --blue:#4A90D9;
+  --blue-bg:#EBF4FF;
+  --orange:#F5A623;
+  --orange-bg:#FEF7EC;
+  --purple:#7B61FF;
+  --purple-bg:#F0EEFF;
+  --green:#27AE60;
+  --green-bg:#EDFAF3;
+  --red:#E74C3C;
+  --red-bg:#FEF0EF;
+  --gray:#8E9AAB;
+  --gray-bg:#F0F2F5;
+  --dark:#2C3E50;
+
+  /* column accent colors */
+  --col-pending:#9AA5B4;
+  --col-arrived:#4A90D9;
+  --col-repairing:#F5A623;
+  --col-ready:#7B61FF;
+  --col-done:#27AE60;
+  --col-transfer:#E74C3C;
+
+  --radius:8px;
+  --radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Noto Sans TC', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px}
 
 /* ── TOP BAR ── */
-.topbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: var(--text);
-  padding: 12px 16px;
-  display: flex; align-items: center; justify-content: space-between;
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  height:56px;
+  display:flex;align-items:center;padding:0 20px;gap:12px;
 }
-.topbar-title {
-  font-family: 'Space Mono', monospace;
-  font-size: 15px; color: #fff; font-weight: 700; letter-spacing: 1px;
+.topbar-logo{
+  font-weight:700;font-size:16px;color:var(--text);
+  display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
 }
-.topbar-subtitle { font-size: 11px; color: #aaa; margin-top: 1px; }
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-.sync-btn {
-  background: var(--accent); border: none; border-radius: 6px;
-  color: #fff; font-size: 12px; padding: 6px 12px; cursor: pointer;
-  font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
-  display: flex; align-items: center; gap: 5px;
+.topbar-logo span{color:var(--blue)}
+.topbar-divider{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;color:var(--text)}
+.topbar-date{font-size:12px;color:var(--text2)}
+.topbar-spacer{flex:1}
+.topbar-stats{display:flex;align-items:center;gap:14px}
+.stat-pill{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text2)}
+.stat-pill .dot{width:7px;height:7px;border-radius:50%}
+.sync-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--blue);color:#fff;
+  border:none;border-radius:var(--radius);
+  padding:7px 14px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:background .15s;
+  white-space:nowrap;flex-shrink:0;
 }
-.sync-btn:active { opacity: 0.8; }
+.sync-btn:hover{background:#3a7bc8}
+.sync-btn:active{background:#2d6aaf}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  background: var(--text);
-  display: flex;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:var(--white);border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:env(safe-area-inset-bottom,0);
 }
-.nav-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 10px 0; cursor: pointer; transition: background 0.2s;
-  border: none; background: transparent; color: #888;
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:10px 0;cursor:pointer;border:none;background:transparent;
+  color:var(--text3);transition:color .15s;font-family:inherit;
 }
-.nav-item.active { color: #fff; }
-.nav-item svg { width: 22px; height: 22px; margin-bottom: 3px; }
-.nav-label { font-size: 10px; }
-.nav-item.active .nav-bg { background: rgba(212,82,26,0.15); border-radius: 8px; }
+.nav-item.active{color:var(--blue)}
+.nav-item svg{width:20px;height:20px;margin-bottom:3px}
+.nav-label{font-size:10px;font-weight:500}
 
-/* ── MAIN CONTENT ── */
-.main-content {
-  padding-top: 72px;
-  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0));
-  min-height: 100vh;
+/* ── MAIN ── */
+.main-content{
+  padding-top:56px;
+  padding-bottom:calc(60px + env(safe-area-inset-bottom,0));
+  min-height:100vh;
 }
+.page{display:none}.page.active{display:block}
 
-/* ── PAGE ── */
-.page { display: none; }
-.page.active { display: block; }
-
-/* ── KANBAN SCROLL ── */
-.kanban-scroll {
-  overflow-x: auto;
-  padding: 16px;
-  display: flex; gap: 12px;
-  scrollbar-width: none;
+/* ── KANBAN ── */
+.kanban-scroll{
+  overflow-x:auto;padding:16px;
+  display:flex;gap:12px;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  min-height:calc(100vh - 120px);
 }
-.kanban-scroll::-webkit-scrollbar { display: none; }
+.kanban-scroll::-webkit-scrollbar{height:6px}
+.kanban-scroll::-webkit-scrollbar-track{background:transparent}
+.kanban-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 /* ── COLUMN ── */
-.col {
-  flex: 0 0 280px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1.5px solid var(--border);
-  display: flex; flex-direction: column;
-  max-height: calc(100vh - 160px);
+.col{
+  flex:0 0 268px;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  border-radius:var(--radius-lg);
+  max-height:calc(100vh - 140px);
 }
-.col-header {
-  padding: 12px 14px;
-  border-bottom: 1.5px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0;
-  border-radius: var(--radius) var(--radius) 0 0;
+.col-header{
+  padding:10px 12px;
+  display:flex;align-items:center;gap:8px;
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  flex-shrink:0;
 }
-.col-title {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+.col-accent-bar{
+  width:4px;height:100%;border-radius:2px;flex-shrink:0;
+  align-self:stretch;min-height:20px;
 }
-.col-dot { width: 8px; height: 8px; border-radius: 50%; }
-.col-count {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; color: var(--text-muted);
-  background: var(--surface2); border-radius: 10px;
-  padding: 2px 7px;
+.col-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;flex:1}
+.col-badge{
+  font-size:11px;font-weight:600;
+  background:rgba(0,0,0,.08);
+  border-radius:10px;padding:2px 8px;
+  color:var(--text2);
 }
-.col-body { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-.col-body::-webkit-scrollbar { width: 3px; }
-.col-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-/* col colors */
-.col-pending .col-dot { background: #AAA; }
-.col-arrived .col-dot { background: var(--blue); }
-.col-repairing .col-dot { background: var(--accent); }
-.col-ready .col-dot { background: var(--green); }
-.col-done .col-dot { background: #555; }
-.col-transfer .col-dot { background: var(--purple); }
+.col-body{
+  flex:1;overflow-y:auto;padding:0 8px 8px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.col-body::-webkit-scrollbar{width:4px}
+.col-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
 /* ── CARD ── */
-.card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  transition: box-shadow 0.2s;
+.card{
+  background:var(--white);
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  transition:box-shadow .15s, transform .1s;
 }
-.card:active { box-shadow: var(--shadow); }
+.card:active{transform:scale(.99);box-shadow:none}
 
-.card-top {
-  padding: 10px 12px;
-  cursor: pointer;
-  user-select: none;
+.card-main{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;cursor:pointer;
 }
-.card-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.card-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 17px; font-weight: 700;
-}
-.card-timer {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; padding: 2px 7px;
-  border-radius: 10px; font-weight: 700;
-}
-.timer-wait { background: var(--blue-light); color: var(--blue); }
-.timer-repair { background: var(--accent-light); color: var(--accent); }
-.card-name { font-size: 13px; font-weight: 500; color: var(--text); }
-.card-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.card-note { font-size: 11px; color: var(--gray); margin-top: 5px; background: var(--surface2); border-radius: 5px; padding: 4px 7px; }
 
-.card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
-.tag {
-  font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500;
+/* Number circle */
+.card-num-circle{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--dark);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;font-family:'Inter',monospace;
+  flex-shrink:0;letter-spacing:0;
+  margin-top:1px;
 }
-.tag-cancel { background: var(--red-light); color: var(--red); }
-.tag-called { background: var(--green-light); color: var(--green); }
-.tag-no-ans { background: var(--yellow-light); color: var(--yellow); }
-.tag-result { background: var(--green-light); color: var(--green); font-size: 11px; }
-.tag-result.fail { background: var(--red-light); color: var(--red); }
-.tag-result.partial { background: var(--yellow-light); color: var(--yellow); }
+.card-num-circle.no-num{background:var(--border2);color:var(--text2)}
 
-/* ── CARD ACTIONS ── */
-.card-actions {
-  display: flex; gap: 6px; padding: 8px 10px 10px;
-}
-.btn-action {
-  flex: 1; border: none; border-radius: var(--radius-sm);
-  padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
-  font-family: 'Noto Sans TC', sans-serif;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  transition: opacity 0.15s;
-}
-.btn-action:active { opacity: 0.8; }
-.btn-start { background: var(--accent); color: #fff; }
-.btn-done { background: var(--green); color: #fff; }
-.btn-call { background: var(--blue); color: #fff; }
-.btn-pickup { background: #555; color: #fff; }
-.btn-transfer { background: var(--purple); color: #fff; }
+.card-body-text{flex:1;min-width:0}
+.card-title{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;word-break:break-all}
+.card-sub{font-size:11px;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-phone-chip{font-size:10px;font-weight:600;color:var(--text2)}
 
-/* ── EXPANDED CARD ── */
-.card-detail {
-  display: none;
-  padding: 10px 12px 12px;
-  border-top: 1.5px solid var(--border);
-  background: var(--surface2);
+.card-arrow{
+  flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  color:var(--text3);margin-top:4px;
 }
-.card-detail.open { display: block; }
+.card-arrow svg{width:14px;height:14px}
 
-.form-section { margin-bottom: 12px; }
-.form-label { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 4px; text-transform: uppercase; }
-.form-input, .form-select, .form-textarea {
-  width: 100%; border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); background: var(--surface);
-  padding: 8px 10px; font-size: 13px; color: var(--text);
-  font-family: 'Noto Sans TC', sans-serif;
-  -webkit-appearance: none; appearance: none;
-  outline: none;
+/* Timer */
+.card-timer{
+  font-size:11px;font-weight:600;font-family:'Inter',monospace;
+  padding:2px 7px;border-radius:20px;white-space:nowrap;
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--accent);
+.tw{background:var(--blue-bg);color:var(--blue)}
+.tr{background:var(--orange-bg);color:var(--orange)}
+.twarn{background:var(--red-bg);color:var(--red)}
+
+/* Tags row */
+.card-tags{display:flex;gap:4px;flex-wrap:wrap;padding:0 12px 8px;margin-top:-2px}
+.tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.tag-cancel{background:var(--red-bg);color:var(--red)}
+.tag-called{background:var(--green-bg);color:var(--green)}
+.tag-no-ans{background:var(--orange-bg);color:var(--orange)}
+.tag-ok{background:var(--green-bg);color:var(--green)}
+.tag-fail{background:var(--red-bg);color:var(--red)}
+.tag-pending-r{background:var(--purple-bg);color:var(--purple)}
+.tag-unsent{background:var(--gray-bg);color:var(--gray)}
+
+/* Note snippet */
+.card-snippet{
+  font-size:11px;color:var(--text2);
+  padding:0 12px 8px;margin-top:-2px;
+  line-height:1.5;
+  border-top:1px dashed var(--border);
+  padding-top:6px;
 }
-.form-textarea { resize: vertical; min-height: 60px; }
-.form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.form-readonly {
-  background: var(--surface2); color: var(--text-muted);
-  font-size: 12px; padding: 7px 10px;
-  border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+
+/* Actions row */
+.card-actions{
+  display:flex;border-top:1px solid var(--border);
 }
-.detail-divider { border: none; border-top: 1px dashed var(--border); margin: 10px 0; }
-.form-checkbox-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.checkbox-pill {
-  display: flex; align-items: center; gap: 5px;
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 4px 10px; cursor: pointer;
-  font-size: 12px; user-select: none;
+.card-action-btn{
+  flex:1;border:none;background:transparent;
+  padding:8px 6px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;color:var(--text2);
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:background .1s, color .1s;
 }
-.checkbox-pill input { width: 13px; height: 13px; }
-.checkbox-pill.checked { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.card-action-btn:hover{background:var(--bg)}
+.card-action-btn:active{background:var(--border)}
+.card-action-btn+.card-action-btn{border-left:1px solid var(--border)}
+.cab-blue{color:var(--blue)}
+.cab-orange{color:var(--orange)}
+.cab-green{color:var(--green)}
+.cab-red{color:var(--red)}
+.cab-purple{color:var(--purple)}
+.cab-dark{color:var(--dark)}
+
+/* Add card btn */
+.add-card-btn{
+  width:100%;border:1.5px dashed var(--border2);background:transparent;
+  border-radius:var(--radius);padding:9px;
+  font-size:12px;font-weight:500;color:var(--text3);
+  cursor:pointer;font-family:inherit;margin-top:2px;
+  transition:border-color .15s, color .15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.add-card-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── EXPANDED DETAIL ── */
+.card-detail{display:none;border-top:1px solid var(--border);background:var(--bg);padding:12px}
+.card-detail.open{display:block}
+
+.form-row{margin-bottom:10px}
+.form-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.form-input,.form-select,.form-textarea{
+  width:100%;border:1px solid var(--border2);border-radius:var(--radius);
+  background:var(--white);padding:7px 10px;
+  font-size:13px;color:var(--text);font-family:inherit;
+  outline:none;-webkit-appearance:none;appearance:none;
+  transition:border-color .15s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,144,217,.1)}
+.form-textarea{resize:vertical;min-height:52px}
+.form-readonly{
+  background:var(--bg);color:var(--text2);font-size:12px;
+  padding:7px 10px;border-radius:var(--radius);
+  border:1px solid var(--border);line-height:1.5;word-break:break-all;
+}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-divider{border:none;border-top:1px solid var(--border);margin:8px 0}
+
+.check-group{display:flex;flex-wrap:wrap;gap:5px}
+.check-pill{
+  display:flex;align-items:center;gap:4px;
+  background:var(--white);border:1px solid var(--border2);
+  border-radius:20px;padding:4px 10px;cursor:pointer;
+  font-size:11px;font-weight:500;user-select:none;transition:all .15s;
+}
+.check-pill input{width:12px;height:12px;accent-color:var(--blue)}
+.check-pill.on{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
 
 /* ── TOAST ── */
-.toast {
-  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-  background: var(--text); color: #fff;
-  padding: 10px 20px; border-radius: 20px;
-  font-size: 13px; z-index: 999; opacity: 0;
-  transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+.toast{
+  position:fixed;bottom:calc(68px + env(safe-area-inset-bottom,0) + 10px);
+  left:50%;transform:translateX(-50%);
+  background:var(--dark);color:#fff;
+  padding:9px 18px;border-radius:20px;
+  font-size:12px;font-weight:500;z-index:999;
+  opacity:0;transition:opacity .25s;
+  pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;
 }
-.toast.show { opacity: 1; }
+.toast.show{opacity:1}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .55s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── INTERVIEW PAGE ── */
-.interview-page { padding: 16px; }
-.section-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+/* ── INTERVIEW ── */
+.inner-page{padding:16px}
+.page-heading{font-size:16px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+.case-picker{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;scrollbar-width:none}
+.case-picker::-webkit-scrollbar{display:none}
+.case-chip{
+  flex:0 0 auto;background:var(--white);
+  border:1px solid var(--border2);border-radius:20px;
+  padding:6px 13px;font-size:12px;font-weight:500;
+  cursor:pointer;white-space:nowrap;color:var(--text2);
+}
+.case-chip.selected{background:var(--blue);border-color:var(--blue);color:#fff}
 
-.case-picker {
-  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
-  scrollbar-width: none;
-}
-.case-picker::-webkit-scrollbar { display: none; }
-.case-chip {
-  flex: 0 0 auto;
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 6px 14px;
-  font-size: 12px; cursor: pointer; white-space: nowrap;
-  transition: all 0.2s;
-}
-.case-chip.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+.iv-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.iv-q{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.pill-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.opt-pill{background:var(--bg);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;font-weight:500}
+.opt-pill.selected{background:var(--blue);border-color:var(--blue);color:#fff}
 
-.interview-card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-}
-.interview-q { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-.interview-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.option-pill {
-  background: var(--surface2); border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 5px 12px;
-  font-size: 12px; cursor: pointer; transition: all 0.15s;
-}
-.option-pill.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-/* ── REPORT PAGE ── */
-.report-page { padding: 16px; }
-.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.stat-card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 14px;
-  text-align: center;
-}
-.stat-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 28px; font-weight: 700; color: var(--accent);
-}
-.stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
-
-.chart-card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
-}
-.chart-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
-
-.bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.bar-label { font-size: 11px; width: 70px; text-align: right; color: var(--text-muted); flex-shrink: 0; }
-.bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 16px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.8s ease; }
-.bar-val { font-size: 11px; font-family: 'Space Mono', monospace; width: 20px; }
-
-.word-cloud { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; }
-.word-pill {
-  background: var(--accent-light); color: var(--accent);
-  border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 500;
-  cursor: default;
-}
-.word-pill.lg { font-size: 15px; padding: 5px 13px; }
-.word-pill.sm { font-size: 10px; padding: 3px 8px; opacity: 0.7; }
-
-.report-notes { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px; }
-.report-note-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
-.note-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-.note-text-edit { flex: 1; background: transparent; border: none; font-size: 12px; font-family: 'Noto Sans TC', sans-serif; resize: none; color: var(--text); outline: none; min-height: 36px; }
+/* ── REPORT ── */
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-size:28px;font-weight:700;font-family:'Inter',monospace;color:var(--blue)}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px;font-weight:500}
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.chart-ttl{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-lbl{font-size:11px;width:90px;text-align:right;color:var(--text2);flex-shrink:0;line-height:1.3}
+.bar-track{flex:1;background:var(--bg);border-radius:4px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--blue);transition:width .7s ease}
+.bar-val{font-size:11px;font-family:'Inter',monospace;color:var(--text2);width:20px}
+.word-cloud{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
+.word-pill{background:var(--blue-bg);color:var(--blue);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600}
+.word-pill.lg{font-size:15px;padding:5px 13px}
+.word-pill.sm{font-size:10px;padding:3px 8px;opacity:.65}
+.report-notes{background:var(--bg);border-radius:var(--radius);padding:10px}
+.note-item{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.note-idx{font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px;font-family:'Inter',monospace}
+.note-edit{flex:1;background:transparent;border:none;font-size:12px;font-family:inherit;resize:none;color:var(--text);outline:none;min-height:32px}
 
 /* ── SETTINGS ── */
-.settings-page { padding: 16px; }
-.settings-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
-.settings-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px; border-bottom: 1px solid var(--border);
-}
-.settings-row:last-child { border-bottom: none; }
-.settings-label { font-size: 14px; font-weight: 500; }
-.settings-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.settings-block{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-lbl{font-size:13px;font-weight:600;color:var(--text)}
+.settings-desc{font-size:11px;color:var(--text2);margin-top:2px}
+.toggle{position:relative;width:42px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.tg-slider{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .2s}
+.tg-slider::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked+.tg-slider{background:var(--blue)}
+.toggle input:checked+.tg-slider::after{transform:translateX(18px)}
+.info-box{background:var(--bg);border-radius:var(--radius);padding:10px 12px;font-size:11px;color:var(--text2);line-height:1.85;margin:0 12px 12px}
+.info-box b{color:var(--text);font-weight:600}
 
-.toggle { position: relative; width: 44px; height: 26px; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; inset: 0;
-  background: var(--border); border-radius: 13px; cursor: pointer;
-  transition: background 0.2s;
-}
-.toggle-slider::after {
-  content: ''; position: absolute;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: #fff; top: 3px; left: 3px;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-.toggle input:checked + .toggle-slider { background: var(--accent); }
-.toggle input:checked + .toggle-slider::after { transform: translateX(18px); }
-
-/* ── MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: var(--surface); border-radius: var(--radius) var(--radius) 0 0;
-  width: 100%; max-width: 480px;
-  max-height: 80vh; overflow-y: auto;
-  padding: 20px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
-}
-.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; }
-.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
-
-/* ── STATUS BADGE ── */
-.status-badge {
-  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
-}
-
-/* ── LOADING SPINNER ── */
-.spinner {
-  display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.4);
-  border-top-color: #fff; border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media (min-width: 600px) {
-  .col { flex: 0 0 300px; }
-  .report-grid { grid-template-columns: repeat(3, 1fr); }
+@media(min-width:600px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .col{flex:0 0 282px}
 }
 </style>
 </head>
@@ -389,164 +356,130 @@ body {
 
 <!-- TOP BAR -->
 <div class="topbar">
+  <div class="topbar-logo"><span>⚙</span> 小家電維修所</div>
+  <div class="topbar-divider"></div>
   <div>
-    <div class="topbar-title">🔧 小家電維修所</div>
-    <div class="topbar-subtitle" id="activityDate">載入中...</div>
+    <div class="topbar-title" id="activityDate">載入中...</div>
   </div>
-  <div class="topbar-right">
-    <button class="sync-btn" onclick="syncFromSheet()">
-      <span id="syncIcon">↺</span> 同步
-    </button>
-  </div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-stats" id="topStats"></div>
+  <button class="sync-btn" onclick="syncFromSheet()">
+    <span id="syncIcon">↺</span> 同步
+  </button>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div class="main-content">
 
-  <!-- ── PAGE: 登記 ── -->
+  <!-- 登記頁 -->
   <div class="page active" id="page-register">
-    <div class="kanban-scroll" id="kanbanScroll">
-      <!-- Columns generated by JS -->
-    </div>
+    <div class="kanban-scroll" id="kanbanScroll"></div>
   </div>
 
-  <!-- ── PAGE: 訪問 ── -->
+  <!-- 訪問頁 -->
   <div class="page" id="page-interview">
-    <div class="interview-page">
-      <div class="section-title">訪問記錄</div>
-      <div class="section-title" style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0">選擇送修者</div>
+    <div class="inner-page">
+      <div class="page-heading">訪問記錄</div>
+      <div class="page-sub">選擇已報到的送修者進行訪問</div>
       <div class="case-picker" id="casePicker"></div>
-      <div id="interviewForm">
-        <div class="interview-card">
-          <div class="interview-q">📣 怎麼知道這個活動？</div>
-          <div class="interview-options" id="opts-q1">
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">Facebook</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">朋友介紹</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">里辦公室</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">傳單</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">Line群組</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">回頭客</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q1')">其他</div>
-          </div>
-          <textarea class="form-textarea" placeholder="補充說明..." id="q1-note" rows="2"></textarea>
+      <div class="iv-card">
+        <div class="iv-q">📣 怎麼知道這個活動？</div>
+        <div class="pill-group" id="opts-q1">
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">Facebook</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">朋友介紹</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">里辦公室</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">傳單</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">Line群組</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">回頭客</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">其他</div>
         </div>
-        <div class="interview-card">
-          <div class="interview-q">💡 對於這個活動有什麼建議？</div>
-          <div class="interview-options" id="opts-q2">
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">場地更好</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">增加品項</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">更多場次</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">提早通知</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">加強宣傳</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">非常滿意</div>
-            <div class="option-pill" onclick="toggleOpt(this,'q2')">其他</div>
-          </div>
-          <textarea class="form-textarea" placeholder="詳細建議..." id="q2-note" rows="2"></textarea>
-        </div>
-        <div class="interview-card">
-          <div class="interview-q">⭐ 整體滿意度</div>
-          <div class="interview-options" id="opts-q3">
-            <div class="option-pill" onclick="setRating(1)">😞 1</div>
-            <div class="option-pill" onclick="setRating(2)">😐 2</div>
-            <div class="option-pill" onclick="setRating(3)">🙂 3</div>
-            <div class="option-pill" onclick="setRating(4)">😊 4</div>
-            <div class="option-pill" onclick="setRating(5)">🤩 5</div>
-          </div>
-        </div>
-        <button class="btn-action btn-done" style="width:100%;margin-top:8px" onclick="saveInterview()">
-          ✓ 儲存訪問記錄
-        </button>
+        <textarea class="form-textarea" placeholder="補充說明..." id="q1-note" rows="2" style="font-size:12px"></textarea>
       </div>
+      <div class="iv-card">
+        <div class="iv-q">💡 對活動有什麼建議？</div>
+        <div class="pill-group" id="opts-q2">
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">場地更好</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">增加品項</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">更多場次</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">提早通知</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">加強宣傳</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">非常滿意</div>
+          <div class="opt-pill" onclick="this.classList.toggle('selected')">其他</div>
+        </div>
+        <textarea class="form-textarea" placeholder="詳細建議..." id="q2-note" rows="2" style="font-size:12px"></textarea>
+      </div>
+      <div class="iv-card">
+        <div class="iv-q">⭐ 整體滿意度</div>
+        <div class="pill-group" id="opts-q3">
+          <div class="opt-pill" onclick="setRating(1)">😞 1</div>
+          <div class="opt-pill" onclick="setRating(2)">😐 2</div>
+          <div class="opt-pill" onclick="setRating(3)">🙂 3</div>
+          <div class="opt-pill" onclick="setRating(4)">😊 4</div>
+          <div class="opt-pill" onclick="setRating(5)">🤩 5</div>
+        </div>
+      </div>
+      <button onclick="saveInterview()" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:2px">
+        ✓ 儲存訪問記錄
+      </button>
     </div>
   </div>
 
-  <!-- ── PAGE: 報告 ── -->
+  <!-- 報告頁 -->
   <div class="page" id="page-report">
-    <div class="report-page">
-      <div class="section-title">活動成果報告</div>
-      <div class="report-grid" id="reportStats"></div>
+    <div class="inner-page">
+      <div class="page-heading">活動成果報告</div>
+      <div class="page-sub" id="reportDate"></div>
+      <div class="stat-grid" id="reportStats"></div>
+      <div class="chart-card"><div class="chart-ttl">🔧 維修品項分布</div><div id="repairChart"></div></div>
+      <div class="chart-card"><div class="chart-ttl">✅ 維修結果比例</div><div id="resultChart"></div></div>
+      <div class="chart-card"><div class="chart-ttl">💬 訪問關鍵字</div><div class="word-cloud" id="wordCloud"></div></div>
       <div class="chart-card">
-        <div class="chart-title">🔧 維修品項分布</div>
-        <div id="repairChart"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">✅ 維修結果比例</div>
-        <div id="resultChart"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">💬 訪問關鍵字</div>
-        <div class="word-cloud" id="wordCloud"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">📝 訪問節錄 <span style="font-weight:400;font-size:11px;color:var(--text-muted)">(可編輯)</span></div>
+        <div class="chart-ttl">📝 訪問節錄 <span style="font-weight:400;font-size:11px;color:var(--text2)">(可編輯)</span></div>
         <div class="report-notes" id="reportNotes"></div>
       </div>
     </div>
   </div>
 
-  <!-- ── PAGE: 設定 ── -->
+  <!-- 設定頁 -->
   <div class="page" id="page-settings">
-    <div class="settings-page">
-      <div class="section-title">功能設定</div>
-      <div class="settings-card">
+    <div class="inner-page">
+      <div class="page-heading">設定</div>
+      <div class="page-sub">功能與連線設定</div>
+      <div class="settings-block">
         <div class="settings-row">
-          <div>
-            <div class="settings-label">訪問功能</div>
-            <div class="settings-desc">啟用志工訪問記錄頁面</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-interview" onchange="toggleTab('interview',this.checked)" checked>
-            <span class="toggle-slider"></span>
-          </label>
+          <div><div class="settings-lbl">訪問功能</div><div class="settings-desc">啟用志工訪問記錄頁面</div></div>
+          <label class="toggle"><input type="checkbox" id="toggle-interview" onchange="toggleTab('interview',this.checked)" checked><span class="tg-slider"></span></label>
         </div>
         <div class="settings-row">
-          <div>
-            <div class="settings-label">報告功能</div>
-            <div class="settings-desc">啟用活動成果報告頁面</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="toggle-report" onchange="toggleTab('report',this.checked)" checked>
-            <span class="toggle-slider"></span>
-          </label>
+          <div><div class="settings-lbl">報告功能</div><div class="settings-desc">啟用活動成果報告頁面</div></div>
+          <label class="toggle"><input type="checkbox" id="toggle-report" onchange="toggleTab('report',this.checked)" checked><span class="tg-slider"></span></label>
         </div>
       </div>
-      <div class="settings-card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Google Sheet 連線設定</div>
-            <div class="settings-desc">Apps Script Web App 發布 URL（需允許匿名存取）</div>
-          </div>
-        </div>
+      <div class="settings-block">
+        <div class="settings-row"><div><div class="settings-lbl">Google Sheet 連線</div><div class="settings-desc">Apps Script Web App URL</div></div></div>
         <div style="padding:0 12px 12px">
-          <input class="form-input" id="sheetUrl" type="url" value="https://script.google.com/macros/s/AKfycby7VyDxyJq232guTyj7_HiKaQDg7wlVkqbG0jb4TYl6VIhgu2__ZSbQLFks5K3KIaCn/exec" placeholder="https://script.google.com/macros/s/...">
-          <div style="margin-top:8px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text-muted);line-height:1.7">
-            <b style="color:var(--text)">同步說明：</b><br>
-            📥 <b>讀取</b>：點右上角「↺ 同步」，從 Sheet list 分頁拉取所有掛號資料<br>
-            📤 <b>寫入</b>：每次修改卡片欄位，自動以 JSONP 更新 Sheet（CORS 免設定）<br>
-            🔑 <b>對應欄位</b>：編號↔id、品牌↔brand、型號↔model、維修結果↔result、維修結果說明↔notes、零件費↔cost<br>
-            ⚠ Sheet 的「分類（status）」欄也會隨卡片狀態同步更新
+          <input class="form-input" id="sheetUrl" type="url" value="https://script.google.com/macros/s/AKfycby7VyDxyJq232guTyj7_HiKaQDg7wlVkqbG0jb4TYl6VIhgu2__ZSbQLFks5K3KIaCn/exec" style="font-size:12px">
+          <div class="info-box" style="margin:8px 0 0">
+            <b>list 分頁欄位對應</b><br>
+            D＝編號 ｜ F＝送修者 ｜ G＝電話 ｜ H＝電話後3碼<br>
+            M＝家電名稱 ｜ C＝分類（Kanban狀態）<br>
+            S＝維修結果 ｜ T＝維修結果說明 ｜ X＝零件費
           </div>
           <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn-action btn-start" style="flex:1" onclick="saveSettings()">💾 儲存設定</button>
-            <button class="btn-action" style="flex:1;background:var(--blue);color:#fff" onclick="syncFromSheet()">↺ 立即同步</button>
+            <button onclick="saveSettings()" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 儲存</button>
+            <button onclick="syncFromSheet()" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius);padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">↺ 立即同步</button>
           </div>
-          <div id="lastSyncInfo" style="margin-top:8px;font-size:11px;color:var(--text-muted);text-align:center"></div>
+          <div id="lastSyncInfo" style="margin-top:8px;font-size:11px;color:var(--text2);text-align:center"></div>
         </div>
       </div>
-      <div class="settings-card">
+      <div class="settings-block">
         <div class="settings-row">
-          <div>
-            <div class="settings-label">新增測試資料</div>
-            <div class="settings-desc">載入示範卡片以便測試</div>
-          </div>
-          <button class="btn-action btn-transfer" style="width:auto;padding:6px 14px" onclick="loadDemo()">載入</button>
+          <div><div class="settings-lbl">載入示範資料</div><div class="settings-desc">測試用，不影響 Sheet</div></div>
+          <button onclick="loadDemo()" style="background:var(--purple-bg);color:var(--purple);border:none;border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">載入</button>
         </div>
         <div class="settings-row">
-          <div>
-            <div class="settings-label">清除所有資料</div>
-            <div class="settings-desc">重置本地所有卡片資料</div>
-          </div>
-          <button class="btn-action" style="width:auto;padding:6px 14px;background:var(--red);color:#fff" onclick="clearData()">清除</button>
+          <div><div class="settings-lbl">清除本地資料</div><div class="settings-desc">重置所有卡片（不影響 Sheet）</div></div>
+          <button onclick="clearData()" style="background:var(--red-bg);color:var(--red);border:none;border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">清除</button>
         </div>
       </div>
     </div>
@@ -555,898 +488,549 @@ body {
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="bottom-nav" id="bottomNav">
-  <button class="nav-item active" onclick="switchPage('register',this)" data-page="register">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-    </svg>
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchPage('register',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <span class="nav-label">登記</span>
   </button>
-  <button class="nav-item" onclick="switchPage('interview',this)" data-page="interview" id="nav-interview">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
+  <button class="nav-item" onclick="switchPage('interview',this)" id="nav-interview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <span class="nav-label">訪問</span>
   </button>
-  <button class="nav-item" onclick="switchPage('report',this)" data-page="report" id="nav-report">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-      <line x1="6" y1="20" x2="6" y2="14"/>
-    </svg>
+  <button class="nav-item" onclick="switchPage('report',this)" id="nav-report">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span class="nav-label">報告</span>
   </button>
-  <button class="nav-item" onclick="switchPage('settings',this)" data-page="settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
+  <button class="nav-item" onclick="switchPage('settings',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span class="nav-label">設定</span>
   </button>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════
-//  DATA & STATE
-// ════════════════════════════════════════════
-const SHEET_URL_KEY = 'repairSheetUrl';
-const DATA_KEY = 'repairCards';
-const INTERVIEW_KEY = 'repairInterviews';
-const SETTINGS_KEY = 'repairSettings';
+// ═══ CONSTANTS ═══
+const SHEET_URL_KEY='repairSheetUrl', DATA_KEY='repairCards', INTERVIEW_KEY='repairInterviews', SETTINGS_KEY='repairSettings';
 
-const COLUMNS = [
-  { id: 'pending',   label: '未報到',       cls: 'col-pending' },
-  { id: 'arrived',   label: '等待維修',      cls: 'col-arrived' },
-  { id: 'repairing', label: '維修中',        cls: 'col-repairing' },
-  { id: 'ready',     label: '待領取',        cls: 'col-ready' },
-  { id: 'done',      label: '已領取',        cls: 'col-done' },
-  { id: 'transfer',  label: '轉診/待確認',   cls: 'col-transfer' },
+const K2S={pending:'未報到',arrived:'已報到',repairing:'維修中',ready:'待領取',done:'已取件',transfer:'轉診'};
+const S2K={'未報到':'pending','已報到':'arrived','維修中':'repairing','待領取':'ready','已取件':'done','取消&無送修':'transfer','轉診':'transfer'};
+
+const COL_COLORS={pending:'var(--col-pending)',arrived:'var(--col-arrived)',repairing:'var(--col-repairing)',ready:'var(--col-ready)',done:'var(--col-done)',transfer:'var(--col-transfer)'};
+
+const COLUMNS=[
+  {id:'pending',   label:'未報到',     color:'var(--col-pending)'},
+  {id:'arrived',   label:'等待維修',    color:'var(--col-arrived)'},
+  {id:'repairing', label:'維修中',      color:'var(--col-repairing)'},
+  {id:'ready',     label:'待領取',      color:'var(--col-ready)'},
+  {id:'done',      label:'已領取',      color:'var(--col-done)'},
+  {id:'transfer',  label:'轉診/待確認', color:'var(--col-transfer)'},
 ];
 
-const ACCESSORY_OPTIONS = ['電源線','說明書','遙控器','濾網','刀頭','配件盒','其他'];
-const ITEM_TAG_OPTIONS = ['取消','電話已通知','未連繫上'];
-
-// Default dropdown data (will be overridden by Sheet)
-let DROPDOWN = {
-  brands: ['NATIONAL','PANASONIC','SHARP','TOSHIBA','HITACHI','SANYO','SAMPO','TATUNG','PHILIPS','TIGER','ZOJIRUSHI','其他'],
-  bigCat: ['廚房小家電','清潔家電','美容家電','辦公室電器','電子產品','其他'],
-  items: {
-    '廚房小家電': ['電鍋','果汁機','烤箱','微波爐','咖啡機','電熱水壺','電磁爐','其他'],
-    '清潔家電': ['吸塵器','電風扇','除濕機','空氣清淨機','其他'],
-    '美容家電': ['吹風機','電熨斗','電捲棒','其他'],
-    '辦公室電器': ['桌上型電腦','筆電','印表機','其他'],
-    '電子產品': ['音響','電視','收音機','其他'],
-    '其他': ['其他'],
-  },
-  subItems: {
-    '電鍋': ['電子鍋','電飯鍋','壓力鍋'],
-    '果汁機': ['果汁機','調理機','榨汁機'],
-    '其他': ['其他'],
-  },
-  repairResult: ['成功修復','部分修復','無法修復','轉診','Pending'],
-  repairResultDesc: {
-    '成功修復': ['零件老化','接觸不良','清潔後正常','更換零件'],
-    '部分修復': ['功能部分恢復','暫時處理'],
-    '無法修復': ['零件停產','損壞嚴重','超出維修範圍'],
-    '轉診': ['需專業廠商','需特殊工具'],
-    'Pending': ['待確認','待零件'],
-  },
+const ACCESSORIES=['電源線','說明書','遙控器','濾網','刀頭','配件盒','其他'];
+const PENDING_TAGS=['取消','電話已通知','未連繫上'];
+const DROPDOWN={
+  bigCat:['廚房家電','生活家電','美容美體家電','照明用具','影視娛樂','兒童玩具','其他'],
+  items:{'廚房家電':['加熱鍋具','電鍋','果汁機/調理機','咖啡機','烤箱','電熱水壺','其他'],'生活家電':['電風扇','除濕機','空氣清淨機','電暖器','其他'],'美容美體家電':['吹風機','電熨斗','電捲棒','電動刮鬍刀','其他'],'照明用具':['檯燈','露營燈','其他'],'影視娛樂':['收音機/錄音機','有線喇叭','其他'],'兒童玩具':['車類玩具','其他'],'其他':['其他']},
+  repairResult:['OK_成功','NO_失敗','未送修','Pending'],
+  repairResultDesc:{'OK_成功':['OK 無更換零件: 清潔/重新組裝或固定','OK 更換零件','OK 沒有解釋說明'],'NO_失敗':['No 沒有零件','No 無法判別故障原因','No 其他'],'未送修':['取消送修','客人未到'],'Pending':['待確認','待零件']}
 };
 
-let cards = [];
-let interviews = {};
-let settings = { showInterview: true, showReport: true };
-let currentInterviewId = null;
-let timerInterval = null;
+let cards=[], interviews={}, settings={showInterview:true,showReport:true};
+let currentInterviewId=null, timerInterval=null, currentRating=0;
 
-// ── INIT ──
-function init() {
-  loadSettings();
-  loadLocalData();
-  document.getElementById('activityDate').textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
-  renderKanban();
-  renderCasePicker();
-  updateReport();
-  applySettings();
+// ═══ INIT ═══
+function init(){
+  try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=JSON.parse(s);}catch(e){}
+  try{const d=localStorage.getItem(DATA_KEY);if(d)cards=JSON.parse(d);}catch(e){}
+  try{const v=localStorage.getItem(INTERVIEW_KEY);if(v)interviews=JSON.parse(v);}catch(e){}
+  const su=localStorage.getItem(SHEET_URL_KEY);
+  if(su)document.getElementById('sheetUrl').value=su;
+  document.getElementById('toggle-interview').checked=settings.showInterview!==false;
+  document.getElementById('toggle-report').checked=settings.showReport!==false;
+  document.getElementById('activityDate').textContent=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('reportDate').textContent=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
+  renderKanban(); renderCasePicker(); updateReport(); applySettings();
 }
 
-function loadSettings() {
-  const s = localStorage.getItem(SETTINGS_KEY);
-  if (s) settings = JSON.parse(s);
-  const url = localStorage.getItem(SHEET_URL_KEY);
-  if (url) document.getElementById('sheetUrl').value = url;
-}
-
-function loadLocalData() {
-  const d = localStorage.getItem(DATA_KEY);
-  if (d) cards = JSON.parse(d);
-  const iv = localStorage.getItem(INTERVIEW_KEY);
-  if (iv) interviews = JSON.parse(iv);
-}
-
-function saveLocalData() {
-  localStorage.setItem(DATA_KEY, JSON.stringify(cards));
-}
-
-function saveInterviews() {
-  localStorage.setItem(INTERVIEW_KEY, JSON.stringify(interviews));
-}
-
-// ════════════════════════════════════════════
-//  GOOGLE SHEET SYNC
-//  讀取：JSONP (action=get)  → 回傳 { data: [...] }
-//  寫入：JSONP (action=update) → GET 參數帶欄位
-//  欄位對應 (Apps Script ↔ HTML card):
-//    id     → card.id      (編號)
-//    name   → card.name    (送修者)
-//    phone  → card.phone   (電話後3碼)
-//    item   → card.itemName (End of 產品)
-//    brand  → card.brand   (品牌)
-//    model  → card.model   (型號)
-//    status → card.status  (分類)
-//    result → card.repairResult  (維修結果)
-//    notes  → card.repairResultDesc (維修結果說明)
-//    cost   → card.partCost (零件費)
-// ════════════════════════════════════════════
-
-let _jsonpCounter = 0;
-
-/**
- * JSONP helper – script tag 注入，繞過 Apps Script CORS 限制
- * 回傳 Promise<data>，timeout 10 秒
- */
-function jsonpRequest(url) {
-  return new Promise((resolve, reject) => {
-    const cbName = '_gs_cb_' + (++_jsonpCounter);
-    const timeout = setTimeout(() => {
-      delete window[cbName];
-      document.getElementById('js-' + cbName)?.remove();
-      reject(new Error('timeout'));
-    }, 10000);
-
-    window[cbName] = function(data) {
-      clearTimeout(timeout);
-      delete window[cbName];
-      document.getElementById('js-' + cbName)?.remove();
-      resolve(data);
-    };
-
-    const sep = url.includes('?') ? '&' : '?';
-    const script = document.createElement('script');
-    script.id = 'js-' + cbName;
-    script.src = url + sep + 'callback=' + cbName;
-    script.onerror = () => {
-      clearTimeout(timeout);
-      delete window[cbName];
-      script.remove();
-      reject(new Error('script load error'));
-    };
-    document.head.appendChild(script);
+// ═══ JSONP ═══
+let _ci=0;
+function jsonpReq(url){
+  return new Promise((res,rej)=>{
+    const cb='_cb'+(++_ci);
+    const tid=setTimeout(()=>{delete window[cb];document.getElementById('_sc'+cb)?.remove();rej(new Error('timeout'));},12000);
+    window[cb]=function(d){clearTimeout(tid);delete window[cb];document.getElementById('_sc'+cb)?.remove();res(d);};
+    const sc=document.createElement('script');
+    sc.id='_sc'+cb;
+    sc.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    sc.onerror=()=>{clearTimeout(tid);delete window[cb];sc.remove();rej(new Error('load error'));};
+    document.head.appendChild(sc);
   });
 }
 
-/**
- * 從 Google Sheet 同步：讀取 list 工作表所有資料
- * Apps Script doGet: action=get → { data: [ {id,name,phone,item,brand,model,status,result,notes,cost,co2} ] }
- */
-async function syncFromSheet() {
-  const url = document.getElementById('sheetUrl').value.trim();
-  if (!url) { showToast('請先設定 Google Sheet URL'); return; }
-  const icon = document.getElementById('syncIcon');
-  icon.innerHTML = '<span class="spinner"></span>';
-  try {
-    const res = await jsonpRequest(url + '?action=get');
-    // Apps Script 回傳格式：{ data: [...] }
-    if (res && Array.isArray(res.data)) {
-      mergeSheetData(res.data);
-      renderKanban();
-      renderCasePicker();
-      updateReport();
-      showToast('✓ 已從 Google Sheet 同步 (' + res.data.length + ' 筆)');
-      updateLastSyncInfo(true, res.data.length);
-    } else {
-      showToast('⚠ 資料格式錯誤，請確認 Apps Script');
-      updateLastSyncInfo(false, 0);
-    }
-  } catch(e) {
-    showToast('⚠ 無法連線：' + e.message);
-    updateLastSyncInfo(false, 0);
-  }
-  icon.textContent = '↺';
+// ═══ SYNC ═══
+async function syncFromSheet(){
+  const url=document.getElementById('sheetUrl').value.trim();
+  if(!url){showToast('請先設定 Google Sheet URL');return;}
+  const icon=document.getElementById('syncIcon');
+  icon.innerHTML='<span class="spinner"></span>';
+  try{
+    const r=await jsonpReq(url+'?action=get');
+    if(r&&Array.isArray(r.data)){
+      mergeSheetData(r.data);
+      renderKanban();renderCasePicker();updateReport();
+      showToast('✓ 同步完成，共 '+r.data.length+' 筆');
+      setLastSync(true,r.data.length);
+    }else{showToast('⚠ 資料格式錯誤');setLastSync(false,0);}
+  }catch(e){showToast('⚠ 連線失敗：'+e.message);setLastSync(false,0);}
+  icon.textContent='↺';
 }
 
-/**
- * 合併 Sheet 資料進本地 cards
- * Sheet 欄位 → card 欄位對應：
- *   id     → id
- *   name   → name  (送修者姓名)
- *   phone  → phone
- *   item   → itemName (End of 產品，顯示用品項名)
- *   brand  → brand
- *   model  → model
- *   status → 忽略（若本地已有狀態則保留本地；新進來的預設 pending）
- *   result → repairResult
- *   notes  → repairResultDesc
- *   cost   → partCost
- */
-function mergeSheetData(rows) {
-  rows.forEach(sheetRow => {
-    const sheetId = String(sheetRow.id);
-    const existing = cards.find(c => String(c.id) === sheetId);
-    if (existing) {
-      // 只用 Sheet 更新基本資料，不覆蓋本地 Kanban 狀態（status 由 HTML 掌控）
-      existing.name   = sheetRow.name   || existing.name;
-      existing.phone  = String(sheetRow.phone || existing.phone || '');
-      existing.itemName = sheetRow.item || existing.itemName;
-      existing.brand  = sheetRow.brand  || existing.brand;
-      existing.model  = sheetRow.model  || existing.model;
-      // 只有當本地尚未有維修結果時，才從 Sheet 帶入
-      if (!existing.repairResult && sheetRow.result) existing.repairResult = sheetRow.result;
-      if (!existing.repairResultDesc && sheetRow.notes) existing.repairResultDesc = sheetRow.notes;
-      if (!existing.partCost && sheetRow.cost) existing.partCost = sheetRow.cost;
-    } else {
-      // 新卡片：從 Sheet 建立，狀態預設 pending
-      cards.push({
-        id:            sheetId,
-        status:        'pending',
-        name:          sheetRow.name  || '',
-        phone:         String(sheetRow.phone || ''),
-        itemName:      sheetRow.item  || '',
-        endOfProduct:  sheetRow.item  || '',   // item = End of 產品（唯讀）
-        brand:         sheetRow.brand || '',
-        model:         sheetRow.model || '',
-        repairResult:  sheetRow.result || '',
-        repairResultDesc: sheetRow.notes || '',
-        partCost:      sheetRow.cost  || '',
-        tags: [], accessories: [],
-        notes: '', extraNote: '', bigCat: '', item: '',
-        subItem: '', itemNote: '', opened: '',
-        regNum: '', repairNote: '', repairman: '',
-      });
+function mergeSheetData(rows){
+  rows.forEach(row=>{
+    const sid=String(row.id||'').trim();if(!sid)return;
+    const ex=cards.find(c=>String(c.id)===sid);
+    if(ex){
+      if(row.name)ex.name=row.name;
+      if(row.phone)ex.phone=String(row.phone);
+      if(row.phoneLast3)ex.phoneLast3=String(row.phoneLast3);
+      if(row.itemName)ex.itemName=row.itemName;
+      if(row.endOfProduct)ex.endOfProduct=row.endOfProduct;
+      if(row.bigCat)ex.bigCat=row.bigCat;
+      if(row.item)ex.item=row.item;
+      if(row.subItem)ex.subItem=row.subItem;
+      if(row.itemNote)ex.itemNote=row.itemNote;
+      if(row.brand)ex.brand=row.brand;
+      if(row.model)ex.model=row.model;
+      if(row.faultNote)ex.faultNote=row.faultNote;
+      if(row.extraNote)ex.extraNote=row.extraNote;
+      if(!ex.repairResult&&row.repairResult)ex.repairResult=row.repairResult;
+      if(!ex.repairResultDesc&&row.repairResultDesc)ex.repairResultDesc=row.repairResultDesc;
+      if(!ex.repairSituation&&row.repairSituation)ex.repairSituation=row.repairSituation;
+      if(!ex.repairman&&row.repairman)ex.repairman=row.repairman;
+      if(!ex.partCost&&row.partCost)ex.partCost=row.partCost;
+      if(ex.status==='pending'&&row.status)ex.status=row.status;
+    }else{
+      cards.push({id:sid,name:row.name||'',phone:String(row.phone||''),phoneLast3:String(row.phoneLast3||''),itemName:row.itemName||'',endOfProduct:row.endOfProduct||'',bigCat:row.bigCat||'',item:row.item||'',subItem:row.subItem||'',itemNote:row.itemNote||'',brand:row.brand||'',model:row.model||'',faultNote:row.faultNote||'',extraNote:row.extraNote||'',repairResult:row.repairResult||'',repairResultDesc:row.repairResultDesc||'',repairSituation:row.repairSituation||'',repairman:row.repairman||'',partCost:row.partCost||'',status:row.status||'pending',tags:[],accessories:[],notifyTags:[],regNum:'',arrivedAt:null,repairStart:null,repairEnd:null});
     }
   });
-  saveLocalData();
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
 }
 
-/**
- * 寫回 Google Sheet – 使用 JSONP GET（action=update）
- * Apps Script updateRow() 支援的欄位：
- *   id, status, brand, model, result, notes, cost
- * 注意：Apps Script 中 notes = 維修結果說明（文字欄）
- */
-function pushToSheet(card) {
-  const url = document.getElementById('sheetUrl').value.trim();
-  if (!url || !card.id) return;
-
-  // 對應到 Apps Script updateRow 接受的 param 名稱
-  const params = new URLSearchParams({
-    action: 'update',
-    id:     String(card.id),
-    status: card.status      || '',
-    brand:  card.brand       || '',
-    model:  card.model       || '',
-    result: card.repairResult || '',
-    notes:  card.repairResultDesc || '',  // Apps Script: notes = 維修結果說明
-    cost:   card.partCost    || '',
-  });
-
-  jsonpRequest(url + '?' + params.toString())
-    .then(res => {
-      if (res && res.result === 'success') {
-        showToast('✓ 已更新至 Google Sheet');
-      } else if (res && res.result === 'not_found') {
-        showToast('⚠ Sheet 找不到編號 ' + card.id);
-      }
-    })
-    .catch(() => {
-      showToast('⚠ 同步失敗，資料已暫存本地');
-    });
+function pushToSheet(card){
+  const url=document.getElementById('sheetUrl').value.trim();
+  if(!url||!card.id)return;
+  const p=new URLSearchParams({action:'update',id:String(card.id),status:K2S[card.status]||card.status||'',bigCat:card.bigCat||'',item:card.item||'',subItem:card.subItem||'',itemNote:card.itemNote||'',brand:card.brand||'',model:card.model||'',repairResult:card.repairResult||'',repairResultDesc:card.repairResultDesc||'',repairSituation:card.repairSituation||'',repairman:card.repairman||'',extraNote:card.extraNote||'',partCost:card.partCost||''});
+  jsonpReq(url+'?'+p.toString())
+    .then(r=>{if(r&&r.result==='success')showToast('✓ 已更新至 Google Sheet');else if(r&&r.result==='not_found')showToast('⚠ Sheet 找不到編號 '+card.id);})
+    .catch(()=>showToast('⚠ 同步失敗，已暫存本地'));
 }
 
-// ════════════════════════════════════════════
-//  KANBAN RENDER
-// ════════════════════════════════════════════
-function renderKanban() {
-  const scroll = document.getElementById('kanbanScroll');
-  scroll.innerHTML = '';
-  COLUMNS.forEach(col => {
-    const colCards = cards.filter(c => c.status === col.id);
-    const el = document.createElement('div');
-    el.className = `col ${col.cls}`;
-    el.id = 'col-' + col.id;
-    el.innerHTML = `
-      <div class="col-header">
-        <div class="col-title">
-          <div class="col-dot"></div>
-          <span>${col.label}</span>
-        </div>
-        <span class="col-count" id="cnt-${col.id}">${colCards.length}</span>
-      </div>
-      <div class="col-body" id="body-${col.id}">
-        ${colCards.map(c => renderCard(c, col.id)).join('')}
-        ${col.id === 'pending' ? `<button class="btn-action" style="background:var(--surface2);color:var(--text);margin-top:4px" onclick="openAddCard()">+ 新增掛號</button>` : ''}
-      </div>
-    `;
+function setLastSync(ok,n){
+  const el=document.getElementById('lastSyncInfo');if(!el)return;
+  const t=new Date().toLocaleTimeString('zh-TW');
+  el.textContent=ok?'✓ 上次同步：'+t+'，共 '+n+' 筆':'⚠ 同步失敗 '+t;
+  el.style.color=ok?'var(--green)':'var(--red)';
+}
+
+// ═══ RENDER KANBAN ═══
+function renderKanban(){
+  const scroll=document.getElementById('kanbanScroll');
+  scroll.innerHTML='';
+  COLUMNS.forEach(col=>{
+    const cc=cards.filter(c=>c.status===col.id);
+    const el=document.createElement('div');
+    el.className='col';el.id='col-'+col.id;
+    el.innerHTML=
+      '<div class="col-header" style="background:'+col.color+'15;border-bottom:2px solid '+col.color+'">'+
+        '<div class="col-accent-bar" style="background:'+col.color+'"></div>'+
+        '<span class="col-label" style="color:'+col.color+'">'+col.label+'</span>'+
+        '<span class="col-badge">'+cc.length+'</span>'+
+      '</div>'+
+      '<div class="col-body" id="body-'+col.id+'">'+
+        cc.map(c=>buildCard(c,col.id)).join('')+
+        (col.id==='pending'?'<button class="add-card-btn" onclick="openAddCard()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新增掛號</button>':'')+
+      '</div>';
     scroll.appendChild(el);
   });
+  updateTopStats();
   startTimers();
 }
 
-function renderCard(c, colId) {
-  const tagHtml = (tags) => (tags||[]).map(t => {
-    const cls = t==='取消'?'tag-cancel':t==='電話已通知'?'tag-called':'tag-no-ans';
-    return `<span class="tag ${cls}">${t}</span>`;
+function buildCard(c,colId){
+  const e=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const numLabel=c.regNum||c.id;
+  const numShort=String(numLabel).length>4?String(numLabel).slice(-4):String(numLabel);
+  const hasNum=!!(c.regNum);
+
+  // Result tag
+  const resCls=r=>r.startsWith('OK')?'tag-ok':r==='Pending'?'tag-pending-r':r==='未送修'?'tag-unsent':'tag-fail';
+  const resTag=c.repairResult?'<span class="tag '+resCls(c.repairResult)+'">'+e(c.repairResult)+'</span>':'';
+
+  // Notify tags
+  const nTags=(c.tags||[]).map(t=>{
+    const cls=t==='取消'?'tag-cancel':t==='電話已通知'?'tag-called':'tag-no-ans';
+    return '<span class="tag '+cls+'">'+e(t)+'</span>';
   }).join('');
 
-  const resultCls = c.repairResult==='成功修復' ? '' : (c.repairResult==='部分修復' ? 'partial' : 'fail');
-  const resultTag = c.repairResult ? `<span class="tag tag-result ${c.repairResult!='成功修復'?'fail':''}">${c.repairResult}</span>` : '';
+  // Timer
+  let timerHtml='';
+  if(colId==='arrived')   timerHtml='<span class="card-timer tw" id="timer-'+c.id+'">00:00</span>';
+  if(colId==='repairing') timerHtml='<span class="card-timer tr" id="timer-'+c.id+'">00:00</span>';
 
-  let topContent = '';
-  if (colId === 'pending') {
-    topContent = `
-      <div class="card-row1">
-        <div class="card-num" style="font-size:14px;color:var(--text-muted)">${c.phone ? c.phone.slice(-3) : '---'}</div>
-        ${tagHtml(c.tags)}
-      </div>
-      <div class="card-name">${c.itemName || '未填寫品項'}</div>
-      <div class="card-meta">${c.name || ''} ${c.phone || ''}</div>
-      ${c.notes ? `<div class="card-note">${c.notes}</div>` : ''}
-    `;
-  } else if (colId === 'arrived') {
-    topContent = `
-      <div class="card-row1">
-        <div class="card-num">${c.regNum || '#?'}</div>
-        <span class="card-timer timer-wait" id="timer-${c.id}">00:00</span>
-      </div>
-      <div class="card-name">${c.itemName || ''}</div>
-      ${c.extraNote ? `<div class="card-note">${c.extraNote}</div>` : ''}
-    `;
-  } else if (colId === 'repairing') {
-    topContent = `
-      <div class="card-row1">
-        <div class="card-num">${c.regNum || '#?'}</div>
-        <span class="card-timer timer-repair" id="timer-${c.id}">00:00</span>
-      </div>
-      <div class="card-name">${c.itemName || ''}</div>
-      ${c.extraNote ? `<div class="card-note">${c.extraNote}</div>` : ''}
-    `;
-  } else if (colId === 'ready') {
-    topContent = `
-      <div class="card-row1">
-        <div class="card-num">${c.regNum || '#?'}</div>
-        ${tagHtml(c.notifyTags)}
-      </div>
-      <div class="card-name">${c.itemName || ''}</div>
-      ${resultTag}
-    `;
+  // Subtitle line
+  let subLine='';
+  if(colId==='pending'){
+    subLine='<span class="card-phone-chip">'+e(c.name)+'</span>';
+    if(c.phoneLast3||(c.phone&&c.phone.length>=3)) subLine+='<span style="color:var(--text3)">·</span><span class="card-phone-chip">···'+e(c.phoneLast3||(c.phone?c.phone.slice(-3):''))+'</span>';
   } else {
-    topContent = `
-      <div class="card-row1">
-        <div class="card-num">${c.regNum || '#?'}</div>
-        ${resultTag}
-      </div>
-      <div class="card-name">${c.itemName || ''}</div>
-    `;
+    if(c.brand) subLine+='<span class="card-phone-chip">'+e(c.brand)+'</span>';
+    if(c.model) subLine+='<span style="color:var(--text3)">·</span><span class="card-phone-chip">'+e(c.model.slice(0,12))+'</span>';
   }
 
-  const actions = getCardActions(c, colId);
-  const detail = renderCardDetail(c, colId);
+  const hasTags=(c.tags||[]).length>0||!!c.repairResult||(c.notifyTags||[]).length>0;
+  const hasSnippet=(colId==='arrived'||colId==='repairing')&&c.faultNote;
 
-  return `
-    <div class="card" id="card-${c.id}">
-      <div class="card-top" onclick="toggleCard('${c.id}')">
-        ${topContent}
-      </div>
-      <div class="card-detail" id="detail-${c.id}">
-        ${detail}
-      </div>
-      ${actions ? `<div class="card-actions">${actions}</div>` : ''}
-    </div>
-  `;
+  const actions=buildActions(c,colId);
+  const detail=buildDetail(c,colId);
+
+  return '<div class="card" id="card-'+c.id+'">'+
+    '<div class="card-main" onclick="toggleCard(\''+c.id+'\')">'+
+      '<div class="card-num-circle'+(hasNum?'':' no-num')+'">'+e(numShort)+'</div>'+
+      '<div class="card-body-text">'+
+        '<div class="card-title">'+e(c.itemName||'未填寫品項')+'</div>'+
+        (subLine?'<div class="card-sub">'+subLine+'</div>':'')+
+      '</div>'+
+      timerHtml+
+      '<div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>'+
+    '</div>'+
+    (hasTags?'<div class="card-tags">'+nTags+(c.notifyTags||[]).map(t=>'<span class="tag '+(t==='電話已通知'?'tag-called':'tag-no-ans')+'">'+e(t)+'</span>').join('')+resTag+'</div>':'')+
+    (hasSnippet?'<div class="card-snippet">'+e(c.faultNote.slice(0,60))+'</div>':'')+
+    '<div class="card-detail" id="detail-'+c.id+'">'+detail+'</div>'+
+    (actions?'<div class="card-actions">'+actions+'</div>':'')+
+  '</div>';
 }
 
-function getCardActions(c, colId) {
-  if (colId === 'arrived') {
-    return `<button class="btn-action btn-start" onclick="moveCard('${c.id}','repairing',event)">▶ 開始維修</button>
-            <button class="btn-action btn-transfer" onclick="moveCard('${c.id}','transfer',event)">↗ 轉診</button>`;
-  }
-  if (colId === 'repairing') {
-    return `<button class="btn-action btn-done" onclick="moveCard('${c.id}','ready',event)">✓ 維修完成</button>
-            <button class="btn-action btn-transfer" onclick="moveCard('${c.id}','transfer',event)">↗ 轉診</button>`;
-  }
-  if (colId === 'ready') {
-    return `<button class="btn-action btn-call" onclick="callPhone('${c.id}',event)">📞 撥打電話</button>
-            <button class="btn-action btn-pickup" onclick="moveCard('${c.id}','done',event)">✓ 已領取</button>`;
-  }
+function buildActions(c,colId){
+  if(colId==='arrived')
+    return '<button class="card-action-btn cab-blue" onclick="moveCard(\''+c.id+'\',\'repairing\',event)"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> 開始維修</button>'+
+           '<button class="card-action-btn cab-red" onclick="moveCard(\''+c.id+'\',\'transfer\',event)">↗ 轉診</button>';
+  if(colId==='repairing')
+    return '<button class="card-action-btn cab-green" onclick="moveCard(\''+c.id+'\',\'ready\',event)">✓ 維修完成</button>'+
+           '<button class="card-action-btn cab-red" onclick="moveCard(\''+c.id+'\',\'transfer\',event)">↗ 轉診</button>';
+  if(colId==='ready')
+    return '<button class="card-action-btn cab-blue" onclick="callPhone(\''+c.id+'\',event)">📞 撥打電話</button>'+
+           '<button class="card-action-btn cab-dark" onclick="moveCard(\''+c.id+'\',\'done\',event)">✓ 已領取</button>';
   return '';
 }
 
-function renderCardDetail(c, colId) {
-  const brandOpts = DROPDOWN.brands.map(b => `<option ${c.brand===b?'selected':''}>${b}</option>`).join('');
-  const bigCatOpts = DROPDOWN.bigCat.map(b => `<option ${c.bigCat===b?'selected':''}>${b}</option>`).join('');
-  const itemOpts = (DROPDOWN.items[c.bigCat] || DROPDOWN.items['其他'] || ['其他']).map(b => `<option ${c.item===b?'selected':''}>${b}</option>`).join('');
-  const subItemOpts = (DROPDOWN.subItems[c.item] || ['其他']).map(b => `<option ${c.subItem===b?'selected':''}>${b}</option>`).join('');
-  const resultOpts = DROPDOWN.repairResult.map(b => `<option ${c.repairResult===b?'selected':''}>${b}</option>`).join('');
-  const resultDescOpts = ((DROPDOWN.repairResultDesc||{})[c.repairResult] || ['其他']).map(b => `<option ${c.repairResultDesc===b?'selected':''}>${b}</option>`).join('');
-  
-  const accessHtml = ACCESSORY_OPTIONS.map(a => `
-    <label class="checkbox-pill ${(c.accessories||[]).includes(a)?'checked':''}">
-      <input type="checkbox" ${(c.accessories||[]).includes(a)?'checked':''} onchange="toggleAccessory('${c.id}','${a}',this.checked)"> ${a}
-    </label>`).join('');
+function buildDetail(c,colId){
+  const e=s=>(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const id=c.id;
+  const sel=(arr,v)=>arr.map(x=>'<option'+(x===v?' selected':'')+'>'+e(x)+'</option>').join('');
+  const itemArr=DROPDOWN.items[c.bigCat]||DROPDOWN.items['其他']||['其他'];
+  const descArr=DROPDOWN.repairResultDesc[c.repairResult]||['其他'];
 
-  const tagSelHtml = ITEM_TAG_OPTIONS.map(t => `
-    <label class="checkbox-pill ${(c.tags||[]).includes(t)?'checked':''}">
-      <input type="checkbox" ${(c.tags||[]).includes(t)?'checked':''} onchange="toggleTag('${c.id}','${t}',this.checked)"> ${t}
-    </label>`).join('');
+  const tagRow=PENDING_TAGS.map(t=>'<label class="check-pill '+((c.tags||[]).includes(t)?'on':'')+'"><input type="checkbox"'+((c.tags||[]).includes(t)?' checked':'')+' onchange="toggleTag(\''+id+'\',\''+t+'\',this.checked)"> '+t+'</label>').join('');
+  const accRow=ACCESSORIES.map(a=>'<label class="check-pill '+((c.accessories||[]).includes(a)?'on':'')+'"><input type="checkbox"'+((c.accessories||[]).includes(a)?' checked':'')+' onchange="toggleAcc(\''+id+'\',\''+a+'\',this.checked)"> '+a+'</label>').join('');
 
-  let extra = '';
-  if (colId === 'repairing' || colId === 'ready' || colId === 'done' || colId === 'transfer') {
-    extra = `
-      <hr class="detail-divider">
-      <div class="form-section">
-        <div class="form-label">維修結果</div>
-        <select class="form-select" onchange="updateField('${c.id}','repairResult',this.value)">
-          <option value="">請選擇...</option>${resultOpts}
-        </select>
-      </div>
-      <div class="form-section">
-        <div class="form-label">維修結果說明</div>
-        <select class="form-select" onchange="updateField('${c.id}','repairResultDesc',this.value)">
-          <option value="">請選擇...</option>${resultDescOpts}
-        </select>
-      </div>
-      <div class="form-section">
-        <div class="form-label">當天修理狀況</div>
-        <textarea class="form-textarea" placeholder="當天狀況描述..." onblur="updateField('${c.id}','repairNote',this.value)">${c.repairNote||''}</textarea>
-      </div>
-      <div class="form-grid2">
-        <div class="form-section">
-          <div class="form-label">維修者</div>
-          <input class="form-input" type="text" value="${c.repairman||''}" placeholder="維修者姓名" onblur="updateField('${c.id}','repairman',this.value)">
-        </div>
-        <div class="form-section">
-          <div class="form-label">零件費 (元)</div>
-          <input class="form-input" type="number" value="${c.partCost||''}" placeholder="0" onblur="updateField('${c.id}','partCost',this.value)">
-        </div>
-      </div>
-    `;
+  let extra='';
+  if(['repairing','ready','done','transfer'].includes(colId)){
+    extra='<div class="form-divider"></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+        '<div class="form-row"><div class="form-label">維修結果</div><select class="form-select" onchange="updateField(\''+id+'\',\'repairResult\',this.value)"><option value="">請選擇...</option>'+sel(DROPDOWN.repairResult,c.repairResult)+'</select></div>'+
+        '<div class="form-row"><div class="form-label">結果說明</div><select class="form-select" onchange="updateField(\''+id+'\',\'repairResultDesc\',this.value)"><option value="">請選擇...</option>'+sel(descArr,c.repairResultDesc)+'</select></div>'+
+      '</div>'+
+      '<div class="form-row"><div class="form-label">當天修理狀況</div><textarea class="form-textarea" onblur="updateField(\''+id+'\',\'repairSituation\',this.value)">'+e(c.repairSituation)+'</textarea></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+        '<div class="form-row"><div class="form-label">維修者</div><input class="form-input" type="text" value="'+e(c.repairman)+'" placeholder="姓名" onblur="updateField(\''+id+'\',\'repairman\',this.value)"></div>'+
+        '<div class="form-row"><div class="form-label">零件費 (元)</div><input class="form-input" type="number" value="'+e(c.partCost)+'" placeholder="0" onblur="updateField(\''+id+'\',\'partCost\',this.value)"></div>'+
+      '</div>';
   }
 
-  return `
-    <div class="form-section">
-      <div class="form-label">掛號號碼</div>
-      <input class="form-input" type="number" min="1" max="999" value="${c.regNum||''}" placeholder="輸入號碼後自動報到" onblur="updateRegNum('${c.id}',this.value)">
-    </div>
-    <div class="form-section">
-      <div class="form-label">備註標籤</div>
-      <div class="form-checkbox-row">${tagSelHtml}</div>
-    </div>
-    <hr class="detail-divider">
-    <div class="form-section">
-      <div class="form-label">家電大分類</div>
-      <select class="form-select" onchange="updateCatField('${c.id}','bigCat',this.value)">
-        <option value="">請選擇...</option>${bigCatOpts}
-      </select>
-    </div>
-    <div class="form-grid2">
-      <div class="form-section">
-        <div class="form-label">產品品項</div>
-        <select class="form-select" onchange="updateCatField('${c.id}','item',this.value)">
-          <option value="">請選擇...</option>${itemOpts}
-        </select>
-      </div>
-      <div class="form-section">
-        <div class="form-label">產品細項</div>
-        <select class="form-select" onchange="updateField('${c.id}','subItem',this.value)">
-          <option value="">請選擇...</option>${subItemOpts}
-        </select>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-label">備註說明</div>
-      <input class="form-input" type="text" value="${c.itemNote||''}" placeholder="補充說明..." onblur="updateField('${c.id}','itemNote',this.value)">
-    </div>
-    <div class="form-section">
-      <div class="form-label">End of 產品</div>
-      <div class="form-readonly">${c.endOfProduct || '—'}</div>
-    </div>
-    <div class="form-grid2">
-      <div class="form-section">
-        <div class="form-label">品牌</div>
-        <select class="form-select" onchange="updateField('${c.id}','brand',this.value)">
-          <option value="">請選擇...</option>${brandOpts}
-        </select>
-      </div>
-      <div class="form-section">
-        <div class="form-label">型號</div>
-        <input class="form-input" type="text" value="${c.model||''}" placeholder="型號" onblur="updateField('${c.id}','model',this.value)">
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-label">是否拆過</div>
-      <select class="form-select" onchange="updateField('${c.id}','opened',this.value)">
-        <option value="">請選擇...</option>
-        <option ${c.opened==='是'?'selected':''}>是</option>
-        <option ${c.opened==='否'?'selected':''}>否</option>
-        <option ${c.opened==='不確定'?'selected':''}>不確定</option>
-      </select>
-    </div>
-    <div class="form-section">
-      <div class="form-label">配件</div>
-      <div class="form-checkbox-row">${accessHtml}</div>
-    </div>
-    <div class="form-section">
-      <div class="form-label">其他備註</div>
-      <textarea class="form-textarea" placeholder="其他備註..." onblur="updateField('${c.id}','extraNote',this.value)">${c.extraNote||''}</textarea>
-    </div>
-    ${extra}
-  `;
+  return '<div class="form-row"><div class="form-label">掛號號碼</div><input class="form-input" type="text" value="'+e(c.regNum)+'" placeholder="輸入號碼後自動報到" onblur="updateRegNum(\''+id+'\',this.value)"></div>'+
+    '<div class="form-row"><div class="form-label">備註標籤</div><div class="check-group">'+tagRow+'</div></div>'+
+    '<div class="form-divider"></div>'+
+    '<div class="form-row"><div class="form-label">送修者姓名</div><input class="form-input" type="text" value="'+e(c.name)+'" onblur="updateField(\''+id+'\',\'name\',this.value)"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="form-row"><div class="form-label">完整電話</div><input class="form-input" type="tel" value="'+e(c.phone)+'" onblur="updateField(\''+id+'\',\'phone\',this.value)"></div>'+
+      '<div class="form-row"><div class="form-label">電話後3碼</div><div class="form-readonly">'+e(c.phoneLast3||(c.phone?c.phone.slice(-3):'—'))+'</div></div>'+
+    '</div>'+
+    '<div class="form-divider"></div>'+
+    '<div class="form-row"><div class="form-label">家電大分類</div><select class="form-select" onchange="updateCatField(\''+id+'\',\'bigCat\',this.value)"><option value="">請選擇...</option>'+sel(DROPDOWN.bigCat,c.bigCat)+'</select></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="form-row"><div class="form-label">產品品項</div><select class="form-select" onchange="updateCatField(\''+id+'\',\'item\',this.value)"><option value="">請選擇...</option>'+sel(itemArr,c.item)+'</select></div>'+
+      '<div class="form-row"><div class="form-label">產品細項</div><input class="form-input" type="text" value="'+e(c.subItem)+'" onblur="updateField(\''+id+'\',\'subItem\',this.value)"></div>'+
+    '</div>'+
+    '<div class="form-row"><div class="form-label">備註說明</div><input class="form-input" type="text" value="'+e(c.itemNote)+'" onblur="updateField(\''+id+'\',\'itemNote\',this.value)"></div>'+
+    '<div class="form-row"><div class="form-label">End of 產品（唯讀）</div><div class="form-readonly">'+e(c.endOfProduct||'—')+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="form-row"><div class="form-label">品牌</div><input class="form-input" type="text" value="'+e(c.brand)+'" onblur="updateField(\''+id+'\',\'brand\',this.value)"></div>'+
+      '<div class="form-row"><div class="form-label">型號</div><input class="form-input" type="text" value="'+e(c.model)+'" onblur="updateField(\''+id+'\',\'model\',this.value)"></div>'+
+    '</div>'+
+    '<div class="form-row"><div class="form-label">配件</div><div class="check-group">'+accRow+'</div></div>'+
+    '<div class="form-row"><div class="form-label">故障說明（原始）</div><div class="form-readonly" style="font-size:11px;line-height:1.6">'+e(c.faultNote||'—')+'</div></div>'+
+    '<div class="form-row"><div class="form-label">其他備註</div><textarea class="form-textarea" onblur="updateField(\''+id+'\',\'extraNote\',this.value)">'+e(c.extraNote)+'</textarea></div>'+
+    extra;
 }
 
-// ════════════════════════════════════════════
-//  CARD INTERACTIONS
-// ════════════════════════════════════════════
-function toggleCard(id) {
-  const d = document.getElementById('detail-' + id);
-  if (!d) return;
-  d.classList.toggle('open');
+// ═══ INTERACTIONS ═══
+function toggleCard(id){
+  const d=document.getElementById('detail-'+id);
+  if(d)d.classList.toggle('open');
 }
 
-function moveCard(id, newStatus, evt) {
-  if (evt) evt.stopPropagation();
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  card.status = newStatus;
-  if (newStatus === 'arrived' && !card.arrivedAt) card.arrivedAt = Date.now();
-  if (newStatus === 'repairing' && !card.repairStart) card.repairStart = Date.now();
-  if (newStatus === 'ready') card.repairEnd = Date.now();
-  saveLocalData();
-  renderKanban();
-  renderCasePicker();
-  updateReport();
+function moveCard(id,newSt,evt){
+  if(evt)evt.stopPropagation();
+  const card=cards.find(c=>c.id===id);if(!card)return;
+  card.status=newSt;
+  if(newSt==='arrived'&&!card.arrivedAt)card.arrivedAt=Date.now();
+  if(newSt==='repairing'&&!card.repairStart)card.repairStart=Date.now();
+  if(newSt==='ready')card.repairEnd=Date.now();
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
+  renderKanban();renderCasePicker();updateReport();pushToSheet(card);
+}
+
+function callPhone(id,evt){
+  if(evt)evt.stopPropagation();
+  const c=cards.find(c=>c.id===id);
+  if(!c||!c.phone){showToast('無電話資料');return;}
+  window.location.href='tel:'+c.phone;
+}
+
+function updateField(id,field,value){
+  const card=cards.find(c=>c.id===id);
+  if(!card||card[field]===value)return;
+  card[field]=value;
+  if(field==='phone')card.phoneLast3=value.slice(-3);
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
+  pushToSheet(card);
+  refreshCol(card.status);
+}
+
+function updateCatField(id,field,value){
+  const card=cards.find(c=>c.id===id);if(!card)return;
+  card[field]=value;
+  if(field==='bigCat'){card.item='';card.subItem='';}
+  if(field==='item'){card.subItem='';card.itemName=value;}
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
   pushToSheet(card);
 }
 
-function callPhone(id, evt) {
-  if (evt) evt.stopPropagation();
-  const card = cards.find(c => c.id === id);
-  if (!card || !card.phone) { showToast('無電話資料'); return; }
-  window.location.href = 'tel:' + card.phone;
-}
-
-function updateField(id, field, value) {
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  card[field] = value;
-  saveLocalData();
-  pushToSheet(card);
-  // re-render header timer area or result
-  if (field === 'extraNote' || field === 'repairResult') {
-    refreshCardTop(card);
+function updateRegNum(id,val){
+  const card=cards.find(c=>c.id===id);if(!card||!val||card.regNum===val)return;
+  card.regNum=val;
+  if(card.status==='pending'){
+    card.status='arrived';if(!card.arrivedAt)card.arrivedAt=Date.now();
+    localStorage.setItem(DATA_KEY,JSON.stringify(cards));
+    renderKanban();pushToSheet(card);showToast('✓ 已報到 → 等待維修');return;
   }
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));pushToSheet(card);
 }
 
-function updateCatField(id, field, value) {
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  card[field] = value;
-  if (field === 'bigCat') { card.item = ''; card.subItem = ''; }
-  if (field === 'item') {
-    card.subItem = '';
-    // also update the display name
-    card.itemName = value;
-  }
-  saveLocalData();
-  pushToSheet(card);
+function toggleTag(id,tag,checked){
+  const card=cards.find(c=>c.id===id);if(!card)return;
+  if(!card.tags)card.tags=[];
+  if(checked){if(!card.tags.includes(tag))card.tags.push(tag);}
+  else card.tags=card.tags.filter(t=>t!==tag);
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
 }
 
-function updateRegNum(id, val) {
-  const card = cards.find(c => c.id === id);
-  if (!card || !val) return;
-  card.regNum = val;
-  if (card.status === 'pending') {
-    card.status = 'arrived';
-    if (!card.arrivedAt) card.arrivedAt = Date.now();
-    saveLocalData();
-    renderKanban();
-    pushToSheet(card);
-    showToast('✓ 已報到 → 等待維修');
-    return;
-  }
-  saveLocalData();
-  pushToSheet(card);
+function toggleAcc(id,acc,checked){
+  const card=cards.find(c=>c.id===id);if(!card)return;
+  if(!card.accessories)card.accessories=[];
+  if(checked){if(!card.accessories.includes(acc))card.accessories.push(acc);}
+  else card.accessories=card.accessories.filter(a=>a!==acc);
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
 }
 
-function toggleAccessory(id, acc, checked) {
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  if (!card.accessories) card.accessories = [];
-  if (checked) { if (!card.accessories.includes(acc)) card.accessories.push(acc); }
-  else { card.accessories = card.accessories.filter(a => a !== acc); }
-  saveLocalData();
-  pushToSheet(card);
+function refreshCol(status){
+  const body=document.getElementById('body-'+status);
+  const cnt =document.getElementById('cnt-' +status);
+  if(!body)return;
+  const cc=cards.filter(c=>c.status===status);
+  body.innerHTML=cc.map(c=>buildCard(c,status)).join('')+
+    (status==='pending'?'<button class="add-card-btn" onclick="openAddCard()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新增掛號</button>':'');
+  if(cnt)cnt.textContent=cc.length;
+  startTimers();
 }
 
-function toggleTag(id, tag, checked) {
-  const card = cards.find(c => c.id === id);
-  if (!card) return;
-  if (!card.tags) card.tags = [];
-  if (checked) { if (!card.tags.includes(tag)) card.tags.push(tag); }
-  else { card.tags = card.tags.filter(t => t !== tag); }
-  saveLocalData();
-  pushToSheet(card);
+function updateTopStats(){
+  const total=cards.length;
+  const repairing=cards.filter(c=>c.status==='repairing').length;
+  const ready=cards.filter(c=>c.status==='ready').length;
+  const done=cards.filter(c=>c.status==='done').length;
+  document.getElementById('topStats').innerHTML=
+    '<div class="stat-pill"><div class="dot" style="background:var(--col-repairing)"></div>維修中 '+repairing+'</div>'+
+    '<div class="stat-pill"><div class="dot" style="background:var(--col-ready)"></div>待領取 '+ready+'</div>'+
+    '<div class="stat-pill"><div class="dot" style="background:var(--col-done)"></div>已領取 '+done+'/'+total+'</div>';
 }
 
-function refreshCardTop(card) {
-  // lightweight refresh without full re-render
-  const el = document.getElementById('card-' + card.id);
-  if (el) {
-    // just trigger re-render for the column
-    const col = document.getElementById('body-' + card.status);
-    if (col) {
-      col.innerHTML = cards.filter(c => c.status === card.status)
-        .map(c => renderCard(c, card.status)).join('');
-      if (card.status === 'pending') {
-        col.innerHTML += `<button class="btn-action" style="background:var(--surface2);color:var(--text);margin-top:4px" onclick="openAddCard()">+ 新增掛號</button>`;
-      }
-    }
-    const cnt = document.getElementById('cnt-' + card.status);
-    if (cnt) cnt.textContent = cards.filter(c => c.status === card.status).length;
-  }
-}
-
-// ── TIMERS ──
-function startTimers() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    cards.forEach(c => {
-      const el = document.getElementById('timer-' + c.id);
-      if (!el) return;
-      const start = c.status === 'repairing' ? c.repairStart : c.arrivedAt;
-      if (!start) return;
-      const secs = Math.floor((Date.now() - start) / 1000);
-      const m = Math.floor(secs / 60).toString().padStart(2, '0');
-      const s = (secs % 60).toString().padStart(2, '0');
-      el.textContent = m + ':' + s;
-      if (c.status === 'arrived' && secs > 1800) el.style.background = '#FDECEA';
+function startTimers(){
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    cards.forEach(c=>{
+      const el=document.getElementById('timer-'+c.id);if(!el)return;
+      const start=c.status==='repairing'?c.repairStart:c.arrivedAt;if(!start)return;
+      const s=Math.floor((Date.now()-start)/1000);
+      const mm=String(Math.floor(s/60)).padStart(2,'0');
+      const ss=String(s%60).padStart(2,'0');
+      el.textContent=mm+':'+ss;
+      if(s>1800)el.className='card-timer twarn';
     });
-  }, 1000);
+  },1000);
 }
 
-// ── ADD CARD ──
-function openAddCard() {
-  const id = 'c' + Date.now();
-  const card = {
-    id, status: 'pending', name: '', phone: '', itemName: '',
-    tags: [], accessories: [], notes: '', regNum: '',
-    bigCat: '', item: '', subItem: '', brand: '', model: '',
-    itemNote: '', endOfProduct: '', extraNote: '', opened: '',
-    repairResult: '', repairResultDesc: '', repairNote: '', repairman: '', partCost: '',
-  };
-  cards.unshift(card);
-  saveLocalData();
-  renderKanban();
-  // auto-open the new card
-  setTimeout(() => toggleCard(id), 100);
+function openAddCard(){
+  const id='new_'+Date.now();
+  cards.unshift({id,status:'pending',name:'',phone:'',phoneLast3:'',itemName:'',endOfProduct:'',bigCat:'',item:'',subItem:'',itemNote:'',brand:'',model:'',faultNote:'',extraNote:'',repairResult:'',repairResultDesc:'',repairSituation:'',repairman:'',partCost:'',tags:[],accessories:[],notifyTags:[],regNum:'',arrivedAt:null,repairStart:null,repairEnd:null});
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
+  refreshCol('pending');
+  setTimeout(()=>{
+    document.getElementById('detail-'+id)?.classList.add('open');
+    document.getElementById('card-'+id)?.scrollIntoView({behavior:'smooth'});
+  },80);
 }
 
-// ════════════════════════════════════════════
-//  INTERVIEW PAGE
-// ════════════════════════════════════════════
-function renderCasePicker() {
-  const picker = document.getElementById('casePicker');
-  if (!picker) return;
-  const arrived = cards.filter(c => ['arrived','repairing','ready','done'].includes(c.status));
-  picker.innerHTML = arrived.map(c => `
-    <div class="case-chip ${currentInterviewId===c.id?'selected':''}" onclick="selectCase('${c.id}')">
-      ${c.regNum ? '#'+c.regNum : c.name || c.id} ${c.itemName || ''}
-    </div>`).join('');
-  if (!arrived.length) {
-    picker.innerHTML = '<div style="font-size:12px;color:var(--text-muted)">尚無報到案例</div>';
-  }
+// ═══ INTERVIEW ═══
+function renderCasePicker(){
+  const p=document.getElementById('casePicker');if(!p)return;
+  const active=cards.filter(c=>['arrived','repairing','ready','done'].includes(c.status));
+  p.innerHTML=active.length
+    ? active.map(c=>'<div class="case-chip'+(currentInterviewId===c.id?' selected':'')+'" onclick="selectCase(\''+c.id+'\')">'+(c.regNum?'#'+c.regNum+' ':'')+(c.itemName||c.name||c.id).slice(0,14)+'</div>').join('')
+    : '<div style="font-size:12px;color:var(--text2)">尚無報到案例</div>';
 }
 
-function selectCase(id) {
-  currentInterviewId = id;
-  const iv = interviews[id] || {};
-  // reset
-  document.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
-  document.getElementById('q1-note').value = iv.q1Note || '';
-  document.getElementById('q2-note').value = iv.q2Note || '';
-  if (iv.q1) iv.q1.forEach(v => {
-    document.querySelectorAll('#opts-q1 .option-pill').forEach(p => { if (p.textContent.trim()===v) p.classList.add('selected'); });
-  });
-  if (iv.q2) iv.q2.forEach(v => {
-    document.querySelectorAll('#opts-q2 .option-pill').forEach(p => { if (p.textContent.trim()===v) p.classList.add('selected'); });
-  });
-  if (iv.rating) {
-    document.querySelectorAll('#opts-q3 .option-pill').forEach((p,i) => {
-      if (i+1 === iv.rating) p.classList.add('selected');
-    });
-  }
+function selectCase(id){
+  currentInterviewId=id;
+  const iv=interviews[id]||{};
+  document.querySelectorAll('.opt-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('q1-note').value=iv.q1Note||'';
+  document.getElementById('q2-note').value=iv.q2Note||'';
+  (iv.q1||[]).forEach(v=>{ document.querySelectorAll('#opts-q1 .opt-pill').forEach(p=>{ if(p.textContent.trim()===v)p.classList.add('selected'); }); });
+  (iv.q2||[]).forEach(v=>{ document.querySelectorAll('#opts-q2 .opt-pill').forEach(p=>{ if(p.textContent.trim()===v)p.classList.add('selected'); }); });
+  currentRating=iv.rating||0;
+  document.querySelectorAll('#opts-q3 .opt-pill').forEach((p,i)=>p.classList.toggle('selected',i+1===currentRating));
   renderCasePicker();
 }
 
-function toggleOpt(el, q) {
-  el.classList.toggle('selected');
+function setRating(r){
+  currentRating=r;
+  document.querySelectorAll('#opts-q3 .opt-pill').forEach((p,i)=>p.classList.toggle('selected',i+1===r));
 }
 
-function setRating(r) {
-  document.querySelectorAll('#opts-q3 .option-pill').forEach((p,i) => {
-    p.classList.toggle('selected', i+1===r);
-  });
+function saveInterview(){
+  if(!currentInterviewId){showToast('請先選擇送修者');return;}
+  const q1=[...document.querySelectorAll('#opts-q1 .opt-pill.selected')].map(p=>p.textContent.trim());
+  const q2=[...document.querySelectorAll('#opts-q2 .opt-pill.selected')].map(p=>p.textContent.trim());
+  interviews[currentInterviewId]={q1,q1Note:document.getElementById('q1-note').value,q2,q2Note:document.getElementById('q2-note').value,rating:currentRating};
+  localStorage.setItem(INTERVIEW_KEY,JSON.stringify(interviews));
+  showToast('✓ 訪問記錄已儲存');updateReport();
 }
 
-function saveInterview() {
-  if (!currentInterviewId) { showToast('請先選擇送修者'); return; }
-  const q1 = [...document.querySelectorAll('#opts-q1 .option-pill.selected')].map(p => p.textContent.trim());
-  const q2 = [...document.querySelectorAll('#opts-q2 .option-pill.selected')].map(p => p.textContent.trim());
-  const rating = [...document.querySelectorAll('#opts-q3 .option-pill')].findIndex(p => p.classList.contains('selected')) + 1;
-  interviews[currentInterviewId] = {
-    q1, q1Note: document.getElementById('q1-note').value,
-    q2, q2Note: document.getElementById('q2-note').value,
-    rating,
-  };
-  saveInterviews();
-  showToast('✓ 訪問記錄已儲存');
-  updateReport();
+// ═══ REPORT ═══
+function updateReport(){
+  const total=cards.length;
+  const done=cards.filter(c=>c.status==='done').length;
+  const repaired=cards.filter(c=>['repairing','ready','done'].includes(c.status)).length;
+  const success=cards.filter(c=>(c.repairResult||'').startsWith('OK')).length;
+  const ivCount=Object.keys(interviews).length;
+  const rate=repaired?Math.round(success/repaired*100):0;
+  document.getElementById('reportStats').innerHTML=
+    mStat(total,'總掛號數','var(--blue)')+mStat(done,'已領取','var(--green)')+
+    mStat(repaired,'已維修','var(--orange)')+mStat(success,'成功修復','var(--green)')+
+    mStat(ivCount,'訪問件數','var(--purple)')+mStat(rate+'%','修復率','var(--blue)');
+
+  const iCnt={};
+  cards.forEach(c=>{if(c.itemName)iCnt[c.itemName]=(iCnt[c.itemName]||0)+1;});
+  const iTop=Object.entries(iCnt).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const iMax=Math.max(...iTop.map(e=>e[1]),1);
+  document.getElementById('repairChart').innerHTML=iTop.length?iTop.map(([n,v])=>mBar(n,v,iMax,'var(--blue)')).join(''):mEmpty();
+
+  const rMap={'OK_成功':0,'NO_失敗':0,'未送修':0,'Pending':0};
+  const rCol={'OK_成功':'var(--green)','NO_失敗':'var(--red)','未送修':'var(--gray)','Pending':'var(--purple)'};
+  cards.forEach(c=>{if(c.repairResult&&rMap[c.repairResult]!==undefined)rMap[c.repairResult]++;});
+  const rMax=Math.max(...Object.values(rMap),1);
+  document.getElementById('resultChart').innerHTML=Object.entries(rMap).map(([n,v])=>mBar(n,v,rMax,rCol[n])).join('');
+
+  const allW=Object.values(interviews).flatMap(iv=>[...(iv.q1||[]),...(iv.q2||[])]);
+  const wCnt={};allW.forEach(w=>wCnt[w]=(wCnt[w]||0)+1);
+  const wE=Object.entries(wCnt).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('wordCloud').innerHTML=wE.length?wE.map(([w,n])=>'<span class="word-pill'+(n>2?' lg':n<2?' sm':'')+'">'+(w)+'</span>').join(''):mEmpty();
+
+  const notes=Object.entries(interviews).map(([id,iv])=>{
+    const c=cards.find(x=>x.id===id);
+    const label=c?('#'+(c.regNum||'?')+' '+c.itemName):id;
+    const text=[iv.q1Note,iv.q2Note].filter(Boolean).join(' / ');
+    return text?{label,text}:null;
+  }).filter(Boolean);
+  document.getElementById('reportNotes').innerHTML=notes.length
+    ?notes.map((n,i)=>'<div class="note-item"><div class="note-idx">'+String(i+1).padStart(2,'0')+'</div><div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">'+n.label+'</div><textarea class="note-edit" rows="2">'+n.text+'</textarea></div></div>').join('')
+    :'<div style="font-size:12px;color:var(--text2)">尚無訪問節錄</div>';
 }
 
-// ════════════════════════════════════════════
-//  REPORT PAGE
-// ════════════════════════════════════════════
-function updateReport() {
-  const total = cards.length;
-  const done = cards.filter(c => c.status === 'done').length;
-  const repairing = cards.filter(c => ['repairing','ready','done'].includes(c.status)).length;
-  const success = cards.filter(c => c.repairResult === '成功修復').length;
-  const ivCount = Object.keys(interviews).length;
+function mStat(n,label,color){return '<div class="stat-card"><div class="stat-num" style="color:'+color+'">'+n+'</div><div class="stat-lbl">'+label+'</div></div>';}
+function mBar(name,val,max,color){return '<div class="bar-row"><div class="bar-lbl">'+name+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(val/max*100)+'%;background:'+color+'"></div></div><div class="bar-val">'+val+'</div></div>';}
+function mEmpty(){return '<div style="font-size:12px;color:var(--text2)">暫無資料</div>';}
 
-  document.getElementById('reportStats').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">總掛號數</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${done}</div><div class="stat-label">已領取</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${repairing}</div><div class="stat-label">已維修</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${success}</div><div class="stat-label">成功修復</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--purple)">${ivCount}</div><div class="stat-label">訪問件數</div></div>
-    <div class="stat-card"><div class="stat-num">${repairing ? Math.round(success/repairing*100) : 0}%</div><div class="stat-label">修復率</div></div>
-  `;
-
-  // item chart
-  const itemCounts = {};
-  cards.forEach(c => { if (c.itemName) itemCounts[c.itemName] = (itemCounts[c.itemName]||0)+1; });
-  const itemEntries = Object.entries(itemCounts).sort((a,b) => b[1]-a[1]).slice(0,6);
-  const maxItem = Math.max(...itemEntries.map(e=>e[1]), 1);
-  document.getElementById('repairChart').innerHTML = itemEntries.length ? itemEntries.map(([name, cnt]) => `
-    <div class="bar-row">
-      <div class="bar-label">${name}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${cnt/maxItem*100}%"></div></div>
-      <div class="bar-val">${cnt}</div>
-    </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無資料</div>';
-
-  // result chart
-  const resCounts = { '成功修復':0, '部分修復':0, '無法修復':0, '轉診':0, 'Pending':0 };
-  cards.forEach(c => { if (c.repairResult && resCounts[c.repairResult]!==undefined) resCounts[c.repairResult]++; });
-  const resCols = { '成功修復':'var(--green)','部分修復':'var(--yellow)','無法修復':'var(--red)','轉診':'var(--purple)','Pending':'var(--gray)' };
-  const maxRes = Math.max(...Object.values(resCounts), 1);
-  document.getElementById('resultChart').innerHTML = Object.entries(resCounts).map(([name, cnt]) => `
-    <div class="bar-row">
-      <div class="bar-label">${name}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${cnt/maxRes*100}%;background:${resCols[name]}"></div></div>
-      <div class="bar-val">${cnt}</div>
-    </div>`).join('');
-
-  // word cloud
-  const allWords = Object.values(interviews).flatMap(iv => [...(iv.q1||[]), ...(iv.q2||[])]);
-  const wordCount = {};
-  allWords.forEach(w => wordCount[w] = (wordCount[w]||0)+1);
-  const wordEntries = Object.entries(wordCount).sort((a,b) => b[1]-a[1]);
-  document.getElementById('wordCloud').innerHTML = wordEntries.length ?
-    wordEntries.map(([w,cnt]) => `<span class="word-pill ${cnt>2?'lg':cnt<2?'sm':''}">${w}</span>`).join('') :
-    '<div style="font-size:12px;color:var(--text-muted)">尚無訪問資料</div>';
-
-  // notes
-  const notes = Object.entries(interviews).map(([id, iv]) => {
-    const card = cards.find(c => c.id === id);
-    const label = card ? `#${card.regNum||'?'} ${card.itemName||''}` : id;
-    const content = [iv.q1Note, iv.q2Note].filter(Boolean).join(' / ');
-    return { label, content };
-  }).filter(n => n.content);
-  document.getElementById('reportNotes').innerHTML = notes.length ?
-    notes.map((n,i) => `
-      <div class="report-note-item">
-        <div class="note-num">${(i+1).toString().padStart(2,'0')}</div>
-        <div>
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">${n.label}</div>
-          <textarea class="note-text-edit" rows="2">${n.content}</textarea>
-        </div>
-      </div>`).join('') :
-    '<div style="font-size:12px;color:var(--text-muted)">尚無訪問節錄</div>';
-}
-
-// ════════════════════════════════════════════
-//  NAV & SETTINGS
-// ════════════════════════════════════════════
-function switchPage(pageId, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
+// ═══ NAV & SETTINGS ═══
+function switchPage(pageId,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
   btn.classList.add('active');
-  if (pageId === 'report') updateReport();
-  if (pageId === 'interview') renderCasePicker();
+  if(pageId==='report')updateReport();
+  if(pageId==='interview')renderCasePicker();
 }
 
-function toggleTab(tab, enabled) {
-  settings['show'+tab.charAt(0).toUpperCase()+tab.slice(1)] = enabled;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+function toggleTab(tab,enabled){
+  settings['show'+tab.charAt(0).toUpperCase()+tab.slice(1)]=enabled;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
   applySettings();
 }
 
-function applySettings() {
-  const ni = document.getElementById('nav-interview');
-  const nr = document.getElementById('nav-report');
-  if (ni) ni.style.display = settings.showInterview ? '' : 'none';
-  if (nr) nr.style.display = settings.showReport ? '' : 'none';
-  document.getElementById('toggle-interview').checked = settings.showInterview;
-  document.getElementById('toggle-report').checked = settings.showReport;
+function applySettings(){
+  document.getElementById('nav-interview').style.display=settings.showInterview!==false?'':'none';
+  document.getElementById('nav-report').style.display=settings.showReport!==false?'':'none';
 }
 
-function saveSettings() {
-  const url = document.getElementById('sheetUrl').value.trim();
-  localStorage.setItem(SHEET_URL_KEY, url);
+function saveSettings(){
+  localStorage.setItem(SHEET_URL_KEY,document.getElementById('sheetUrl').value.trim());
   showToast('✓ 設定已儲存');
 }
 
-function updateLastSyncInfo(success, count) {
-  const el = document.getElementById('lastSyncInfo');
-  if (!el) return;
-  const t = new Date().toLocaleTimeString('zh-TW');
-  el.textContent = success
-    ? '✓ 上次同步：' + t + '，共 ' + count + ' 筆'
-    : '⚠ 同步失敗 ' + t;
-  el.style.color = success ? 'var(--green)' : 'var(--red)';
-}
-
-// ════════════════════════════════════════════
-//  DEMO & UTILITY
-// ════════════════════════════════════════════
-function loadDemo() {
-  const now = Date.now();
-  const demo = [
-    { id:'d1', status:'pending', name:'王小明', phone:'0912345601', itemName:'電鍋', bigCat:'廚房小家電', item:'電鍋', brand:'TATUNG', regNum:'', tags:[], notes:'不加熱', endOfProduct:'2008' },
-    { id:'d2', status:'pending', name:'李美華', phone:'0923456702', itemName:'吹風機', bigCat:'美容家電', item:'吹風機', brand:'PHILIPS', regNum:'', tags:['電話已通知'], notes:'', endOfProduct:'2015' },
-    { id:'d3', status:'arrived', name:'陳大偉', phone:'0934567803', itemName:'果汁機', bigCat:'廚房小家電', item:'果汁機', brand:'NATIONAL', regNum:'3', tags:[], extraNote:'刀頭鬆動', arrivedAt: now - 12*60*1000, endOfProduct:'2010' },
-    { id:'d4', status:'repairing', name:'張淑芬', phone:'0945678904', itemName:'吸塵器', bigCat:'清潔家電', item:'吸塵器', brand:'SHARP', regNum:'7', tags:[], extraNote:'吸力不足', repairStart: now - 8*60*1000, endOfProduct:'2012' },
-    { id:'d5', status:'ready', name:'林志豪', phone:'0956789005', itemName:'電風扇', bigCat:'清潔家電', item:'電風扇', brand:'SAMPO', regNum:'2', repairResult:'成功修復', notifyTags:['電話已通知'], endOfProduct:'2005' },
-    { id:'d6', status:'done', name:'黃雅婷', phone:'0967890106', itemName:'電熨斗', bigCat:'美容家電', item:'電熨斗', brand:'PHILIPS', regNum:'1', repairResult:'無法修復', endOfProduct:'2001' },
+// ═══ DEMO & UTIL ═══
+function loadDemo(){
+  const now=Date.now();
+  const demo=[
+    {id:'4', status:'done',      name:'AAA',phone:'0932000258',phoneLast3:'258',itemName:'箱扇',          endOfProduct:'箱扇',          brand:'無法辨識/無品牌',model:'',          regNum:'4', bigCat:'生活家電',   item:'電風扇', faultNote:'有時無法通電',  repairResult:'NO_失敗',tags:[],accessories:[],notifyTags:[],arrivedAt:now-3600000,repairStart:now-3300000,repairEnd:now-1800000},
+    {id:'16',status:'ready',     name:'BBB',phone:'0932000123',phoneLast3:'123',itemName:'烘被器/烘鞋機',  endOfProduct:'烘被器/烘鞋機',  brand:'Sampo 聲寶',   model:'skc4160rl', regNum:'16',bigCat:'生活家電',   item:'電暖器', faultNote:'懷疑啟動電容',  repairResult:'NO_失敗',tags:[],accessories:[],notifyTags:['電話已通知'],arrivedAt:now-3000000,repairStart:now-2700000,repairEnd:now-1200000},
+    {id:'17',status:'arrived',   name:'CCC',phone:'0932000111',phoneLast3:'111',itemName:'吹風機',         endOfProduct:'吹風機',         brand:'Sharp 夏普',   model:'PJS16JA',   regNum:'17',bigCat:'美容美體家電',item:'吹風機', faultNote:'插電無反應',   repairResult:'',       tags:[],accessories:[],notifyTags:[],arrivedAt:now-1200000},
+    {id:'18',status:'transfer',  name:'DDD',phone:'0932000112',phoneLast3:'112',itemName:'箱扇',           endOfProduct:'箱扇',           brand:'大家源',       model:'TCY-2788',  regNum:'18',bigCat:'生活家電',   item:'電風扇', faultNote:'底座彈片歪掉',  repairResult:'未送修', tags:['取消'],accessories:[],notifyTags:[],arrivedAt:null},
+    {id:'20',status:'pending',   name:'AAA',phone:'0932000113',phoneLast3:'113',itemName:'檯燈',           endOfProduct:'檯燈',           brand:'Twinbird',     model:'TB-G006TW', regNum:'',  bigCat:'照明用具',   item:'檯燈',   faultNote:'無法噴蒸氣',   repairResult:'',       tags:[],accessories:[],notifyTags:[],arrivedAt:null},
+    {id:'22',status:'repairing', name:'CCC',phone:'0932000115',phoneLast3:'115',itemName:'露營燈',         endOfProduct:'露營燈',         brand:'國際牌National',model:'NL-780',    regNum:'22',bigCat:'照明用具',   item:'露營燈', faultNote:'加熱指示燈不亮',repairResult:'',       tags:[],accessories:[],notifyTags:[],arrivedAt:now-1800000,repairStart:now-600000},
+    {id:'25',status:'pending',   name:'DDD',phone:'0932000116',phoneLast3:'116',itemName:'檯燈',           endOfProduct:'檯燈',           brand:'國際牌Panasonic',model:'SR-RQ189', regNum:'',  bigCat:'照明用具',   item:'檯燈',   faultNote:'彈簧開關壞掉',  repairResult:'',       tags:['電話已通知'],accessories:[],notifyTags:[],arrivedAt:null},
   ];
-  demo.forEach(d => { if (!cards.find(c => c.id === d.id)) cards.push(d); });
-  saveLocalData();
-  renderKanban();
-  renderCasePicker();
-  updateReport();
+  demo.forEach(d=>{if(!cards.find(c=>c.id===d.id))cards.push(d);});
+  localStorage.setItem(DATA_KEY,JSON.stringify(cards));
+  renderKanban();renderCasePicker();updateReport();
   showToast('✓ 示範資料已載入');
 }
 
-function clearData() {
-  if (!confirm('確定要清除所有資料嗎？')) return;
-  cards = []; interviews = {};
-  saveLocalData(); saveInterviews();
-  renderKanban(); renderCasePicker(); updateReport();
-  showToast('已清除所有資料');
+function clearData(){
+  if(!confirm('確定清除所有本地資料？'))return;
+  cards=[];interviews={};
+  localStorage.setItem(DATA_KEY,'[]');localStorage.setItem(INTERVIEW_KEY,'{}');
+  renderKanban();renderCasePicker();updateReport();showToast('已清除');
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ── BOOT ──
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
