@@ -680,7 +680,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 // ═══════════════════════════════════════════
 // CONFIG (可在設定頁修改)
 // ═══════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbxL0QTCbCvl2VqWAl-IXkClBxVXJvLxsKz0uhO7YgHePvin_E2-0MsL0d1Qgsy0kcmk/exec';
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbzQpUOVfsBfHcqBsa8cshNfLNsyDKlnemRDkU9NhXj92A19eInyRv6R4bM0ABdlmWFm/exec';
 
 const STAGES = [
   {key:'未報到',        ci:0},
@@ -1040,14 +1040,12 @@ function openModal(id,stageKey){
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.price||'')}</span>
-      </div>
       <div class="trow">
         <span class="tl">配件</span>
         <span class="tv-edit" id="ei-price-${escH(sid)}"
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.accessories||'')}</span>
-      <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
       </div>
       </div>  
       </div>
@@ -1193,7 +1191,7 @@ function saveCard(id,sid){
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
   const accWrap=document.getElementById('acc-'+sid);
   const accOn=accWrap?[...accWrap.querySelectorAll('.acc-item.on')].map(el=>el.dataset.acc).join('、'):'';
-  const newId      = (()=>{const el=document.getElementById('ei-id-'+sid);return el?el.value.trim():'';})() || c.id;
+  const newId      = (()=>{const el=document.getElementById('ei-id-'+sid);return el?el.value.trim():c.id;})();
   const newName    = getEdit('ei-name-'+sid)     || c.name;
   const newPhone   = getEdit('ei-phone-'+sid)    || c.phone;
   const newModel   = getEdit('ei-model-'+sid)    || c.model;
