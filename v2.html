@@ -1046,27 +1046,30 @@ function openModal(id,stageKey){
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.model||'')}</span>
+      </div>
       <div class="trow">
         <span class="tl">出廠日期</span>
         <span class="tv-edit" id="ei-mfgdate-${escH(sid)}"
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.mfgDate||'')}</span>
+      </div>
       <div class="trow">
         <span class="tl">價格</span>
         <span class="tv-edit" id="ei-price-${escH(sid)}"
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.price||'')}</span>
+      </div>
       <div class="trow">
         <span class="tl">配件</span>
-        <span class="tv-edit" id="ei-price-${escH(sid)}"
-          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-        >${escH(c.accessories||'')}</span>
+        <div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div>
       </div>
-      </div>  
+      <div class="trow">
+        <span class="tl">是否拆過</span>
+        <span class="tv">${boolPill(c.opened)}</span>
       </div>
+    </div>
     <div class="msec">
       <div class="msec-title">故障說明</div>
       <div class="trow">
@@ -1079,9 +1082,6 @@ function openModal(id,stageKey){
       <div class="trow"><span class="tl">產品備註</span><span class="tv note-text">${escH(c.itemNote||'—')}</span></div>
       <div class="trow"><span class="tl">備註標籤</span><span class="tv">${escH(c.noteTag||'—')}</span></div>
     </div>
-        </div>
-            </div>
-            </div>
     <div class="msec">
       <div class="msec-title">維修紀錄</div>
       <div class="trow">
