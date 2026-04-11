@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>小家電維修所 · 維修追蹤</title>
+<title>小家電維修所</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#f2f3f6;
-  --surface:#ffffff;
+  --surface:#fff;
   --surface2:#f0f1f5;
   --border:#e3e5ee;
   --border2:#c9ccd8;
@@ -21,156 +21,147 @@
   --accent-bg:#eef3ff;
   --shadow:0 1px 3px rgba(28,35,80,.07),0 1px 8px rgba(28,35,80,.04);
   --shadow-md:0 4px 18px rgba(28,35,80,.11);
+  --tab-h:62px;
 }
 body{
   background:var(--bg);
   font-family:'Noto Sans TC',system-ui,sans-serif;
-  color:var(--text);min-height:100vh;
+  color:var(--text);
+  min-height:100vh;
+  padding-bottom:var(--tab-h);
   -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
 }
 
-/* ── NAV ── */
-.nav{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 16px;
-  overflow-x:auto;scrollbar-width:none;
-  position:sticky;top:0;z-index:60;box-shadow:var(--shadow);
+/* ══ TOP BAR ══ */
+.topbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+  box-shadow:var(--shadow);
 }
-.nav::-webkit-scrollbar{display:none;}
-.nav-brand{
-  font-size:14px;font-weight:600;color:var(--accent);
-  padding:14px 0;margin-right:18px;white-space:nowrap;
-  display:flex;align-items:center;gap:6px;flex-shrink:0;
-}
-.nav-tab{
-  padding:14px 13px;font-size:13px;font-weight:500;
-  color:var(--text2);white-space:nowrap;cursor:pointer;
-  border-bottom:2px solid transparent;transition:all .15s;
-}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.brand{font-size:16px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
 .sync-pill{
-  margin-left:auto;display:flex;align-items:center;gap:5px;
-  font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;
-  padding:5px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--text3);
+  padding:4px 10px;border-radius:20px;
+  background:var(--surface2);border:1px solid var(--border);
 }
 .sdot{width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0;animation:blink 2s infinite;}
 .sdot.syncing{background:#f59e0b;animation:none;}
 .sdot.err{background:#ef4444;animation:none;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* ── HEADER ── */
-.header{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:16px 16px 12px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
-}
-.header h1{font-size:20px;font-weight:600;}
-.header .sub{font-size:12px;color:var(--text3);margin-top:3px;}
-.hbtns{display:flex;gap:8px;align-items:center;}
-.btn{
-  padding:7px 14px;font-size:12px;font-weight:500;border-radius:8px;
-  cursor:pointer;font-family:inherit;transition:all .15s;
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tbtn{
+  padding:6px 12px;font-size:12px;font-weight:500;border-radius:7px;
+  cursor:pointer;font-family:inherit;
   border:1px solid var(--border2);background:var(--surface);color:var(--text2);
+  transition:all .15s;
 }
-.btn:hover{background:var(--surface2);}
-.btn.pri{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn.pri:hover{background:#1d4ed8;}
-.btn:active{transform:scale(.97);}
+.tbtn:active{transform:scale(.96);}
 
-/* ── FILTER BAR ── */
+/* ══ PAGES ══ */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ══ BOTTOM TAB BAR ══ */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--tab-h);
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;align-items:stretch;
+  z-index:60;
+  box-shadow:0 -2px 12px rgba(28,35,80,.07);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;transition:color .15s;
+  color:var(--text3);font-size:11px;font-weight:500;
+  border:none;background:none;font-family:inherit;
+  padding:6px 0 4px;
+}
+.tab svg{width:22px;height:22px;transition:all .15s;}
+.tab.active{color:var(--accent);}
+.tab.active svg{stroke:var(--accent);}
+.tab:active{opacity:.7;}
+
+/* ══ REPAIR PAGE ══ */
+.repair-header{
+  padding:14px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.repair-header h1{font-size:20px;font-weight:600;}
+
+/* ── search bar (pill shape, above chips) ── */
+.searchbar{
+  background:var(--surface);border-bottom:0;
+  padding:10px 14px 6px;
+}
+.sbox{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:999px;
+  padding:9px 16px;width:100%;
+}
+.sbox svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;}
+.sbox input{background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;flex:1;}
+.sbox input::placeholder{color:var(--text3);}
+
+/* ── chip filter: two-row wrap ── */
 .fbar{
   background:var(--surface);border-bottom:1px solid var(--border);
-  padding:9px 16px;display:flex;align-items:center;gap:7px;
-  overflow-x:auto;scrollbar-width:none;
+  padding:6px 14px 10px;
+  display:flex;flex-wrap:wrap;gap:6px;
 }
-.fbar::-webkit-scrollbar{display:none;}
 .chip{
-  padding:5px 12px;font-size:12px;font-weight:500;border-radius:20px;
+  padding:5px 13px;font-size:12px;font-weight:500;border-radius:20px;
   border:1px solid var(--border);background:var(--surface);color:var(--text2);
   cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit;flex-shrink:0;
 }
-.chip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.chip.on{color:#fff;border-color:transparent;}
 .chip:hover:not(.on){background:var(--surface2);}
-.sbox{
-  margin-left:auto;flex-shrink:0;
-  display:flex;align-items:center;gap:7px;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;padding:6px 11px;
-}
-.sbox svg{width:13px;height:13px;color:var(--text3);flex-shrink:0;}
-.sbox input{
-  background:none;border:none;outline:none;
-  font-size:13px;color:var(--text);font-family:inherit;width:120px;
-}
-.sbox input::placeholder{color:var(--text3);}
 
-/* ── BOARD ── */
-.board-wrap{overflow-x:auto;padding:16px 16px 32px;}
+.board-wrap{overflow-x:auto;padding:14px 14px 24px;}
 .board-wrap::-webkit-scrollbar{height:5px;}
 .board-wrap::-webkit-scrollbar-track{background:var(--border);border-radius:10px;}
 .board-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
 .board{display:flex;gap:12px;align-items:flex-start;min-width:max-content;}
 
-.col{width:210px;flex-shrink:0;}
+.col{width:220px;flex-shrink:0;display:flex;flex-direction:column;}
 .col-hd{
   display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;border-radius:9px;margin-bottom:9px;
-  border:1px solid transparent;
+  padding:9px 13px;border-radius:10px 10px 0 0;
 }
-.col-hd-l{display:flex;align-items:center;gap:6px;}
-.cdot{width:7px;height:7px;border-radius:50%;}
-.cname{font-size:12px;font-weight:600;}
-.ccnt{font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(0,0,0,.07);}
-.col-cards{display:flex;flex-direction:column;gap:7px;}
+.cname{font-size:13px;font-weight:700;}
+.ccnt{font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.28);}
+.col-body{border-radius:0 0 11px 11px;padding:9px 7px 11px;flex:1;min-height:70px;display:flex;flex-direction:column;gap:7px;}
 
-/* ── CARD ── */
 .kcard{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-left:3px solid #ccc; /* overridden per stage */
-  border-radius:11px;
-  padding:11px 12px;
-  cursor:pointer;
-  box-shadow:var(--shadow);
-  transition:box-shadow .15s,transform .15s,border-color .15s;
+  background:var(--surface);border:1px solid rgba(0,0,0,.06);
+  border-radius:10px;padding:11px 12px;cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  transition:box-shadow .15s,transform .12s;
 }
-.kcard:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--border2);}
+.kcard:hover{box-shadow:0 4px 12px rgba(0,0,0,.11);transform:translateY(-2px);}
 .kcard:active{transform:scale(.97);}
-
-/* card layout: circle left + info right */
-.kcard-inner{display:flex;align-items:flex-start;gap:10px;}
-
-/* Circle avatar showing 編號 */
+.kcard-inner{display:flex;align-items:center;gap:10px;}
 .knum-circle{
   width:40px;height:40px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:600;flex-shrink:0;
+  font-size:14px;font-weight:700;flex-shrink:0;
   font-family:'DM Mono',monospace;
-  border:2px solid;
 }
 .kcard-info{flex:1;min-width:0;}
-/* End of 產品 – main product label */
-.k-product{
-  font-size:13px;font-weight:600;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-bottom:3px;
-}
-/* 電話後3碼 */
-.k-phone{
-  font-size:16px;font-weight:600;
-  font-family:'DM Mono',monospace;
-  letter-spacing:1.5px;color:var(--text);
-  line-height:1;
-}
-/* 送修者姓名 */
-.k-name{font-size:11px;color:var(--text3);margin-top:3px;}
+.k-product{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.k-name{font-size:12px;color:var(--text2);}
+.empty-col{border:1.5px dashed rgba(0,0,0,.13);border-radius:9px;padding:18px 10px;text-align:center;font-size:12px;color:var(--text3);}
 
-.empty-col{
-  border:1.5px dashed var(--border2);border-radius:11px;
-  padding:20px 12px;text-align:center;font-size:12px;color:var(--text3);
-}
-
-/* ── MODAL ── */
+/* ══ MODAL ══ */
 .moverlay{
   position:fixed;inset:0;z-index:200;
   background:rgba(20,25,60,.45);backdrop-filter:blur(3px);
@@ -179,10 +170,8 @@ body{
 }
 @media(min-width:560px){.moverlay{align-items:center;padding:20px;}}
 @keyframes fdi{from{opacity:0}to{opacity:1}}
-
 .modal{
-  background:var(--surface);
-  border:1px solid var(--border2);
+  background:var(--surface);border:1px solid var(--border2);
   border-radius:20px 20px 0 0;
   width:100%;max-height:92vh;overflow-y:auto;
   animation:slu .22s cubic-bezier(.22,1,.36,1);
@@ -192,87 +181,194 @@ body{
 @keyframes slu{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal::-webkit-scrollbar{width:4px;}
 .modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
-
-.m-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:13px auto 0;}
+.m-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:13px auto 0;}
 .m-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 12px;border-bottom:1px solid var(--border);
+  padding:14px 20px 12px;border-bottom:1px solid var(--border);
   position:sticky;top:0;background:var(--surface);z-index:1;
 }
-.m-head-l{display:flex;align-items:center;gap:10px;}
-.m-num{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);}
-.m-title{font-size:15px;font-weight:600;line-height:1.3;}
+.m-head-l{display:flex;align-items:center;gap:11px;}
+.m-num{font-size:12px;font-family:'DM Mono',monospace;color:var(--text3);}
+.m-title{font-size:16px;font-weight:600;line-height:1.3;}
 .mclose{
-  width:28px;height:28px;border-radius:50%;
+  width:30px;height:30px;border-radius:50%;
   border:1px solid var(--border2);background:var(--surface2);
   color:var(--text2);font-size:15px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
 }
-.m-body{padding:16px 18px 28px;}
+.m-body{padding:0 0 30px;}
 
-.ml{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
-.mv{font-size:13px;color:var(--text);}
-.mv.hero{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;}
-.mrow{margin-bottom:13px;}
-.mdiv{border:none;border-top:1px solid var(--border);margin:14px 0;}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
-
-.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;}
-.pill-y{background:#ecfdf5;color:#059669;}
-.pill-n{background:#f1f5f9;color:#64748b;}
-
-.acc-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
-.acc-item{
-  font-size:11px;padding:4px 10px;border-radius:7px;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;
+/* modal sections */
+.m-hero-strip{
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:14px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
-.acc-item.on{background:var(--accent-bg);border-color:#bfdbfe;color:var(--accent);}
-
+.m-hero-id{font-size:28px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:2px;line-height:1;}
+.m-hero-stage{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:5px 13px;border-radius:20px;}
+.msec{padding:16px 20px 4px;}
+.msec-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:12px;
+}
+.msec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.msec-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.trow{display:grid;grid-template-columns:88px 1fr;align-items:start;gap:6px 10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.trow:last-child{border-bottom:none;}
+.trow.edit{grid-template-columns:1fr;gap:4px;}
+.tl{font-size:11px;color:var(--text3);font-weight:500;padding-top:2px;line-height:1.4;}
+.trow.edit .tl{font-size:10px;letter-spacing:.05em;text-transform:uppercase;}
+.tv{font-size:13px;color:var(--text);line-height:1.5;word-break:break-word;}
+.tv.bold{font-weight:600;}
+.tv.mono{font-family:'DM Mono',monospace;}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:3px 9px;border-radius:20px;}
+.pill-y{background:#ecfdf5;color:#065f46;}
+.pill-n{background:#f1f5f9;color:#475569;}
+.call-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:500;}
+.acc-wrap{display:flex;flex-wrap:wrap;gap:5px;padding-top:3px;}
+.acc-item{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
+.acc-item.on{background:var(--accent-bg);border-color:#bfdbfe;color:var(--accent);font-weight:500;}
+.note-text{font-size:13px;color:var(--text2);line-height:1.6;}
 .msel,.mta,.minput{
   width:100%;padding:9px 11px;font-size:13px;
   border:1px solid var(--border2);border-radius:8px;
   background:var(--surface);color:var(--text);
-  font-family:inherit;margin-top:5px;outline:none;transition:border-color .15s;
+  font-family:inherit;outline:none;transition:border-color .15s;
 }
 .msel:focus,.mta:focus,.minput:focus{border-color:var(--accent);}
-.mta{resize:vertical;min-height:64px;}
-
+.mta{resize:vertical;min-height:68px;}
+.two-inp{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stage-select-wrap{background:var(--surface2);border-top:1px solid var(--border);padding:16px 20px 18px;}
+.stage-select-wrap label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:7px;}
 .save-btn{
-  width:100%;padding:12px;font-size:14px;font-weight:600;
+  display:block;width:100%;padding:13px;font-size:14px;font-weight:600;
   background:var(--accent);color:#fff;border:none;border-radius:10px;
-  cursor:pointer;font-family:inherit;margin-top:14px;transition:all .15s;
+  cursor:pointer;font-family:inherit;transition:all .15s;margin-top:11px;
 }
 .save-btn:hover{background:#1d4ed8;}
 .save-btn:active{transform:scale(.98);}
 .save-btn:disabled{background:#94a3b8;cursor:not-allowed;}
 
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:#1c1e2e;color:#fff;font-size:13px;font-weight:500;
-  padding:10px 20px;border-radius:20px;z-index:500;
-  opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;
+/* ══ INTERVIEW PAGE ══ */
+.page-inner{padding:16px;}
+.page-header{margin-bottom:18px;}
+.page-header h2{font-size:20px;font-weight:600;margin-bottom:4px;}
+.page-header p{font-size:13px;color:var(--text2);}
+.card-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.card-box h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text);}
+.form-row{margin-bottom:12px;}
+.form-row label{display:block;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.form-inp,.form-ta,.form-sel{
+  width:100%;padding:10px 12px;font-size:14px;
+  border:1px solid var(--border2);border-radius:9px;
+  background:var(--surface);color:var(--text);
+  font-family:inherit;outline:none;transition:border-color .15s;
 }
-.toast.show{opacity:1;}
+.form-inp:focus,.form-ta:focus,.form-sel:focus{border-color:var(--accent);}
+.form-ta{resize:vertical;min-height:80px;}
+.match-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+.match-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface2);cursor:pointer;transition:all .15s;
+}
+.match-item:hover{border-color:var(--accent);background:var(--accent-bg);}
+.match-item.selected{border-color:var(--accent);background:var(--accent-bg);}
+.match-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace;}
+.match-info{flex:1;min-width:0;}
+.match-info .mi-name{font-size:13px;font-weight:600;}
+.match-info .mi-prod{font-size:12px;color:var(--text2);}
+.match-check{font-size:16px;color:var(--accent);flex-shrink:0;}
+.submit-btn{
+  width:100%;padding:13px;font-size:14px;font-weight:600;
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  cursor:pointer;font-family:inherit;transition:all .15s;margin-top:4px;
+}
+.submit-btn:disabled{background:#94a3b8;cursor:not-allowed;}
+.submit-btn:active{transform:scale(.98);}
+.interview-log{margin-top:14px;}
+.ilog-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;margin-bottom:8px;
+  box-shadow:var(--shadow);
+}
+.ilog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ilog-tag{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:20px;}
+.ilog-time{font-size:11px;color:var(--text3);}
+.ilog-name{font-size:14px;font-weight:600;margin-bottom:4px;}
+.ilog-prod{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.ilog-q{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;}
+.ilog-a{font-size:13px;color:var(--text);margin-bottom:8px;line-height:1.5;}
+.del-btn{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;}
+.del-btn:hover{color:#ef4444;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
 
-/* ── LOADING BAR ── */
-.lbar{
-  position:fixed;top:0;left:0;right:0;height:3px;
-  background:var(--accent);z-index:999;
-  transform:scaleX(0);transform-origin:left;transition:transform .3s ease;
+/* ══ SETTINGS PAGE ══ */
+.settings-row{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
+.settings-row .sr-left{}
+.sr-label{font-size:15px;font-weight:500;margin-bottom:3px;}
+.sr-desc{font-size:12px;color:var(--text2);}
+/* iOS-style toggle */
+.toggle{position:relative;width:48px;height:28px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.slider{
+  position:absolute;inset:0;border-radius:28px;
+  background:var(--border2);cursor:pointer;transition:.2s;
+}
+.slider::before{
+  content:'';position:absolute;width:22px;height:22px;
+  border-radius:50%;background:#fff;left:3px;top:3px;
+  transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+input:checked+.slider{background:var(--accent);}
+input:checked+.slider::before{transform:translateX(20px);}
+
+/* ══ STATS PAGE ══ */
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:16px;box-shadow:var(--shadow);
+}
+.stat-card-title{
+  font-size:12px;font-weight:700;color:var(--text3);
+  letter-spacing:.07em;text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.stat-card-title::before{content:'';display:inline-block;width:3px;height:12px;background:var(--accent);border-radius:2px;}
+.kpi-mini{text-align:center;}
+.kpi-n{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;margin-bottom:2px;}
+.kpi-l{font-size:11px;color:var(--text3);}
+
+/* legacy stats (still used for bar-list fallback) */
+.stats-section{margin-bottom:14px;}
+.stats-section h3{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 8px;text-align:center;box-shadow:var(--shadow);}
+.metric-num{font-size:20px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;margin-bottom:3px;}
+.metric-label{font-size:11px;color:var(--text3);}
+.bar-list{display:flex;flex-direction:column;gap:7px;}
+.bar-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;}
+.bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.bar-label{font-size:12px;font-weight:500;}
+.bar-val{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;}
+.bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+
+/* ══ GLOBAL UTILS ══ */
+.lbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
 .lbar.on{transform:scaleX(.75);}
 .lbar.done{transform:scaleX(1);opacity:0;transition:transform .2s,opacity .3s .1s;}
+.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:20px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;}
+.toast.show{opacity:1;}
 
-/* stage palette */
-.sp0{--sc:#64748b;--sbg:#f1f5f9;--sbr:#e2e8f0;--sd:#94a3b8;}
-.sp1{--sc:#2563eb;--sbg:#eff4ff;--sbr:#bfdbfe;--sd:#3b82f6;}
-.sp2{--sc:#d97706;--sbg:#fffbeb;--sbr:#fde68a;--sd:#f59e0b;}
-.sp3{--sc:#7c3aed;--sbg:#f5f3ff;--sbr:#ddd6fe;--sd:#8b5cf6;}
-.sp4{--sc:#059669;--sbg:#ecfdf5;--sbr:#a7f3d0;--sd:#10b981;}
-.sp5{--sc:#db2777;--sbg:#fdf2f8;--sbr:#fbcfe8;--sd:#ec4899;}
+/* ══ STAGE PALETTE ══ */
+/* defined in JS for dynamic use */
 </style>
 </head>
 <body>
@@ -280,47 +376,159 @@ body{
 <div class="lbar" id="lbar"></div>
 <div class="toast" id="toast"></div>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-brand">🔧 小家電維修所</div>
-  <div class="nav-tab active">維修看板</div>
-  <div class="nav-tab">客戶管理</div>
-  <div class="nav-tab">報表統計</div>
-  <div class="sync-pill" id="sync-pill">
-    <div class="sdot" id="sdot"></div>
-    <span id="slbl">連線中…</span>
-  </div>
-</nav>
-
-<!-- HEADER -->
-<div class="header">
-  <div>
-    <h1 id="ttl">載入中…</h1>
-    <div class="sub" id="sub-lbl">正在連接 Google Sheets…</div>
-  </div>
-  <div class="hbtns">
-    <button class="btn" onclick="fetchData()">⟳ 重新整理</button>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">🔧 小家電維修所</div>
+  <div class="topbar-right">
+    <div class="sync-pill" id="sync-pill">
+      <div class="sdot" id="sdot"></div>
+      <span id="slbl">連線中…</span>
+    </div>
+    <button class="tbtn" onclick="fetchData()">⟳</button>
   </div>
 </div>
 
-<!-- FILTER -->
-<div class="fbar" id="fbar">
-  <button class="chip on" onclick="setFilter('all',this)">全部</button>
-  <!-- stage chips injected by JS -->
-  <div class="sbox">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3"/></svg>
-    <input type="search" id="q" placeholder="姓名、電話、編號…" autocomplete="off">
+<!-- ═══ PAGE: REPAIR ═══ -->
+<div class="page active" id="page-repair">
+  <div class="repair-header">
+    <h1>維修看板</h1>
+  </div>
+  <!-- 搜尋框：膠囊形，位於chips上方 -->
+  <div class="searchbar">
+    <div class="sbox">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3"/></svg>
+      <input type="search" id="q" placeholder="搜尋姓名、編號、品項…" autocomplete="off">
+    </div>
+  </div>
+  <!-- 階段篩選：兩列換行 -->
+  <div class="fbar" id="fbar">
+    <button class="chip" id="chip-all" onclick="toggleAll(this)">全部</button>
+    <!-- stage chips injected by JS -->
+  </div>
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <div style="padding:40px;color:var(--text3);font-size:14px;">載入中…</div>
+    </div>
   </div>
 </div>
 
-<!-- BOARD -->
-<div class="board-wrap">
-  <div class="board" id="board">
-    <div style="padding:40px 0;color:var(--text3);font-size:14px;">正在讀取資料…</div>
+<!-- ═══ PAGE: INTERVIEW ═══ -->
+<div class="page" id="page-interview">
+  <div class="page-inner">
+    <div class="page-header">
+      <h2>👋 訪問記錄</h2>
+      <p>輸入品項搜尋送修家電，綁定訪問內容</p>
+    </div>
+
+    <!-- Search & bind -->
+    <div class="card-box">
+      <h3>🔍 搜尋送修家電</h3>
+      <div class="form-row">
+        <label>輸入品項 / 姓名 / 編號</label>
+        <input class="form-inp" id="iv-search" type="text" placeholder="例：電風扇、王小明…" oninput="ivSearch()" autocomplete="off">
+      </div>
+      <div class="match-list" id="iv-matches"></div>
+    </div>
+
+    <!-- Interview questions — only shown when interviewEnabled -->
+    <div id="iv-form-wrap">
+      <div class="card-box" id="iv-selected-info" style="display:none;border-color:var(--accent);background:var(--accent-bg);">
+        <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px;">已選取送修者</div>
+        <div id="iv-selected-name" style="font-size:15px;font-weight:600;"></div>
+        <div id="iv-selected-prod" style="font-size:13px;color:var(--text2);margin-top:2px;"></div>
+      </div>
+
+      <div class="card-box" id="iv-questions">
+        <h3>📝 訪問問題</h3>
+        <div class="form-row">
+          <label>為什麼知道我們的活動？</label>
+          <textarea class="form-ta" id="iv-q1" placeholder="例：朋友介紹、社群媒體、路過看到…"></textarea>
+        </div>
+        <div class="form-row">
+          <label>如果希望活動可以做得更好，你有什麼建議？</label>
+          <textarea class="form-ta" id="iv-q2" placeholder="例：希望增加更多品項、場地更大…"></textarea>
+        </div>
+        <button class="submit-btn" id="iv-submit" onclick="submitInterview()" disabled>提交訪問記錄</button>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="interview-log" id="iv-log-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);">訪問紀錄 <span id="iv-count" style="color:var(--text3);font-weight:400;"></span></div>
+        <button onclick="clearAllInterviews()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit;">清除全部</button>
+      </div>
+      <div id="iv-log"></div>
+    </div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ═══ PAGE: SETTINGS ═══ -->
+<div class="page" id="page-settings">
+  <div class="page-inner">
+    <div class="page-header">
+      <h2>⚙️ 設定</h2>
+      <p>應用程式功能設定</p>
+    </div>
+
+    <div class="card-box">
+      <h3 style="margin-bottom:14px;">功能開關</h3>
+
+      <div class="settings-row" style="border:none;padding:0 0 14px;margin-bottom:14px;border-bottom:1px solid var(--border);">
+        <div class="sr-left">
+          <div class="sr-label">訪問功能</div>
+          <div class="sr-desc">開啟後可在「訪問」頁記錄送修者意見</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-interview" checked onchange="saveSettings()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-row" style="border:none;padding:0;">
+        <div class="sr-left">
+          <div class="sr-label">自動同步</div>
+          <div class="sr-desc">每 30 秒自動從 Google Sheets 更新資料</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-autosync" checked onchange="saveSettings()">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card-box">
+      <h3 style="margin-bottom:14px;">資料來源</h3>
+      <div class="form-row">
+        <label>Google Apps Script URL</label>
+        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/…/exec" oninput="saveSettings()">
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">修改後重新整理即生效</div>
+    </div>
+
+    <div class="card-box" style="background:var(--surface2);">
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+        <div style="font-weight:600;margin-bottom:6px;">版本資訊</div>
+        小家電維修所 · 維修追蹤系統 v5<br>
+        資料同步：Google Apps Script JSONP<br>
+        本機訪問記錄：localStorage
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE: STATS ═══ -->
+<div class="page" id="page-stats">
+  <div class="page-inner">
+    <div class="page-header">
+      <h2>📊 統計</h2>
+      <p>維修工單與訪問資料摘要</p>
+    </div>
+    <div id="stats-content"></div>
+  </div>
+</div>
+
+<!-- MODAL (repair card detail) -->
 <div class="moverlay" id="mov" style="display:none" onclick="closeBg(event)">
   <div class="modal">
     <div class="m-handle"></div>
@@ -338,437 +546,618 @@ body{
   </div>
 </div>
 
+<!-- BOTTOM TAB BAR -->
+<nav class="tabbar">
+  <button class="tab active" id="tab-repair" onclick="switchTab('repair')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    維修
+  </button>
+  <button class="tab" id="tab-interview" onclick="switchTab('interview')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    訪問
+  </button>
+  <button class="tab" id="tab-stats" onclick="switchTab('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+      <line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+    統計
+  </button>
+  <button class="tab" id="tab-settings" onclick="switchTab('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+    設定
+  </button>
+</nav>
+
 <script>
-// ═══════════════════════════════════════════════════
-// ★ 設定區：填入你的 GAS Web App URL
-// ═══════════════════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxREDKG37n6FACiFa3YsZa0giUDwkV1lRR_fpoi9YY7VJw0Y3vy8KfjV0Wp4hLu0Bc0/exec';
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════
+// CONFIG (可在設定頁修改)
+// ═══════════════════════════════════════════
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbxREDKG37n6FACiFa3YsZa0giUDwkV1lRR_fpoi9YY7VJw0Y3vy8KfjV0Wp4hLu0Bc0/exec';
 
-// 流程階段（對應 Google Sheet「流程階段」欄位的實際文字）
 const STAGES = [
-  { key:'未報到',        ci:0 },
-  { key:'已報到等待維修', ci:1 },
-  { key:'維修中',        ci:2 },
-  { key:'待領取',        ci:3 },
-  { key:'已領取',        ci:4 },
-  { key:'轉診或待確認',  ci:5 },
+  {key:'未報到',        ci:0},
+  {key:'已報到等待維修',ci:1},
+  {key:'維修中',        ci:2},
+  {key:'待領取',        ci:3},
+  {key:'已領取',        ci:4},
+  {key:'轉診或待確認',  ci:5},
 ];
-const STAGE_KEYS = STAGES.map(s=>s.key);
 
-// Stage visual palette (light theme)
 const PALETTE = [
-  {sc:'#64748b',sbg:'#f1f5f9',sbr:'#e2e8f0',sd:'#94a3b8'},
-  {sc:'#2563eb',sbg:'#eff4ff',sbr:'#bfdbfe',sd:'#3b82f6'},
-  {sc:'#d97706',sbg:'#fffbeb',sbr:'#fde68a',sd:'#f59e0b'},
-  {sc:'#7c3aed',sbg:'#f5f3ff',sbr:'#ddd6fe',sd:'#8b5cf6'},
-  {sc:'#059669',sbg:'#ecfdf5',sbr:'#a7f3d0',sd:'#10b981'},
-  {sc:'#db2777',sbg:'#fdf2f8',sbr:'#fbcfe8',sd:'#ec4899'},
+  {sc:'#fff',sbg:'#94a3b8',colBg:'#f1f5f9',circleBg:'#e2e8f0',circleColor:'#475569'},
+  {sc:'#fff',sbg:'#3b82f6',colBg:'#eff6ff',circleBg:'#dbeafe',circleColor:'#1d4ed8'},
+  {sc:'#fff',sbg:'#f97316',colBg:'#fff7ed',circleBg:'#fed7aa',circleColor:'#c2410c'},
+  {sc:'#fff',sbg:'#8b5cf6',colBg:'#f5f3ff',circleBg:'#ede9fe',circleColor:'#6d28d9'},
+  {sc:'#fff',sbg:'#10b981',colBg:'#ecfdf5',circleBg:'#d1fae5',circleColor:'#065f46'},
+  {sc:'#fff',sbg:'#ef4444',colBg:'#fef2f2',circleBg:'#fecaca',circleColor:'#b91c1c'},
 ];
 
-// Avatar colors per 編號 hash
-const AV_COLORS = ['#2563eb','#d97706','#059669','#7c3aed','#db2777','#0891b2','#65a30d','#9a3412'];
-
-let allCards  = [];
-let filterKey = 'all';
-let searchQ   = '';
+// ══ STATE ══
+let allCards   = [];
+let activeKeys = new Set();
+let searchQ    = '';
 let refreshTimer = null;
+let chipsBuilt = false;
+let currentTab = 'repair';
+let interviewEnabled = true;
+let autoSync   = true;
+let selectedCard = null; // for interview binding
+let interviews = JSON.parse(localStorage.getItem('interviews')||'[]');
 
-// ─── map from GAS getData() response field names ───
-// GAS returns: { id, name, phone, regNum, bigCat, item, subItem, itemNote,
-//   endOfProduct, brand, model, opened, accessories, extraNote,
-//   repairResult, repairResultDesc, repairNote, repairman, partCost, status }
-//
-// 實際 Sheet 欄位：
-//   日期|流程階段|備註標籤|編號|送修者姓名|送件者電話|電話後3碼|產品分類|
-//   產品品項|產品細項|產品備註|End of 產品|品牌|型號|配件|出廠日期|
-//   產品價格|故障說明|維修_結果分類|維修_結果說明|維修_補充備註|
-//   維修者|零件費|隨喜費|減碳貢獻
-//
-// GAS getData() 回傳欄位對應（依照你提供的 GAS 程式碼）：
-//   status        ← 分類 (X欄) → 但我們的 Kanban 用「流程階段」
-//   NOTE: GAS 原本的 getData 讀的是舊欄位，需要在下方做欄位映射調整
-//
-// ★ 由於 GAS getData() 是用 header 名稱動態找欄位，
-//   實際上只要 GAS 的 col("欄位名") 有對應到 Sheet 的欄位名稱就會正確取得。
-//   我們在前端用以下對應來使用 GAS 回傳的資料：
+// ══ SETTINGS ══
+function loadSettings(){
+  const gs = localStorage.getItem('gasUrl');
+  if(gs){ GAS_URL=gs; document.getElementById('gas-url-input').value=gs; }
+  const ie = localStorage.getItem('interviewEnabled');
+  interviewEnabled = ie===null ? true : ie==='true';
+  document.getElementById('toggle-interview').checked = interviewEnabled;
+  const as = localStorage.getItem('autoSync');
+  autoSync = as===null ? true : as==='true';
+  document.getElementById('toggle-autosync').checked = autoSync;
+  applyInterviewSetting();
+}
+function saveSettings(){
+  const url = document.getElementById('gas-url-input').value.trim();
+  if(url) { GAS_URL=url; localStorage.setItem('gasUrl',url); }
+  interviewEnabled = document.getElementById('toggle-interview').checked;
+  localStorage.setItem('interviewEnabled', interviewEnabled);
+  autoSync = document.getElementById('toggle-autosync').checked;
+  localStorage.setItem('autoSync', autoSync);
+  applyInterviewSetting();
+  if(autoSync) startAuto(); else clearInterval(refreshTimer);
+}
+function applyInterviewSetting(){
+  // show/hide interview tab indicator
+  const ivTab = document.getElementById('tab-interview');
+  ivTab.style.opacity = interviewEnabled ? '1' : '0.4';
+  document.getElementById('iv-form-wrap').style.display = interviewEnabled ? '' : 'none';
+}
 
-function mapCard(raw) {
-  // raw 是 GAS getData() 回傳的每一筆物件
-  // 依照你的 GAS script getData() 的 map 函數欄位對應：
-  //   raw.id          = 編號
-  //   raw.name        = 姓名  (GAS裡是"姓名", Sheet是"送修者姓名" → GAS需更新)
-  //   raw.phone       = 電話  (GAS裡是"電話", Sheet是"送件者電話")
-  //   raw.status      = 分類  → 但Kanban用「流程階段」(stage)
-  //   raw.endOfProduct = End of 產品
-  //
-  // ★ 因為 GAS col() 是依 header 名稱搜尋，
-  //   如果 Sheet 的 header 是「送修者姓名」但 GAS 找「姓名」→ 找不到
-  //   前端在此做容錯，同時接受舊欄位名與新欄位名。
+// ══ TAB SWITCHING ══
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='stats') renderStats();
+  if(tab==='interview') renderInterviewLog();
+}
 
-  return {
-    // 識別
-    id:         String(raw.id          || raw['編號']        || ''),
-    // 卡片顯示三行
-    endOfProduct: raw.endOfProduct     || raw['End of 產品']  || raw.item || '',
-    phone3:     raw.phone3             || raw['電話後3碼']    || extractPhone3(String(raw.phone||'')),
-    name:       raw.name               || raw['送修者姓名']   || raw['姓名'] || '',
-    // 完整電話（撥打用）
-    phone:      String(raw.phone       || raw['送件者電話']   || ''),
-    // 掛號
-    regNum:     raw.regNum             || raw['掛號號碼']     || raw.id || '',
-    // 流程階段 → Kanban 欄位
-    stage:      raw.stage              || raw['流程階段']     || raw.status || '未報到',
-    // 備註標籤
-    noteTag:    raw.noteTag            || raw['備註標籤']     || '',
-    // 產品資訊
-    bigCat:     raw.bigCat             || raw['家電大分類']   || raw['產品分類'] || '',
-    item:       raw.item               || raw['產品品項']     || '',
-    subItem:    raw.subItem            || raw['產品細項']     || '',
-    itemNote:   raw.itemNote           || raw['產品備註']     || raw['備註說明'] || '',
-    brand:      raw.brand              || raw['品牌']         || '',
-    model:      raw.model              || raw['型號']         || '',
-    accessories:raw.accessories        || raw['配件']         || '',
-    mfgDate:    raw.mfgDate            || raw['出廠日期']     || '',
-    price:      raw.price              || raw['產品價格']     || '',
-    faultDesc:  raw.faultDesc          || raw['故障說明']     || '',
-    opened:     raw.opened             || raw['是否拆過']     || '',
-    extraNote:  raw.extraNote          || raw['其他備註']     || '',
-    // 維修
-    repairResult:     raw.repairResult     || raw['維修_結果分類']  || raw['維修結果']     || '',
-    repairResultDesc: raw.repairResultDesc || raw['維修_結果說明']  || raw['維修結果說明']  || '',
-    repairNote:       raw.repairNote       || raw['維修_補充備註']  || raw['當天修理狀況']  || '',
-    repairman:        raw.repairman        || raw['維修者']        || '',
-    partCost:         raw.partCost         || raw['零件費']        || '',
-    donationFee:      raw.donationFee      || raw['隨喜費']        || '',
-    ecoContrib:       raw.ecoContrib       || raw['減碳貢獻']      || '',
+// ══ DATA MAPPING ══
+function mapCard(raw){
+  const phone = String(raw.phone||raw['送件者電話']||'');
+  let phone3  = String(raw.phone3||raw['電話後3碼']||'');
+  if(!phone3&&phone){ const d=phone.replace(/\D/g,''); phone3=d.length>=3?d.slice(-3):d; }
+  const rawId = String(raw.id||raw['編號']||'').trim();
+  const stage = (raw.stage||raw['流程階段']||raw.status||'').trim()||'未報到';
+  return{
+    id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
+    phone3, name:raw.name||raw['送修者姓名']||raw['姓名']||'',
+    phone, regNum:raw.regNum||rawId||'',
+    stage, noteTag:raw.noteTag||raw['備註標籤']||'',
+    bigCat:raw.bigCat||raw['家電大分類']||raw['產品分類']||'',
+    item:raw.item||raw['產品品項']||'',
+    subItem:raw.subItem||raw['產品細項']||'',
+    itemNote:raw.itemNote||raw['產品備註']||raw['備註說明']||'',
+    brand:raw.brand||raw['品牌']||'',
+    model:raw.model||raw['型號']||'',
+    accessories:String(raw.accessories||raw['配件']||''),
+    mfgDate:raw.mfgDate||raw['出廠日期']||'',
+    price:raw.price||raw['產品價格']||'',
+    faultDesc:raw.faultDesc||raw['故障說明']||'',
+    opened:raw.opened||raw['是否拆過']||'',
+    extraNote:raw.extraNote||raw['其他備註']||'',
+    repairResult:raw.repairResult||raw['維修_結果分類']||'',
+    repairResultDesc:raw.repairResultDesc||raw['維修_結果說明']||'',
+    repairNote:raw.repairNote||raw['維修_補充備註']||'',
+    repairman:raw.repairman||raw['維修者']||'',
+    partCost:String(raw.partCost||raw['零件費']||''),
+    donationFee:String(raw.donationFee||raw['隨喜費']||''),
+    ecoContrib:raw.ecoContrib||raw['減碳貢獻']||'',
   };
 }
 
-function extractPhone3(phone){
-  if(!phone)return'';
-  const digits=phone.replace(/\D/g,'');
-  return digits.length>=3?digits.slice(-3):digits;
-}
-
-// ── JSONP fetch via GAS ──
+// ══ FETCH ══
 function fetchData(){
-  setSyncState('syncing','同步中…');
-  setLBar(true);
-  const cbName='_gas_cb_'+Date.now();
-  const script=document.createElement('script');
-  script.src=GAS_URL+'?action=get&callback='+cbName+'&t='+Date.now();
-
+  setSyncState('syncing','同步中…');setLBar(true);
+  const cb='_gc_'+Date.now();
+  const s=document.createElement('script');
+  s.src=GAS_URL+'?action=get&callback='+cb+'&t='+Date.now();
   let done=false;
-  window[cbName]=function(resp){
-    done=true;
-    document.head.removeChild(script);
-    delete window[cbName];
+  window[cb]=function(resp){
+    done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];
     if(resp&&resp.data&&resp.data.length>0){
       allCards=resp.data.map(mapCard);
-      render();
+      buildStageChips();render();
       const now=new Date();
-      const hm=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-      setSyncState('ok','上次同步 '+hm);
-      document.getElementById('sub-lbl').textContent='資料來源：Google Sheets · 共 '+allCards.length+' 筆工單';
-    } else if(resp&&resp.error){
-      setSyncState('err','GAS 錯誤：'+resp.error);
-    } else {
-      setSyncState('err','資料為空');
-    }
+      setSyncState('ok',now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 同步');
+    } else { setSyncState('err','無資料'); if(!allCards.length)loadDemo(); }
     setLBar(false);
   };
-
-  script.onerror=function(){
-    if(!done){
-      done=true;
-      try{document.head.removeChild(script);}catch(e){}
-      delete window[cbName];
-      setSyncState('err','連線失敗 – 請確認 GAS_URL 設定');
-      setLBar(false);
-      showToast('⚠ 無法連線至 Google Sheets，請確認 GAS_URL');
-      loadDemo();
-    }
+  s.onerror=function(){
+    if(!done){done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];
+    setSyncState('err','連線失敗');setLBar(false);if(!allCards.length)loadDemo();}
   };
-
-  setTimeout(function(){
-    if(!done){script.onerror();}
-  },12000);
-
-  document.head.appendChild(script);
+  setTimeout(()=>{if(!done)s.onerror();},12000);
+  document.head.appendChild(s);
 }
 
-// ── JSONP update via GAS ──
-function gasUpdate(params, onOk, onErr){
-  const cbName='_gas_upd_'+Date.now();
+function gasUpdate(params,onOk,onErr){
+  const cb='_gu_'+Date.now();
   const qs=Object.entries(params).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
-  const script=document.createElement('script');
-  script.src=GAS_URL+'?action=update&callback='+cbName+'&'+qs;
-
+  const s=document.createElement('script');
+  s.src=GAS_URL+'?action=update&callback='+cb+'&'+qs;
   let done=false;
-  window[cbName]=function(resp){
-    done=true;
-    try{document.head.removeChild(script);}catch(e){}
-    delete window[cbName];
-    if(resp&&resp.result==='success') onOk&&onOk(resp);
-    else onErr&&onErr(resp);
-  };
-  script.onerror=function(){
-    if(!done){done=true;try{document.head.removeChild(script);}catch(e){}delete window[cbName];onErr&&onErr();}
-  };
-  setTimeout(function(){if(!done)script.onerror();},10000);
-  document.head.appendChild(script);
+  window[cb]=function(resp){done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];
+    if(resp&&resp.result==='success')onOk&&onOk(resp);else onErr&&onErr(resp);};
+  s.onerror=function(){if(!done){done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];onErr&&onErr();}};
+  setTimeout(()=>{if(!done)s.onerror();},10000);
+  document.head.appendChild(s);
 }
 
-// ── RENDER ──
-function stageInfo(key){
-  const idx=STAGES.findIndex(s=>s.key===key);
-  return {idx:idx<0?0:idx, p:PALETTE[idx<0?0:idx]};
+// ══ REPAIR: BUILD CHIPS ══
+function buildStageChips(){
+  if(chipsBuilt)return;chipsBuilt=true;
+  const fbar=document.getElementById('fbar');
+  STAGES.forEach(s=>{
+    const p=PALETTE[s.ci];
+    const btn=document.createElement('button');
+    btn.className='chip';btn.dataset.key=s.key;btn.dataset.ci=s.ci;
+    btn.textContent=s.key;btn.onclick=function(){toggleStage(s.key,this);};
+    fbar.appendChild(btn);
+  });
+  updateAllChip();
+}
+function toggleStage(key,el){
+  if(activeKeys.has(key)){activeKeys.delete(key);el.classList.remove('on');el.style.background='';el.style.color='';}
+  else{activeKeys.add(key);const p=PALETTE[parseInt(el.dataset.ci||'0')];el.classList.add('on');el.style.background=p.sbg;el.style.color='#fff';}
+  updateAllChip();render();
+}
+function toggleAll(){
+  activeKeys.clear();
+  document.querySelectorAll('#fbar .chip[data-key]').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  updateAllChip();render();
+}
+function updateAllChip(){
+  const btn=document.getElementById('chip-all');if(!btn)return;
+  if(activeKeys.size===0){btn.classList.add('on');btn.style.background='var(--accent)';btn.style.color='#fff';}
+  else{btn.classList.remove('on');btn.style.background='';btn.style.color='';}
 }
 
-function avColor(id){
-  let h=0;for(let i=0;i<String(id).length;i++)h=(h*31+String(id).charCodeAt(i))|0;
-  return AV_COLORS[Math.abs(h)%AV_COLORS.length];
-}
-
+// ══ REPAIR: RENDER BOARD ══
 function render(){
   const q=searchQ.toLowerCase();
+  const showStages=activeKeys.size>0?STAGES.filter(s=>activeKeys.has(s.key)):STAGES;
   const filtered=allCards.filter(c=>{
-    if(filterKey!=='all'&&c.stage!==filterKey)return false;
-    if(q&&!(c.name.toLowerCase().includes(q)||c.phone.includes(q)||c.phone3.includes(q)||String(c.id).includes(q)||c.endOfProduct.toLowerCase().includes(q)))return false;
+    if(activeKeys.size>0&&!activeKeys.has(c.stage))return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.phone.includes(q)&&!String(c.id).includes(q)&&!c.endOfProduct.toLowerCase().includes(q))return false;
     return true;
   });
-
-  document.getElementById('ttl').textContent=filtered.length+' 筆維修工單';
-
-  // Inject stage filter chips (once)
-  const fbar=document.getElementById('fbar');
-  if(!fbar.dataset.built){
-    fbar.dataset.built='1';
-    const sbox=fbar.querySelector('.sbox');
-    STAGES.forEach(s=>{
-      const p=PALETTE[s.ci];
-      const btn=document.createElement('button');
-      btn.className='chip';
-      btn.textContent=s.key;
-      btn.onclick=function(){setFilter(s.key,this);};
-      btn.style.setProperty('--ac',p.sd);
-      fbar.insertBefore(btn,sbox);
-    });
-  }
-
-  document.getElementById('board').innerHTML=STAGES.map(stage=>{
+  document.getElementById('board').innerHTML=showStages.map(stage=>{
     const p=PALETTE[stage.ci];
     const sc=filtered.filter(c=>c.stage===stage.key);
-
-    const cardsHtml=sc.length?sc.map(c=>{
-      const col=avColor(c.id);
-      const colBg=col+'1a';
-      return `<div class="kcard" onclick="openModal('${escH(c.id)}')"
-        style="border-left-color:${p.sd};">
+    const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
+    const cHtml=sc.length?sc.map(c=>`
+      <div class="kcard" onclick="openModal('${escH(c.id||'__empty__')}','${escH(stage.key)}')">
         <div class="kcard-inner">
-          <div class="knum-circle" style="background:${colBg};color:${col};border-color:${col}40;">
-            ${escH(c.id)}
-          </div>
+          <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
             <div class="k-product">${escH(c.endOfProduct||c.item||'—')}</div>
-            <div class="k-phone">${escH(c.phone3||'—')}</div>
             <div class="k-name">${escH(c.name||'—')}</div>
           </div>
         </div>
-      </div>`;
-    }).join(''):`<div class="empty-col">暫無工單</div>`;
-
-    return `<div class="col">
-      <div class="col-hd" style="background:${p.sbg};border-color:${p.sbr};">
-        <div class="col-hd-l">
-          <div class="cdot" style="background:${p.sd};"></div>
-          <span class="cname" style="color:${p.sc};">${stage.key}</span>
-        </div>
-        <span class="ccnt" style="color:${p.sc};">${sc.length}</span>
-      </div>
-      <div class="col-cards">${cardsHtml}</div>
+      </div>`).join(''):`<div class="empty-col">暫無工單</div>`;
+    return`<div class="col">
+      <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
+      <div class="col-body" style="background:${p.colBg};">${cHtml}</div>
     </div>`;
   }).join('');
 }
 
-// ── MODAL ──
-function openModal(id){
-  const c=allCards.find(x=>String(x.id)===String(id));
+// ══ REPAIR: MODAL ══
+let _modalStageKey='';
+function openModal(id,stageKey){
+  _modalStageKey=stageKey||'';
+  const isEmpty=id==='__empty__';
+  const c=isEmpty?allCards.find(x=>!x.id&&x.stage===stageKey):allCards.find(x=>String(x.id)===String(id));
   if(!c)return;
-  const col=avColor(c.id);
-  const si=stageInfo(c.stage);
-  const p=si.p;
-
-  // header circle
+  const ci=STAGES.findIndex(s=>s.key===c.stage);
+  const p=PALETTE[ci<0?0:ci];
   const mc=document.getElementById('m-circle');
-  mc.textContent=c.id;
-  mc.style.background=col+'1a';mc.style.color=col;mc.style.borderColor=col+'50';
-  document.getElementById('m-num').textContent='掛號 '+c.regNum;
-  document.getElementById('m-title').textContent=(c.endOfProduct||c.item||'—')+' · '+c.name;
-
-  // accessories as toggle chips
+  const idD=String(c.id||'').replace(/\D/g,'');
+  mc.textContent=idD?idD.slice(-2):'';
+  mc.style.background=p.circleBg;mc.style.color=p.circleColor;
+  document.getElementById('m-num').textContent=c.id?'掛號 '+c.id:'（未編號）';
+  document.getElementById('m-title').textContent=(c.endOfProduct||c.item||'—')+' · '+(c.name||'—');
   const accList=c.accessories?c.accessories.split(/[,，、\s]+/).filter(Boolean):[];
   const accHtml=accList.length?accList.map(a=>`<span class="acc-item on" onclick="this.classList.toggle('on')" data-acc="${escH(a)}">${escH(a)}</span>`).join(''):'<span style="font-size:12px;color:var(--text3)">無</span>';
-
-  // stage options
   const stageOpts=STAGES.map(s=>`<option value="${escH(s.key)}"${c.stage===s.key?' selected':''}>${s.key}</option>`).join('');
-
-  const boolPill=(v)=>{
-    const yes=['是','true','1','yes','有'].includes(String(v).toLowerCase());
-    const no=['否','false','0','no','無'].includes(String(v).toLowerCase());
-    if(yes)return`<span class="pill pill-y">✔ 是</span>`;
-    if(no)return`<span class="pill pill-n">✘ 否</span>`;
+  const boolPill=v=>{
+    const y=['是','true','1','yes','有'].includes(String(v).toLowerCase());
+    const n=['否','false','0','no','無'].includes(String(v).toLowerCase());
+    if(y)return`<span class="pill pill-y">✔ 是</span>`;
+    if(n)return`<span class="pill pill-n">✘ 否</span>`;
     return`<span class="pill pill-n">${escH(v)||'—'}</span>`;
   };
-
+  const sid=c.id||'noid';
   document.getElementById('m-body').innerHTML=`
-    <div class="mrow"><div class="ml">掛號號碼</div><div class="mv hero">${escH(c.regNum||c.id)}</div></div>
-    <hr class="mdiv">
-
-    <div class="two">
-      <div class="mrow"><div class="ml">送修者姓名</div><div class="mv">${escH(c.name||'—')}</div></div>
-      <div class="mrow"><div class="ml">電話後3碼</div>
-        <div class="mv" style="font-family:'DM Mono',monospace;font-size:20px;font-weight:600;">${escH(c.phone3||'—')}</div>
+    <div class="m-hero-strip">
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;">掛號號碼</div>
+      <div class="m-hero-id">${escH(c.regNum||c.id||'—')}</div></div>
+      <div class="m-hero-stage" style="background:${p.circleBg};color:${p.circleColor};">${escH(c.stage)}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title"><div class="msec-icon" style="background:#eff4ff;color:#2563eb;">👤</div>客戶資訊</div>
+      <div class="trow"><span class="tl">送修者</span><span class="tv bold">${escH(c.name||'—')}</span></div>
+      <div class="trow"><span class="tl">電話後3碼</span><span class="tv mono" style="font-size:18px;font-weight:700;letter-spacing:2px;">${escH(c.phone3||'—')}</span></div>
+      ${c.phone?`<div class="trow"><span class="tl">聯絡電話</span><a class="call-link" href="tel:${escH(c.phone)}">📞 ${escH(c.phone)}</a></div>`:''}
+    </div>
+    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
+      <div class="msec-title"><div class="msec-icon" style="background:#fff7ed;color:#c2410c;">📦</div>產品資訊</div>
+      <div class="trow"><span class="tl">End of 產品</span><span class="tv bold">${escH(c.endOfProduct||'—')}</span></div>
+      <div class="trow"><span class="tl">分類 / 品項</span><span class="tv">${escH(c.bigCat||'—')} / ${escH(c.item||'—')}</span></div>
+      <div class="trow"><span class="tl">品牌 / 型號</span><span class="tv">${escH(c.brand||'—')} <span class="mono">${escH(c.model||'—')}</span></span></div>
+      <div class="trow"><span class="tl">出廠 / 價格</span><span class="tv">${escH(c.mfgDate||'—')} / ${escH(c.price||'—')}</span></div>
+      <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
+      <div class="trow"><span class="tl">配件</span><span class="tv"><div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div></span></div>
+    </div>
+    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
+      <div class="msec-title"><div class="msec-icon" style="background:#fff1f2;color:#be123c;">⚠️</div>故障說明</div>
+      <div class="trow"><span class="tl">故障說明</span><span class="tv note-text">${escH(c.faultDesc||'—')}</span></div>
+      <div class="trow"><span class="tl">產品備註</span><span class="tv note-text">${escH(c.itemNote||'—')}</span></div>
+      <div class="trow"><span class="tl">備註標籤</span><span class="tv" style="color:var(--text2);">${escH(c.noteTag||'—')}</span></div>
+    </div>
+    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
+      <div class="msec-title"><div class="msec-icon" style="background:#f0fdf4;color:#15803d;">🔧</div>維修紀錄</div>
+      <div class="trow edit"><span class="tl">結果分類 / 維修者</span>
+        <div class="two-inp"><input class="minput" id="mi-result-${escH(sid)}" value="${escH(c.repairResult)}" placeholder="結果分類">
+        <input class="minput" id="mi-repairman-${escH(sid)}" value="${escH(c.repairman)}" placeholder="維修者"></div>
       </div>
+      <div class="trow edit"><span class="tl">結果說明</span><textarea class="mta" id="mi-resdesc-${escH(sid)}" placeholder="結果說明…">${escH(c.repairResultDesc)}</textarea></div>
+      <div class="trow edit"><span class="tl">補充備註</span><textarea class="mta" id="mi-repnote-${escH(sid)}" placeholder="補充備註…">${escH(c.repairNote)}</textarea></div>
     </div>
-    ${c.phone?`<div class="mrow"><div class="ml">完整電話</div>
-      <div class="mv"><a href="tel:${escH(c.phone)}" style="color:var(--accent);text-decoration:none;">📞 ${escH(c.phone)}</a></div>
-    </div>`:''}
-
-    <hr class="mdiv">
-    <div class="two">
-      <div class="mrow"><div class="ml">產品分類</div><div class="mv">${escH(c.bigCat||'—')}</div></div>
-      <div class="mrow"><div class="ml">產品品項</div><div class="mv">${escH(c.item||'—')}</div></div>
-    </div>
-    <div class="two">
-      <div class="mrow"><div class="ml">產品細項</div><div class="mv">${escH(c.subItem||'—')}</div></div>
-      <div class="mrow"><div class="ml">End of 產品</div><div class="mv" style="font-weight:600;">${escH(c.endOfProduct||'—')}</div></div>
-    </div>
-    <div class="two">
-      <div class="mrow"><div class="ml">品牌</div><div class="mv">${escH(c.brand||'—')}</div></div>
-      <div class="mrow"><div class="ml">型號</div><div class="mv" style="font-family:'DM Mono',monospace;">${escH(c.model||'—')}</div></div>
-    </div>
-    <div class="three">
-      <div class="mrow"><div class="ml">出廠日期</div><div class="mv">${escH(c.mfgDate||'—')}</div></div>
-      <div class="mrow"><div class="ml">產品價格</div><div class="mv">${escH(c.price||'—')}</div></div>
-      <div class="mrow"><div class="ml">是否拆過</div>${boolPill(c.opened)}</div>
-    </div>
-    <div class="mrow"><div class="ml">配件</div><div class="acc-wrap" id="acc-wrap-${escH(c.id)}">${accHtml}</div></div>
-    <div class="mrow"><div class="ml">故障說明</div><div class="mv" style="color:var(--text2);font-size:13px;">${escH(c.faultDesc||'—')}</div></div>
-    <div class="mrow"><div class="ml">產品備註</div><div class="mv" style="color:var(--text2);font-size:13px;">${escH(c.itemNote||'—')}</div></div>
-    <div class="mrow"><div class="ml">備註標籤</div><div class="mv" style="color:var(--text2);font-size:13px;">${escH(c.noteTag||'—')}</div></div>
-
-    <hr class="mdiv">
-    <div class="two">
-      <div class="mrow"><div class="ml">維修_結果分類</div>
-        <input class="minput" id="mi-result-${escH(c.id)}" value="${escH(c.repairResult)}" placeholder="輸入結果分類">
+    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
+      <div class="msec-title"><div class="msec-icon" style="background:#fefce8;color:#a16207;">💰</div>費用</div>
+      <div class="trow edit"><span class="tl">零件費 / 隨喜費</span>
+        <div class="two-inp"><input class="minput" id="mi-cost-${escH(sid)}" value="${escH(c.partCost)}" placeholder="零件費" inputmode="numeric">
+        <input class="minput" id="mi-donation-${escH(sid)}" value="${escH(c.donationFee)}" placeholder="隨喜費" inputmode="numeric"></div>
       </div>
-      <div class="mrow"><div class="ml">維修者</div>
-        <input class="minput" id="mi-repairman-${escH(c.id)}" value="${escH(c.repairman)}" placeholder="維修者">
-      </div>
+      <div class="trow"><span class="tl">減碳貢獻</span><span class="tv">${escH(c.ecoContrib||'—')}</span></div>
+      <div class="trow edit"><span class="tl">其他備註</span><textarea class="mta" id="mi-extra-${escH(sid)}" placeholder="其他備註…">${escH(c.extraNote)}</textarea></div>
     </div>
-    <div class="mrow"><div class="ml">維修_結果說明</div>
-      <textarea class="mta" id="mi-resdesc-${escH(c.id)}" placeholder="輸入結果說明…">${escH(c.repairResultDesc)}</textarea>
-    </div>
-    <div class="mrow"><div class="ml">維修_補充備註</div>
-      <textarea class="mta" id="mi-repnote-${escH(c.id)}" placeholder="輸入補充備註…">${escH(c.repairNote)}</textarea>
-    </div>
-    <div class="three">
-      <div class="mrow"><div class="ml">零件費</div>
-        <input class="minput" id="mi-cost-${escH(c.id)}" value="${escH(String(c.partCost))}" placeholder="0">
-      </div>
-      <div class="mrow"><div class="ml">隨喜費</div>
-        <input class="minput" id="mi-donation-${escH(c.id)}" value="${escH(String(c.donationFee))}" placeholder="0">
-      </div>
-      <div class="mrow"><div class="ml">減碳貢獻</div>
-        <div class="mv">${escH(c.ecoContrib||'—')}</div>
-      </div>
-    </div>
-    <div class="mrow"><div class="ml">其他備註</div>
-      <textarea class="mta" id="mi-extra-${escH(c.id)}" placeholder="輸入其他備註…">${escH(c.extraNote)}</textarea>
-    </div>
-
-    <hr class="mdiv">
-    <div class="mrow"><div class="ml">流程階段（Kanban 狀態）</div>
-      <select class="msel" id="mi-stage-${escH(c.id)}">${stageOpts}</select>
-    </div>
-    <button class="save-btn" id="save-btn-${escH(c.id)}" onclick="saveCard('${escH(c.id)}')">儲存並同步至 Google Sheets</button>
-  `;
-
+    <div class="stage-select-wrap">
+      <label>流程階段</label>
+      <select class="msel" id="mi-stage-${escH(sid)}">${stageOpts}</select>
+      <button class="save-btn" id="save-btn-${escH(sid)}" onclick="saveCard('${escH(c.id||'')}','${escH(sid)}')">儲存並同步至 Google Sheets</button>
+    </div>`;
   document.getElementById('mov').style.display='flex';
   document.body.style.overflow='hidden';
 }
 
-function saveCard(id){
-  const c=allCards.find(x=>String(x.id)===String(id));
+function saveCard(id,sid){
+  const c=id?allCards.find(x=>String(x.id)===String(id)):allCards.find(x=>!x.id&&x.stage===_modalStageKey);
   if(!c)return;
-  const btn=document.getElementById('save-btn-'+id);
-
-  // collect acc
-  const accWrap=document.getElementById('acc-wrap-'+id);
+  const btn=document.getElementById('save-btn-'+sid);
+  const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';};
+  const newStage=g('mi-stage-'+sid)||c.stage;
+  const accWrap=document.getElementById('acc-'+sid);
   const accOn=accWrap?[...accWrap.querySelectorAll('.acc-item.on')].map(el=>el.dataset.acc).join('、'):'';
-
-  // collect fields
-  const g=(eid)=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
-
-  const newStage=g('mi-stage-'+id)||c.stage;
-  const newResult=g('mi-result-'+id);
-  const newResDesc=g('mi-resdesc-'+id);
-  const newRepNote=g('mi-repnote-'+id);
-  const newCost=g('mi-cost-'+id);
-  const newExtra=g('mi-extra-'+id);
-  const newRepairman=g('mi-repairman-'+id);
-
-  // update local
-  c.stage=newStage;
-  c.repairResult=newResult;
-  c.repairResultDesc=newResDesc;
-  c.repairNote=newRepNote;
-  c.partCost=newCost;
-  c.extraNote=newExtra;
-  c.repairman=newRepairman;
-  c.accessories=accOn||c.accessories;
-
+  c.stage=newStage;c.repairResult=g('mi-result-'+sid);c.repairResultDesc=g('mi-resdesc-'+sid);
+  c.repairNote=g('mi-repnote-'+sid);c.partCost=g('mi-cost-'+sid);c.extraNote=g('mi-extra-'+sid);
+  c.repairman=g('mi-repairman-'+sid);if(accOn)c.accessories=accOn;
   btn.disabled=true;btn.textContent='同步中…';
-
-  // GAS update params — 對應 GAS updateRow() 的 writeIf 欄位
-  const params={
-    id: c.id,
-    status: newStage,          // 分類 / 流程階段
-    result: newResult,         // 維修結果 → GAS writeIf("維修結果","result")
-    notes: newResDesc,         // 維修結果說明 → GAS writeIf("維修結果說明","notes")
-    repairNote: newRepNote,    // 當天修理狀況 → GAS writeIf("當天修理狀況","repairNote")
-    cost: newCost,             // 零件費
-    extraNote: newExtra,       // 其他備註
-    repairman: newRepairman,   // 維修者
-    accessories: c.accessories,
-  };
-
-  gasUpdate(params,
-    function(resp){
-      btn.disabled=false;btn.textContent='儲存並同步至 Google Sheets';
-      showToast('✓ 已成功同步至 Google Sheets（列 '+resp.row+'）');
-      closeModal();render();
-    },
-    function(){
-      btn.disabled=false;btn.textContent='儲存並同步至 Google Sheets';
-      showToast('⚠ 本機已更新，但 Google Sheets 同步失敗');
-      closeModal();render();
-    }
+  gasUpdate({id:c.id,status:newStage,result:c.repairResult,notes:c.repairResultDesc,repairNote:c.repairNote,repairman:c.repairman,cost:c.partCost,extraNote:c.extraNote,accessories:c.accessories},
+    resp=>{btn.disabled=false;btn.textContent='儲存並同步至 Google Sheets';showToast('✓ 已同步（列 '+resp.row+'）');closeModal();render();},
+    ()=>{btn.disabled=false;btn.textContent='儲存並同步至 Google Sheets';showToast('⚠ 本機已更新，同步失敗');closeModal();render();}
   );
 }
-
 function closeModal(){document.getElementById('mov').style.display='none';document.body.style.overflow='';}
 function closeBg(e){if(e.target===document.getElementById('mov'))closeModal();}
 
-function setFilter(key,el){
-  filterKey=key;
-  document.querySelectorAll('.fbar .chip').forEach(b=>b.classList.remove('on'));
-  if(el)el.classList.add('on');
-  render();
+// ══ INTERVIEW ══
+function ivSearch(){
+  const q=document.getElementById('iv-search').value.trim().toLowerCase();
+  const wrap=document.getElementById('iv-matches');
+  if(!q){wrap.innerHTML='';return;}
+  const matches=allCards.filter(c=>
+    c.endOfProduct.toLowerCase().includes(q)||c.item.toLowerCase().includes(q)||
+    c.name.toLowerCase().includes(q)||String(c.id).includes(q)
+  ).slice(0,8);
+  if(!matches.length){wrap.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0;">找不到符合的送修家電</div>';return;}
+  const ci=i=>STAGES.findIndex(s=>s.key===allCards.find(c=>c===i)?.stage)||0;
+  wrap.innerHTML=matches.map(c=>{
+    const stageIdx=STAGES.findIndex(s=>s.key===c.stage);
+    const p=PALETTE[stageIdx<0?0:stageIdx];
+    const idD=String(c.id||'').replace(/\D/g,'');
+    const isSel=selectedCard&&selectedCard.id===c.id;
+    return`<div class="match-item${isSel?' selected':''}" onclick="selectCard('${escH(c.id||'')}')">
+      <div class="match-num" style="background:${p.circleBg};color:${p.circleColor};">${idD?idD.slice(-2):''}</div>
+      <div class="match-info">
+        <div class="mi-name">${escH(c.name||'—')}</div>
+        <div class="mi-prod">${escH(c.endOfProduct||c.item||'—')} · ${escH(c.stage)}</div>
+      </div>
+      ${isSel?'<span class="match-check">✓</span>':''}
+    </div>`;
+  }).join('');
 }
 
+function selectCard(id){
+  selectedCard=allCards.find(x=>String(x.id)===String(id))||null;
+  const info=document.getElementById('iv-selected-info');
+  const submitBtn=document.getElementById('iv-submit');
+  if(selectedCard){
+    info.style.display='';
+    document.getElementById('iv-selected-name').textContent=selectedCard.name||'—';
+    document.getElementById('iv-selected-prod').textContent=(selectedCard.endOfProduct||selectedCard.item||'—')+' · '+selectedCard.stage;
+    submitBtn.disabled=false;
+  } else {
+    info.style.display='none';
+    submitBtn.disabled=true;
+  }
+  ivSearch(); // refresh highlight
+}
+
+function submitInterview(){
+  if(!selectedCard)return;
+  const q1=document.getElementById('iv-q1').value.trim();
+  const q2=document.getElementById('iv-q2').value.trim();
+  if(!q1&&!q2){showToast('請至少填寫一個問題的回答');return;}
+  const rec={
+    id: Date.now(),
+    cardId: selectedCard.id,
+    name: selectedCard.name||'—',
+    product: selectedCard.endOfProduct||selectedCard.item||'—',
+    stage: selectedCard.stage,
+    q1,q2,
+    time: new Date().toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+  };
+  interviews.unshift(rec);
+  localStorage.setItem('interviews',JSON.stringify(interviews));
+  // reset
+  document.getElementById('iv-q1').value='';
+  document.getElementById('iv-q2').value='';
+  document.getElementById('iv-search').value='';
+  document.getElementById('iv-matches').innerHTML='';
+  document.getElementById('iv-selected-info').style.display='none';
+  document.getElementById('iv-submit').disabled=true;
+  selectedCard=null;
+  showToast('✓ 訪問記錄已儲存');
+  renderInterviewLog();
+}
+
+function renderInterviewLog(){
+  const log=document.getElementById('iv-log');
+  const cnt=document.getElementById('iv-count');
+  cnt.textContent='('+interviews.length+')';
+  if(!interviews.length){
+    log.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>尚無訪問記錄</div>';
+    return;
+  }
+  log.innerHTML=interviews.map(r=>`
+    <div class="ilog-item">
+      <div class="ilog-head">
+        <span class="ilog-tag">#${escH(String(r.cardId||''))}</span>
+        <span class="ilog-time">${escH(r.time)}</span>
+      </div>
+      <div class="ilog-name">${escH(r.name)}</div>
+      <div class="ilog-prod">${escH(r.product)} · ${escH(r.stage)}</div>
+      ${r.q1?`<div class="ilog-q">為什麼知道我們的活動？</div><div class="ilog-a">${escH(r.q1)}</div>`:''}
+      ${r.q2?`<div class="ilog-q">如何讓活動做得更好？</div><div class="ilog-a">${escH(r.q2)}</div>`:''}
+      <button class="del-btn" onclick="deleteInterview(${r.id})">✕ 刪除</button>
+    </div>`).join('');
+}
+
+function deleteInterview(id){
+  interviews=interviews.filter(r=>r.id!==id);
+  localStorage.setItem('interviews',JSON.stringify(interviews));
+  renderInterviewLog();
+}
+function clearAllInterviews(){
+  if(!confirm('確定要清除所有訪問記錄？'))return;
+  interviews=[];localStorage.setItem('interviews','[]');
+  renderInterviewLog();
+}
+
+// ══ STATS ══
+function renderStats(){
+  const el=document.getElementById('stats-content');
+
+  const total=allCards.length;
+  const done=allCards.filter(c=>c.stage==='已領取').length;
+  const referred=allCards.filter(c=>c.stage==='轉診或待確認').length;
+  const inProgress=allCards.filter(c=>c.stage==='維修中').length;
+  const waiting=allCards.filter(c=>c.stage==='已報到等待維修').length;
+  const pending=allCards.filter(c=>c.stage==='未報到').length;
+  const readyPickup=allCards.filter(c=>c.stage==='待領取').length;
+
+  // 完成率 = 已領取 / (已領取+轉診)
+  const repaired=done;
+  const failed=referred;
+  const attempted=repaired+failed;
+  const successRate=attempted?Math.round(repaired/attempted*100):0;
+  const failRate=attempted?Math.round(failed/attempted*100):0;
+
+  // category
+  const catMap={};
+  allCards.forEach(c=>{const k=c.bigCat||'未分類';catMap[k]=(catMap[k]||0)+1;});
+  const catList=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const maxCat=Math.max(...catList.map(x=>x[1]),1);
+
+  // item breakdown
+  const itemMap={};
+  allCards.forEach(c=>{const k=c.item||c.endOfProduct||'未知';itemMap[k]=(itemMap[k]||0)+1;});
+  const itemList=Object.entries(itemMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxItem=Math.max(...itemList.map(x=>x[1]),1);
+
+  // ── stage bar chart data ──
+  const stageData=STAGES.map(s=>({label:s.key,count:allCards.filter(c=>c.stage===s.key).length,p:PALETTE[s.ci]}));
+  const maxStage=Math.max(...stageData.map(x=>x.count),1);
+
+  // ── interview stats ──
+  const ivTotal=interviews.length;
+  const ivCards=new Set(interviews.map(r=>r.cardId)).size;
+
+  // keyword cloud from q1+q2
+  const stopWords=new Set(['的','了','我','是','有','在','和','你','他','她','我','這','那','也','都','但','就','很','要','可以','希望','如果','因為','所以','一個','可','不','沒有','這個','一些','或者','還有','以及','讓','做','更','活動','我們']);
+  const wordMap={};
+  interviews.forEach(r=>{
+    [r.q1||'',r.q2||''].join(' ').replace(/[，。！？、；：""''「」【】\s]+/g,' ').split(' ')
+      .forEach(w=>{w=w.trim();if(w.length>=2&&!stopWords.has(w)){wordMap[w]=(wordMap[w]||0)+1;}});
+  });
+  const wordList=Object.entries(wordMap).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  const maxW=wordList.length?wordList[0][1]:1;
+
+  // ring SVG helper
+  function ringChart(pct,color,label,sub){
+    const r=38,cx=50,cy=50;
+    const circ=2*Math.PI*r;
+    const dash=circ*pct/100;
+    return`<div style="text-align:center;flex:1;">
+      <svg viewBox="0 0 100 100" width="90" height="90">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e8eaf0" stroke-width="10"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="10"
+          stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ*0.25}" stroke-linecap="round"
+          style="transition:stroke-dasharray .6s ease;"/>
+        <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central"
+          font-size="16" font-weight="700" fill="${color}" font-family="'DM Mono',monospace">${pct}%</text>
+      </svg>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">${label}</div>
+      <div style="font-size:11px;color:var(--text3);">${sub}</div>
+    </div>`;
+  }
+
+  // column bar chart helper
+  function colChart(items,maxVal,colorFn){
+    const barW=Math.max(20,Math.floor(240/items.length)-4);
+    return`<div style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 4px;">
+      ${items.map(([k,v])=>{
+        const h=Math.max(4,Math.round(v/maxVal*80));
+        return`<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;">
+          <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px;">${v}</div>
+          <div style="width:100%;max-width:36px;height:${h}px;background:${colorFn(k,v)};border-radius:4px 4px 0 0;"></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:6px;padding:4px 4px 0;border-top:1px solid var(--border);margin-top:4px;">
+      ${items.map(([k])=>`<div style="flex:1;min-width:0;font-size:10px;color:var(--text3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(k)}</div>`).join('')}
+    </div>`;
+  }
+
+  el.innerHTML=`
+  <!-- ① 總覽 KPI -->
+  <div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">整體送件數</div>
+    <div style="font-size:40px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;line-height:1;margin-bottom:10px;">${total}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+      <div class="kpi-mini"><div class="kpi-n" style="color:#3b82f6;">${waiting}</div><div class="kpi-l">等待維修</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#f97316;">${inProgress}</div><div class="kpi-l">維修中</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#8b5cf6;">${readyPickup}</div><div class="kpi-l">待領取</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#10b981;">${done}</div><div class="kpi-l">已領取</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#94a3b8;">${pending}</div><div class="kpi-l">未報到</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#ef4444;">${referred}</div><div class="kpi-l">轉診</div></div>
+    </div>
+  </div>
+
+  <!-- ② 維修率分析 -->
+  <div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">維修率分析</div>
+    <div style="display:flex;justify-content:space-around;align-items:flex-start;padding:8px 0 4px;">
+      ${ringChart(total?Math.round(attempted/total*100):0,'#2563eb','整體維修率',attempted+' / '+total+' 件')}
+      ${ringChart(successRate,'#10b981','成功維修率',repaired+' 件已領取')}
+      ${ringChart(failRate,'#ef4444','轉診比率',failed+' 件轉診')}
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">以已領取視為成功，轉診視為暫不成功</div>
+  </div>
+
+  <!-- ③ 各階段分佈（直條圖） -->
+  <div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">各階段分佈</div>
+    ${colChart(stageData.map(x=>[x.label,x.count]),maxStage,(k)=>stageData.find(x=>x.label===k)?.p?.sbg||'#94a3b8')}
+  </div>
+
+  <!-- ④ 送修家電分類分析 -->
+  ${catList.length?`<div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">送修家電分類</div>
+    ${colChart(catList.slice(0,7),maxCat,()=>'#3b82f6')}
+  </div>`:''}
+
+  <!-- ⑤ 送修品項 TOP 8 水平條 -->
+  ${itemList.length?`<div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">送修品項分析（前 8）</div>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-top:6px;">
+      ${itemList.map(([k,v],i)=>`
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+          <span style="color:var(--text2);font-weight:500;">${escH(k)}</span>
+          <span style="font-weight:600;font-family:'DM Mono',monospace;">${v}</span>
+        </div>
+        <div style="height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${Math.round(v/maxItem*100)}%;background:${['#3b82f6','#10b981','#f97316','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f59e0b'][i%8]};border-radius:4px;"></div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- ⑥ 關鍵字雲 -->
+  <div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">訪問關鍵字雲</div>
+    ${wordList.length?`
+    <div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:8px 0;line-height:1.6;">
+      ${wordList.map(([w,c])=>{
+        const sz=Math.round(11+((c-1)/(maxW||1))*14);
+        const op=0.5+0.5*(c/maxW);
+        const colors=['#2563eb','#10b981','#f97316','#8b5cf6','#ec4899','#0891b2'];
+        const col=colors[Math.abs(w.charCodeAt(0))%colors.length];
+        return`<span style="font-size:${sz}px;font-weight:${c>1?600:400};color:${col};opacity:${op.toFixed(2)};cursor:default;transition:opacity .2s;" title="${c}次">${escH(w)}</span>`;
+      }).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;">共 ${ivTotal} 筆訪問，${Object.keys(wordMap).length} 個關鍵詞</div>
+    `:`<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--text3);">
+      <div style="font-size:28px;margin-bottom:8px;">💬</div>尚無訪問資料
+    </div>`}
+  </div>
+
+  <!-- ⑦ 訪問摘要 -->
+  <div class="stat-card" style="margin-bottom:12px;">
+    <div class="stat-card-title">訪問紀錄摘要</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div class="kpi-mini" style="background:var(--accent-bg);border-radius:9px;padding:10px;"><div class="kpi-n" style="color:var(--accent);font-size:22px;">${ivTotal}</div><div class="kpi-l">訪問總筆數</div></div>
+      <div class="kpi-mini" style="background:#f0fdf4;border-radius:9px;padding:10px;"><div class="kpi-n" style="color:#10b981;font-size:22px;">${ivCards}</div><div class="kpi-l">涵蓋送修者</div></div>
+    </div>
+  </div>
+  `;}
+
+// ══ HELPERS ══
 function setSyncState(st,lbl){
   const d=document.getElementById('sdot');
   d.className='sdot'+(st==='syncing'?' syncing':st==='err'?' err':'');
@@ -786,48 +1175,42 @@ function showToast(msg){
 }
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// Demo fallback
+// ══ DEMO ══
 function loadDemo(){
   const names=['王小明','李美華','陳大偉','張雅婷','林志遠','吳佳穎','黃建國','劉淑芬'];
   const prods=['電風扇','吹風機','電鍋','果汁機','咖啡機','吸塵器','烤麵包機','電熨斗'];
   const brands=['Panasonic','LG','TECO','Hitachi','Sharp'];
+  const cats=['生活電器','廚房電器','視聽電器'];
+  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','轉診或待確認'];
   const r=a=>a[Math.floor(Math.random()*a.length)];
   allCards=Array.from({length:20},(_,i)=>({
-    id:String(i+1).padStart(3,'0'),rowIndex:i+2,
+    id:i%5===0?'':String(i+1).padStart(3,'0'),
     name:r(names),phone:'0912'+String(Math.floor(Math.random()*9000)+1000),
     phone3:String(Math.floor(Math.random()*900)+100),
     endOfProduct:r(prods),item:r(prods),subItem:'家用型',
-    bigCat:r(['生活電器','廚房電器']),brand:r(brands),
+    bigCat:r(cats),brand:r(brands),
     model:'M'+String(Math.floor(Math.random()*9000)+1000),
     accessories:'電源線、遙控器',mfgDate:'2020-01',price:'',
     faultDesc:'無法正常啟動',itemNote:'',noteTag:'',
-    opened:Math.random()>.5?'是':'否',
-    regNum:String(i+1).padStart(4,'0'),
+    opened:Math.random()>.5?'是':'否',regNum:String(i+1).padStart(4,'0'),
     extraNote:'',repairResult:'',repairResultDesc:'',
     repairNote:'',repairman:'',partCost:'',donationFee:'',ecoContrib:'',
-    stage:['未報到','已報到等待維修','維修中','待領取','已領取','轉診或待確認'][Math.floor(Math.random()*6)],
+    stage:i%5===0?'未報到':r(stgList),
   }));
-  document.getElementById('sub-lbl').textContent='⚠ 顯示示範資料（請設定 GAS_URL）';
-  render();
+  setSyncState('err','示範資料');
+  buildStageChips();render();
 }
 
-// auto refresh every 30s
-function startAuto(){
-  clearInterval(refreshTimer);
-  refreshTimer=setInterval(fetchData,30000);
-}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)fetchData();});
+// ══ AUTO REFRESH ══
+function startAuto(){clearInterval(refreshTimer);if(autoSync)refreshTimer=setInterval(fetchData,30000);}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&autoSync)fetchData();});
 document.getElementById('q').addEventListener('input',function(){searchQ=this.value.trim();render();});
 
-// init
-if(GAS_URL&&GAS_URL.includes('script.google.com')){
-  fetchData();
-  startAuto();
-} else {
-  setSyncState('err','請設定 GAS_URL');
-  document.getElementById('sub-lbl').textContent='請在程式碼中填入 GAS_URL';
-  loadDemo();
-}
+// ══ INIT ══
+loadSettings();
+if(GAS_URL&&GAS_URL.includes('script.google.com')){fetchData();startAuto();}
+else{setSyncState('err','請設定 GAS URL');loadDemo();}
+renderInterviewLog();
 </script>
 </body>
 </html>
