@@ -260,11 +260,24 @@ body{
 .acc-item{font-size:13px;padding:5px 12px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
 .acc-item.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:500;}
 .note-text{font-size:15px;color:var(--text2);line-height:1.5;}
-.msel,.mta,.minput{
-  width:100%;padding:11px 13px;font-size:15px;
-  border:1px solid var(--border2);border-radius:10px;
-  background:var(--surface);color:var(--text);
-  font-family:inherit;outline:none;transition:border-color .15s;
+/* 保持一般的輸入框為 100% */
+.mta, .minput {
+  width: 100%;
+  padding: 11px 13px;
+  /* ...其他原本的設定... */
+}
+
+/* 針對下拉選單單獨設定 */
+.msel, .m-quick-stage {
+  width: fit-content;    /* 讓寬度隨文字內容長度自動調整，不再撐死 */
+  min-width: 120px;      /* 設定一個最小寬度，避免選單太縮 */
+  max-width: 160px;      /* 限制最大寬度，避免擋到其他元件 */
+  padding: 8px 30px 8px 12px; /* 增加右側內距 (30px)，為箭頭留空間 */
+  font-size: 15px;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
 }
 .msel:focus,.mta:focus,.minput:focus{border-color:var(--accent);}
 .mta{resize:vertical;min-height:72px;}
