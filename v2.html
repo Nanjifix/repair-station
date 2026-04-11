@@ -296,7 +296,7 @@ body{
   outline:none;
   background:var(--surface);
   border:1.5px solid var(--accent);
-  border-radius:6px;
+  border-radius:999px;
   color:var(--text);
   padding:4px 8px;
 }
@@ -1005,7 +1005,7 @@ function openModal(id,stageKey){
         <span class="tl">分類</span>
         <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span id="bigcat-text-${escH(sid)}">${escH(c.bigCat||'—')}</span>
-          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 6px 1px 6px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
           <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;width:100%;margin-top:4px;"
             onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
             ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
@@ -1016,7 +1016,7 @@ function openModal(id,stageKey){
         <span class="tl">品項</span>
         <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
-          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
           <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
         </span>
       </div>
@@ -1042,14 +1042,15 @@ function openModal(id,stageKey){
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.price||'')}</span>
       </div>
-      <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
-       <div class="trow">
+      <div class="trow">
         <span class="tl">配件</span>
         <span class="tv-edit" id="ei-price-${escH(sid)}"
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.accessories||'')}</span>
+      <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
       </div>
+      </div>  
       </div>
     <div class="msec">
       <div class="msec-title">故障說明</div>
