@@ -666,7 +666,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 // ═══════════════════════════════════════════
 // CONFIG (可在設定頁修改)
 // ═══════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbzYDbhz7vaCWk7x2NiGhhEyUBkgiiLIuDO9J-2W695OWnKfdr3SJTRUF8F-8QxFWY_s/exec';
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbwwECvTabwZYB1feKto-pR3APRtPJfVJc1rGxegmwB_T1YWDpXfCgO3qVXAg1cg_1uQ/exec';
 
 const STAGES = [
   {key:'未報到',        ci:0},
@@ -705,7 +705,10 @@ let dropdownCache = {
     'OK_成功':['OK 更換零件','OK 無更換零件: 清潔/重新組裝或固定','OK 非故障/不熟悉或不當操作','OK 沒有解釋說明','OK 物主自行購買更換零件','OK 維修但原有部分功能失效','OK 改裝&升級代替原有零件'],
     'NO_失敗':['No 沒有零件','No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)','No 沒有解釋說明','No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)','No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)','No 物主放棄維修 (破損疑慮/費用疑慮等)'],
     '轉診或退回不受理':['考量活動當下時間與資源轉介至專業維修店','保固期內建議送至原廠或經銷中心','配件不齊全無法檢測','No 已更換零件或清潔但無法正常使用','No 功能疑慮 不建議維修 (影響防水或精準)'],
-  }
+  },
+  // 產品分類/品項 (from Dropdown List C欄 → D~I欄)
+  catOpts: [],   // C欄大分類清單
+  itemOpts: {},  // { '生活家電': [...], '照明用具': [...], ... }
 };
 
 // ══ SETTINGS ══
@@ -829,9 +832,15 @@ function gasGetDropdowns(){
   let done=false;
   window[cb]=function(resp){
     done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];
-    if(resp&&resp.resultOpts&&resp.resultOpts.length){
-      dropdownCache.resultOpts=resp.resultOpts;
-      if(resp.subOpts)dropdownCache.subOpts=resp.subOpts;
+    if(resp){
+      if(resp.resultOpts&&resp.resultOpts.length){
+        dropdownCache.resultOpts=resp.resultOpts;
+        if(resp.subOpts)dropdownCache.subOpts=resp.subOpts;
+      }
+      if(resp.catOpts&&resp.catOpts.length){
+        dropdownCache.catOpts=resp.catOpts;
+        if(resp.itemOpts)dropdownCache.itemOpts=resp.itemOpts;
+      }
     }
   };
   s.onerror=function(){if(!done){done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];}};
@@ -962,9 +971,39 @@ function openModal(id,stageKey){
     <div class="msec">
       <div class="msec-title">產品資訊</div>
       <div class="trow"><span class="tl">End of 產品</span><span class="tv">${escH(c.endOfProduct||'—')}</span></div>
-      <div class="trow"><span class="tl">分類 / 品項</span><span class="tv">${escH(c.bigCat||'—')} / ${escH(c.item||'—')}</span></div>
-      <div class="trow"><span class="tl">品牌 / 型號</span><span class="tv">${escH(c.brand||'—')} <span class="mono">${escH(c.model||'—')}</span></span></div>
-      <div class="trow"><span class="tl">出廠日期</span><span class="tv">${escH(c.mfgDate||'—')}</span></div>
+      <div class="trow">
+        <span class="tl">分類</span>
+        <select class="msel-result" id="mi-bigcat-${escH(sid)}"
+          onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
+          ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')=== o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="trow">
+        <span class="tl">品項</span>
+        <div id="item-wrap-${escH(sid)}">
+          ${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}" style="display:none;"></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')=== o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}
+        </div>
+      </div>
+      <div class="trow">
+        <span class="tl">品牌</span>
+        <span class="tv">${escH(c.brand||'—')}</span>
+      </div>
+      <div class="trow">
+        <span class="tl">型號</span>
+        <span class="tv-edit" id="ei-model-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.model||'')}</span>
+      </div>
+      <div class="trow">
+        <span class="tl">出廠日期</span>
+        <span class="tv-edit" id="ei-mfgdate-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.mfgDate||'')}</span>
+      </div>
       <div class="trow">
         <span class="tl">價格</span>
         <span class="tv-edit" id="ei-price-${escH(sid)}"
@@ -1009,7 +1048,14 @@ function openModal(id,stageKey){
           onblur="stopEdit(this,'${escH(sid)}')"
         >${escH(c.repairNote||'')}</span>
       </div>
-      <div class="trow"><span class="tl">零件費</span><span class="tv">${escH(c.partCost||'—')}</span></div>
+      <div class="trow">
+        <span class="tl">零件費</span>
+        <span class="tv-edit" id="ei-partcost-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.partCost||'')}</span>
+      </div>
       <div class="trow"><span class="tl">其他備註</span><span class="tv">${escH(c.extraNote||'—')}</span></div>
     </div>
     <div style="padding:16px 20px 8px;display:flex;justify-content:center;">
@@ -1047,6 +1093,16 @@ function onResultChange(sid){
   wrap.innerHTML=`<select class="msel-result" id="mi-resdesc-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${o}">${o||'— 選擇說明 —'}</option>`).join('')}</select>`;
 }
 
+// ── cascading category → item dropdown ──
+function onCatChange(sid){
+  const selCat=document.getElementById('mi-bigcat-'+sid).value;
+  const wrap=document.getElementById('item-wrap-'+sid);
+  if(!wrap)return;
+  const opts=dropdownCache.itemOpts[selCat]||[];
+  if(!opts.length){wrap.innerHTML=`<select class="msel-result" id="mi-item-${sid}" style="display:none;"></select>`;return;}
+  wrap.innerHTML=`<select class="msel-result" id="mi-item-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${o}">${o||'— 選擇品項 —'}</option>`).join('')}</select>`;
+}
+
 function saveCard(id,sid){
   const c=id?allCards.find(x=>String(x.id)===String(id)):allCards.find(x=>!x.id&&x.stage===_modalStageKey);
   if(!c)return;
@@ -1055,24 +1111,32 @@ function saveCard(id,sid){
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
   const accWrap=document.getElementById('acc-'+sid);
   const accOn=accWrap?[...accWrap.querySelectorAll('.acc-item.on')].map(el=>el.dataset.acc).join('、'):'';
-  const newName    = getEdit('ei-name-'+sid)    || c.name;
-  const newPhone   = getEdit('ei-phone-'+sid)   || c.phone;
-  const newPrice   = getEdit('ei-price-'+sid)   || c.price;
-  const newFault   = getEdit('ei-fault-'+sid)   || c.faultDesc;
+  const newName    = getEdit('ei-name-'+sid)     || c.name;
+  const newPhone   = getEdit('ei-phone-'+sid)    || c.phone;
+  const newModel   = getEdit('ei-model-'+sid)    || c.model;
+  const newMfgDate = getEdit('ei-mfgdate-'+sid)  || c.mfgDate;
+  const newPrice   = getEdit('ei-price-'+sid)    || c.price;
+  const newFault   = getEdit('ei-fault-'+sid)    || c.faultDesc;
   const newRepNote = getEdit('ei-repnote-'+sid)  || c.repairNote;
+  const newPartCost= getEdit('ei-partcost-'+sid) || c.partCost;
   const newResult  = g('mi-result-'+sid)         || c.repairResult;
   const newResDesc = g('mi-resdesc-'+sid)        || c.repairResultDesc;
-  c.name=newName; c.phone=newPhone; c.price=newPrice;
-  c.faultDesc=newFault; c.repairNote=newRepNote;
-  c.repairResult=newResult; c.repairResultDesc=newResDesc;
+  const newBigCat  = g('mi-bigcat-'+sid)         || c.bigCat;
+  const newItem    = g('mi-item-'+sid)           || c.item;
+  c.name=newName; c.phone=newPhone; c.model=newModel; c.mfgDate=newMfgDate;
+  c.price=newPrice; c.faultDesc=newFault; c.repairNote=newRepNote;
+  c.partCost=newPartCost; c.repairResult=newResult; c.repairResultDesc=newResDesc;
+  c.bigCat=newBigCat; c.item=newItem;
   if(accOn)c.accessories=accOn;
   btn.disabled=true;btn.textContent='同步中…';
   gasUpdate({
     id:c.id, status:c.stage,
-    name:newName, phone:newPhone, price:newPrice,
-    faultDesc:newFault,
+    name:newName, phone:newPhone,
+    model:newModel, mfgDate:newMfgDate,
+    price:newPrice, faultDesc:newFault,
+    bigCat:newBigCat, item:newItem,
     result:newResult, notes:newResDesc,
-    repairNote:newRepNote,
+    repairNote:newRepNote, cost:newPartCost,
     accessories:c.accessories
   },
     resp=>{btn.disabled=false;btn.textContent='儲存';showToast('✓ 已同步（列 '+resp.row+'）');closeModal();render();},
