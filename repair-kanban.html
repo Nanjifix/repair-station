@@ -240,16 +240,16 @@ body{
 .msec-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 
 /* 2-col rows */
-.trow{display:grid;grid-template-columns:90px 1fr;align-items:start;gap:4px 12px;padding:8px 0;}
+.trow{display:grid;grid-template-columns:82px 1fr;align-items:start;gap:4px 0;padding:7px 0;}
 .trow:last-child{}
 .trow.edit{grid-template-columns:1fr;gap:5px;}
 
-/* Label - bold and dark */
-.tl{font-size:15px;color:var(--text);font-weight:700;padding-top:2px;line-height:1.5;}
+/* Label - bold, smaller, muted */
+.tl{font-size:12px;color:var(--text3);font-weight:700;padding-top:3px;line-height:1.5;letter-spacing:.02em;text-transform:uppercase;}
 .trow.edit .tl{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);}
 
-/* Value - slightly lighter */
-.tv{font-size:15px;color:var(--text2);font-weight:500;padding-top:2px;line-height:1.5;}
+/* Value - main text, indented via grid column */
+.tv{font-size:15px;color:var(--text);font-weight:500;padding-top:2px;line-height:1.5;padding-left:4px;}
 .tv.bold{font-weight:700;}
 .tv.mono{font-family:'DM Mono',monospace;}
 .pill{display:inline-flex;align-items:center;font-size:13px;font-weight:500;padding:3px 10px;border-radius:20px;}
@@ -271,13 +271,14 @@ body{
 
 /* inline editable field */
 .tv-edit{
-  font-size:15px;color:var(--text2);font-weight:500;padding:2px 4px;line-height:1.5;
+  font-size:15px;color:var(--text);font-weight:500;padding:2px 4px;line-height:1.5;
   cursor:pointer;
   border-radius:4px;
   min-height:22px;display:inline-block;width:100%;box-sizing:border-box;
+  padding-left:4px;
 }
 .tv-edit:hover{background:var(--surface2);}
-.tv-edit:empty::before{content:'點擊編輯';color:var(--text3);font-size:13px;}
+.tv-edit:empty::before{content:'—';color:var(--text3);font-size:15px;}
 .tv-edit[contenteditable="true"]{
   outline:none;
   background:var(--surface);
@@ -666,7 +667,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 // ═══════════════════════════════════════════
 // CONFIG (可在設定頁修改)
 // ═══════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbzRcQ9i3_LsusUDhpNIZLPGYjfd9xR1KD9YMLymUfC6e3hHc2bewv6kTucDlkRc1w0N/exec';
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbyPb8jaUB7g6I2H9mBOW15IP1kScWL5UyVpBPKbECCoJNGZsmMbPqcLe8UaE4_ddosI/exec';
 
 const STAGES = [
   {key:'未報到',        ci:0},
@@ -706,9 +707,16 @@ let dropdownCache = {
     'NO_失敗':['No 沒有零件','No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)','No 沒有解釋說明','No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)','No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)','No 物主放棄維修 (破損疑慮/費用疑慮等)'],
     '轉診或退回不受理':['考量活動當下時間與資源轉介至專業維修店','保固期內建議送至原廠或經銷中心','配件不齊全無法檢測','No 已更換零件或清潔但無法正常使用','No 功能疑慮 不建議維修 (影響防水或精準)'],
   },
-  // 產品分類/品項 (from Dropdown List C欄 → D~I欄)
-  catOpts: [],   // C欄大分類清單
-  itemOpts: {},  // { '生活家電': [...], '照明用具': [...], ... }
+  // 產品分類/品項 fallback（GAS 載入前使用）
+  catOpts: ['生活家電','照明用具','影視娛樂','美容美體家電','廚房家電','兒童玩具'],
+  itemOpts: {
+    '生活家電': ['電風扇','電暖器','吸塵器','除濕機','掃地機器人','水氧機/ 噴霧機','計算機','電蚊拍/捕蚊燈','體重計/電子秤','碎紙機','緊急照明通訊組','延長線/充電器','熨斗/掛燙機','電話','(機械) 鬧鐘/時鐘/ 計時器/ 定時器','(電子) 鬧鐘/時鐘/ 計時器/ 定時器','電鑽/電動工具','空氣清淨機','遙控器','血壓器','耳溫槍','刮毛球機','免治馬桶','削鉛筆機','縫紉機','翻譯機','其他','香酚燈/香酚機','洗衣機'],
+    '照明用具': ['檯燈','立燈','夾燈','吸頂燈','露營燈','頭燈','感應燈','車用照明燈','情境燈','手電筒','其他/特殊用途燈'],
+    '影視娛樂': ['收音機/錄音機','手提/三件式音響','CD Player/MP3','有線喇叭','耳機','藍芽喇叭&音響','樂器','遊戲機','投影機','卡拉OK/伴唱機','電視螢幕','DVD Player','擴大機','麥克風','電腦周邊','行動電源/充電器','其他'],
+    '美容美體家電': ['吹風機','整髮梳/捲髮器','除毛刀/電剪','刮鬍刀','按摩器/熱敷器/電毯','洗牙器/電動牙刷','洗臉機','光療機'],
+    '廚房家電': ['廚房家電','加熱鍋具','食物料理機','烤箱/ 食物烘烤機','微波爐','鬆餅機/ 熱壓機','烤土司機','按壓式電熱水瓶','烘碗機/溫奶器','封口機','冰箱','飲水機/ 開飲機'],
+    '兒童玩具': ['車類玩具','音樂類玩具','其他'],
+  }
 };
 
 // ══ SETTINGS ══
@@ -951,6 +959,15 @@ function openModal(id,stageKey){
     <div class="msec">
       <div class="msec-title">送修資料</div>
       <div class="trow">
+        <div class="tl">編號</div>
+        <span class="tv" style="display:flex;align-items:center;gap:6px;">
+          <span id="id-text-${escH(sid)}" style="font-family:'DM Mono',monospace;font-weight:600;">${escH(c.id||'—')}</span>
+          <button onclick="openIdEdit('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <input type="text" id="ei-id-${escH(sid)}" value="${escH(c.id||'')}" style="display:none;font-family:'DM Mono',monospace;font-size:14px;padding:3px 8px;border:1.5px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--text);outline:none;width:120px;"
+            onkeydown="if(event.key==='Enter'){closeIdEdit('${escH(sid)}');}" onblur="closeIdEdit('${escH(sid)}')">
+        </span>
+      </div>
+      <div class="trow">
         <div class="tl">姓名</div>
         <span class="tv-edit" id="ei-name-${escH(sid)}"
           onclick="startEdit(this)"
@@ -975,8 +992,8 @@ function openModal(id,stageKey){
         <span class="tl">分類</span>
         <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span id="bigcat-text-${escH(sid)}">${escH(c.bigCat||'—')}</span>
-          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;">更正</button>
-          <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;margin-top:4px;width:100%;"
+          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;width:100%;margin-top:4px;"
             onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
             ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
           </select>
@@ -986,7 +1003,7 @@ function openModal(id,stageKey){
         <span class="tl">品項</span>
         <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
-          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;">更正</button>
+          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
           <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
         </span>
       </div>
@@ -1066,6 +1083,24 @@ function openModal(id,stageKey){
   document.body.style.overflow='hidden';
 }
 
+// ── id edit helpers ──
+function openIdEdit(sid){
+  document.getElementById('id-text-'+sid).style.display='none';
+  const inp=document.getElementById('ei-id-'+sid);
+  if(inp){inp.style.display='inline-block';inp.focus();inp.select();}
+  markDirty(sid);
+}
+function closeIdEdit(sid){
+  const inp=document.getElementById('ei-id-'+sid);
+  const txt=document.getElementById('id-text-'+sid);
+  if(inp&&txt){
+    txt.textContent=inp.value||'—';
+    inp.style.display='none';
+    txt.style.display='';
+  }
+  markDirty(sid);
+}
+
 // ── inline edit helpers ──
 function startEdit(el){
   el.setAttribute('contenteditable','true');
@@ -1095,23 +1130,26 @@ function onResultChange(sid){
 
 // ── open cat/item selectors ──
 function openCatSel(sid){
+  // hide text, show select
+  const txtEl=document.getElementById('bigcat-text-'+sid);
+  if(txtEl)txtEl.style.display='none';
   const sel=document.getElementById('mi-bigcat-'+sid);
-  // fill options from cache if not yet populated
-  if(sel&&dropdownCache.catOpts.length&&sel.options.length<=1){
-    const cur=sel.value||document.getElementById('bigcat-text-'+sid)?.textContent||'';
-    sel.innerHTML=['', ...dropdownCache.catOpts].map(o=>`<option value="${o}"${cur===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('');
+  if(sel){
+    // if cache arrived after modal opened, refresh options
+    if(dropdownCache.catOpts.length && sel.options.length<=1){
+      const cur=(txtEl?txtEl.textContent:'').trim();
+      sel.innerHTML=['', ...dropdownCache.catOpts].map(o=>`<option value="${o}"${cur===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('');
+    }
+    sel.style.display='block';
   }
-  if(sel)sel.style.display='block';
-  const txt=document.getElementById('bigcat-text-'+sid);
-  if(txt)txt.style.display='none';
-  // also open item selector
+  // also open item wrap
   openItemSel(sid);
 }
 function openItemSel(sid){
-  const wrap=document.getElementById('item-wrap-'+sid);
-  if(wrap)wrap.style.display='block';
   const txt=document.getElementById('item-text-'+sid);
   if(txt)txt.style.display='none';
+  const wrap=document.getElementById('item-wrap-'+sid);
+  if(wrap)wrap.style.display='block';
 }
 
 // ── cascading category → item dropdown ──
@@ -1133,6 +1171,7 @@ function saveCard(id,sid){
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
   const accWrap=document.getElementById('acc-'+sid);
   const accOn=accWrap?[...accWrap.querySelectorAll('.acc-item.on')].map(el=>el.dataset.acc).join('、'):'';
+  const newId      = (()=>{const el=document.getElementById('ei-id-'+sid);return el?el.value.trim():'';})() || c.id;
   const newName    = getEdit('ei-name-'+sid)     || c.name;
   const newPhone   = getEdit('ei-phone-'+sid)    || c.phone;
   const newModel   = getEdit('ei-model-'+sid)    || c.model;
@@ -1152,7 +1191,7 @@ function saveCard(id,sid){
   if(accOn)c.accessories=accOn;
   btn.disabled=true;btn.textContent='同步中…';
   gasUpdate({
-    id:c.id, status:c.stage,
+    id:c.id, newId:newId, status:c.stage,
     name:newName, phone:newPhone,
     model:newModel, mfgDate:newMfgDate,
     price:newPrice, faultDesc:newFault,
