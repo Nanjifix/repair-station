@@ -104,7 +104,7 @@ body{
   background:var(--surface);
   /* no bottom border per request */
 }
-.repair-header h1{font-size:22px;font-weight:900;color:var(--text);font-family:'Noto Sans TC',sans-serif;}
+.repair-header h1{font-size:24px;font-weight:900;color:var(--text);font-family:'Noto Sans TC',sans-serif;}
 .repair-header-right{display:flex;align-items:center;gap:8px;}
 
 /* ── search bar (pill shape, above chips) ── */
@@ -129,7 +129,7 @@ body{
   display:flex;flex-wrap:wrap;gap:6px;
 }
 .chip{
-  padding:6px 14px;font-size:13px;font-weight:500;border-radius:20px;
+  padding:6px 14px;font-size:14px;font-weight:500;border-radius:20px;
   border:1px solid var(--border);background:var(--surface);color:var(--text2);
   cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit;flex-shrink:0;
 }
@@ -147,8 +147,8 @@ body{
   display:flex;align-items:center;justify-content:space-between;
   padding:9px 13px;border-radius:10px 10px 0 0;
 }
-.cname{font-size:15px;font-weight:600;}
-.ccnt{font-size:15px;font-weight:600;padding:2px 9px;border-radius:20px}
+.cname{font-size:16px;font-weight:700;}
+.ccnt{font-size:16px;font-weight:700;padding:2px 9px;border-radius:20px}
 .col-body{padding:9px 7px 11px;flex:1;min-height:70px;display:flex;flex-direction:column;gap:7px;}
 
 .kcard{
@@ -167,8 +167,8 @@ body{
   font-family:'DM Mono',monospace;
 }
 .kcard-info{flex:1;min-width:0;}
-.k-product{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.k-name{font-size:13px;color:var(--text2);font-weight:500;}
+.k-product{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.k-name{font-size:14px;color:var(--text2);font-weight:500;}
 .empty-col{border-radius:9px;padding:18px 10px;text-align:center;font-size:12px;color:var(--text3);}
 
 /* ══ MODAL ══ */
@@ -245,11 +245,11 @@ body{
 .trow.edit{grid-template-columns:1fr;gap:5px;}
 
 /* Label - bold, smaller, muted */
-.tl{font-size:14px;color:var(--text);font-weight:700;padding-top:3px;line-height:1.5;padding-left:15px;text-transform:uppercase;}
-.trow.edit .tl{font-size:12px;text-transform:uppercase;color:var(--text2);}
+.tl{font-size:16px;color:var(--text);font-weight:700;padding-top:3px;line-height:1.5;padding-left:16px;text-transform:uppercase;}
+.trow.edit .tl{font-size:14px;text-transform:uppercase;color:var(--text2);}
 
 /* Value - main text, indented via grid column */
-.tv{font-size:14px;color:var(--text);font-weight:500;padding-top:3px;line-height:1.5;padding-left:4px;}
+.tv{font-size:16px;color:var(--text);font-weight:500;padding-top:3px;line-height:1.5;padding-left:4px;}
 .tv.bold{font-weight:700;}
 .tv.mono{font-family:'DM Mono',monospace;}
 .pill{display:inline-flex;align-items:center;font-size:13px;font-weight:500;padding:3px 10px;border-radius:20px;}
@@ -272,7 +272,7 @@ body{
   width: fit-content;    /* 讓寬度隨文字內容長度自動調整，不再撐死 */
   min-width: 120px;      /* 設定一個最小寬度，避免選單太縮 */
   max-width: 160px;      /* 限制最大寬度，避免擋到其他元件 */
-  padding: 8px 60px 8px 12px; /* 增加右側內距 (30px)，為箭頭留空間 */
+  padding: 8px 20px 8px 12px; /* 增加右側內距 (30px)，為箭頭留空間 */
   font-size: 15px;
   border: 1px solid var(--border2);
   border-radius: 10px;
@@ -340,11 +340,11 @@ body{
 .page-header h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;}
 .page-header p{font-size:15px;color:var(--text2);}
 .card-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
-.card-box h3{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--text);}
+.card-box h3{font-size:18px;font-weight:700;margin-bottom:14px;color:var(--text);}
 
 /* 2-col form layout */
 .form-row{
-  display:grid;grid-template-columns:150px 1fr;
+  display:grid;grid-template-columns:100px 1fr;
   align-items:start;gap:10px 14px;
   margin-bottom:14px;
 }
@@ -352,7 +352,7 @@ body{
   font-size:14px;font-weight:600;color:var(--text);
   padding-top:10px;line-height:1.5;
 }
-.form-row .form-sublabel{font-size:12px;color:var(--text3);font-weight:400;margin-top:2px;}
+.form-row .form-sublabel{font-size:16px;color:var(--text3);font-weight:400;margin-top:2px;}
 .form-inp,.form-ta,.form-sel{
   width:100%;padding:11px 15px;font-size:12px;
   border:1px solid var(--border2);border-radius:999px;
@@ -407,7 +407,7 @@ body{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
 .settings-row .sr-left{}
-.sr-label{font-size:15px;font-weight:500;margin-bottom:3px;}
+.sr-label{font-size:16px;font-weight:700;margin-bottom:3px;}
 .sr-desc{font-size:12px;color:var(--text2);}
 /* iOS-style toggle */
 .toggle{position:relative;width:48px;height:28px;flex-shrink:0;}
@@ -430,7 +430,7 @@ input:checked+.slider::before{transform:translateX(20px);}
   border-radius:14px;padding:16px;box-shadow:var(--shadow);
 }
 .stat-card-title{
-  font-size:15px;font-weight:700;color:var(--text);
+  font-size:16px;font-weight:700;color:var(--text);
   letter-spacing:.07em;text-transform:uppercase;
   margin-bottom:12px;
   display:flex;align-items:center;gap:6px;
@@ -475,7 +475,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 .photo-thumb-wrap img{width:100%;height:100%;object-fit:cover;cursor:pointer;transition:opacity .15s;}
 .photo-thumb-wrap img:hover{opacity:.85;}
 .photo-del-btn{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(239,68,68,.85);color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
-.photo-add-btn{width:72px;height:72px;border-radius:8px;border:2px dashed var(--border2);background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:var(--text2);font-size:11px;font-weight:500;flex-shrink:0;transition:all .15s;}
+.photo-add-btn{width:72px;height:72px;border-radius:8px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:var(--text2);font-size:11px;font-weight:500;flex-shrink:0;transition:all .15s;}
 .photo-add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
 .photo-add-btn svg{width:22px;height:22px;}
 .photo-uploading{opacity:.5;pointer-events:none;}
@@ -557,11 +557,11 @@ input:checked+.slider::before{transform:translateX(20px);}
       <div class="card-box" id="iv-questions">
         <h3>訪問問題</h3>
         <div class="form-row">
-          <label>來源<div class="form-sublabel">為什麼知道我們的活動？</div></label>
+          <label>為什麼知道我們的活動？</label>
           <textarea class="form-ta" id="iv-q1" placeholder="例：朋友介紹、社群媒體、路過看到…"></textarea>
         </div>
         <div class="form-row">
-          <label>建議<div class="form-sublabel">希望如何做得更好？</div></label>
+          <label>希望做得更好？</label>
           <textarea class="form-ta" id="iv-q2" placeholder="例：希望增加更多品項、場地更大…"></textarea>
         </div>
         <div style="display:flex;justify-content:center;margin-top:6px;">
@@ -1120,7 +1120,7 @@ function openModal(id,stageKey){
 
     </div>
     <div class="msec">
-      <div class="msec-title">📷 照片暫存</div>
+      <div class="msec-title"> 照片暫存</div>
       ${buildPhotoSection(c, sid, '外觀', 2)}
       ${buildPhotoSection(c, sid, '配件', 2)}
       ${buildPhotoSection(c, sid, '內部', 2)}
