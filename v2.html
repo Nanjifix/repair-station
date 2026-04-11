@@ -698,7 +698,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 // ═══════════════════════════════════════════
 // CONFIG (可在設定頁修改)
 // ═══════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbz_vNZpm8GIjR4PKa5TewZ8kN3JBHG33EUkMkZSPEzwtI1GMEKIb_C-kKLncHcuXgM7/exec';
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbyQZNQ_B9QwGK0BReC9PP1uKdBbKHe3FoIwPaRYNATErA_xx8FbzdJWtFiTt7g08-aX/exec';
 
 const STAGES = [
   {key:'未報到',        ci:0},
@@ -796,7 +796,11 @@ function mapCard(raw){
   let phone3  = String(raw.phone3||raw['電話後3碼']||'');
   if(!phone3&&phone){ const d=phone.replace(/\D/g,''); phone3=d.length>=3?d.slice(-3):d; }
   const rawId = String(raw.id||raw['編號']||'').trim();
-  const stage = (raw.stage||raw['流程階段']||raw.status||'').trim()||'未報到';
+  // ── 自動推算 stage：有編號→已報到等待維修，無編號→未報到（與 GAS 邏輯一致）──
+  const rawStage = (raw.stage||raw['流程階段']||raw.status||'').trim();
+  const stage = rawId
+    ? (rawStage || '已報到等待維修')
+    : '未報到';
   return{
     rowNum:raw.rowNum||0,
     id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
@@ -1113,6 +1117,7 @@ function openModal(id,stageKey){
       </div>
       <div class="trow"><span class="tl">其他備註</span><span class="tv">${escH(c.extraNote||'—')}</span></div>
 
+
     </div>
     <div class="msec">
       <div class="msec-title">📷 照片暫存</div>
@@ -1245,7 +1250,17 @@ function saveCard(id,sid){
     repairNote:newRepNote, cost:newPartCost,
     accessories:c.accessories
   },
-    resp=>{btn.disabled=false;btn.textContent='儲存';showToast('✓ 已同步（列 '+resp.row+'）');closeModal();render();},
+    resp=>{
+      btn.disabled=false;btn.textContent='儲存';
+      // ── 本機同步更新 id，並依 id 有無重新計算 stage ──
+      c.id = newId;
+      c.regNum = newId;
+      if(newId && (c.stage === '未報到' || !c.stage)){
+        c.stage = '已報到等待維修';
+      }
+      showToast('✓ 已同步（列 '+resp.row+'）');
+      closeModal();render();
+    },
     ()=>{btn.disabled=false;btn.textContent='儲存';showToast('⚠ 本機已更新，同步失敗');closeModal();render();}
   );
 }
@@ -1679,55 +1694,77 @@ function openLightbox(dataUrl){
 }
 
 function uploadPhotoToGAS(sid, zone, seqNum, dataUrl, origName){
-  if(!GAS_URL || !GAS_URL.includes('script.google.com')){ showToast('⚠ 未設定 GAS URL，照片僅暫存於本機'); return; }
-  // 取得卡片資訊來組命名
+  if(!GAS_URL || !GAS_URL.includes('script.google.com')){
+    showToast('⚠ 未設定 GAS URL，照片僅暫存於本機'); return;
+  }
   const c = allCards.find(x => String(x.id) === String(sid)) || allCards.find(x => !x.id);
   const cardId = c ? (c.id || '') : '';
   const phone3 = c ? (c.phone3 || '') : '';
   const ext = (origName.match(/\.([a-z0-9]+)$/i)||['','jpg'])[1];
   const seq = String(seqNum).padStart(2,'0');
   const filename = `${cardId}_${phone3}_照片${zone}_${seq}.${ext}`;
-  // base64 資料（去掉 data:image/xxx;base64, 前綴）
   const base64 = dataUrl.split(',')[1];
   const mimeType = dataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
-  showToast('📤 上傳照片中…');
-  // 用 JSONP 方式（避免 CORS），將 base64 以 POST form 方式送出
-  // GAS doGet 不適合傳大 base64，改用隱藏 form POST
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = GAS_URL;
-  form.target = '_photo_upload_frame_' + Date.now();
-  form.style.display = 'none';
-  const addField = (name, value) => {
-    const inp = document.createElement('input');
-    inp.type = 'hidden'; inp.name = name; inp.value = value;
-    form.appendChild(inp);
-  };
-  addField('action', 'uploadPhoto');
-  addField('folderId', DRIVE_FOLDER_ID);
-  addField('filename', filename);
-  addField('base64', base64);
-  addField('mimeType', mimeType);
-  // 建立隱藏 iframe 接收回應
-  const iframe = document.createElement('iframe');
-  iframe.name = form.target;
-  iframe.style.display = 'none';
-  iframe.onload = function(){
-    try {
-      const txt = iframe.contentDocument ? iframe.contentDocument.body.innerText : '';
-      const resp = JSON.parse(txt);
-      if(resp && resp.result === 'success') showToast('✓ 照片已上傳：' + filename);
-      else showToast('⚠ 照片上傳失敗：' + (resp.message||''));
-    } catch(e) {
-      // GAS redirect 後無法讀 iframe 內容屬正常（same-origin 限制），視為成功
-      showToast('✓ 照片已送出：' + filename);
+  const uploadId = 'up_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+  // JSONP GET 分塊上傳（每塊 800 字元，避免 URL 過長）
+  const CHUNK = 800;
+  const total = Math.ceil(base64.length / CHUNK);
+  showToast('📤 上傳照片（共 ' + total + ' 塊）…');
+
+  function gasCall(params, cb){
+    const cbName = '_up_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const qs = Object.entries(params)
+      .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
+    const s = document.createElement('script');
+    s.src = GAS_URL + '?callback=' + cbName + '&' + qs;
+    let done = false;
+    window[cbName] = function(resp){
+      done = true;
+      try{ document.head.removeChild(s); }catch(e){}
+      delete window[cbName];
+      cb(null, resp);
+    };
+    s.onerror = function(){
+      if(!done){
+        done = true;
+        try{ document.head.removeChild(s); }catch(e){}
+        delete window[cbName];
+        cb(new Error('script error'));
+      }
+    };
+    setTimeout(()=>{ if(!done) s.onerror(); }, 15000);
+    document.head.appendChild(s);
+  }
+
+  function sendChunk(idx){
+    if(idx >= total){
+      // 全部塊送完，通知 GAS 合併並寫入 Drive
+      gasCall({
+        action:'photoFinish', uploadId, filename,
+        mimeType, total, folderId: DRIVE_FOLDER_ID
+      }, function(err, resp){
+        if(err || !resp || resp.result !== 'success'){
+          showToast('⚠ 照片合併失敗：' + (resp && resp.message || err));
+        } else {
+          showToast('✓ 照片已上傳：' + filename);
+        }
+      });
+      return;
     }
-    setTimeout(()=>{ try{document.body.removeChild(iframe);}catch(e){} }, 3000);
-  };
-  document.body.appendChild(iframe);
-  document.body.appendChild(form);
-  form.submit();
-  setTimeout(()=>{ try{document.body.removeChild(form);}catch(e){} }, 1000);
+    const chunk = base64.slice(idx * CHUNK, (idx+1) * CHUNK);
+    gasCall({
+      action:'photoChunk', uploadId, idx: String(idx), total: String(total), chunk
+    }, function(err, resp){
+      if(err || !resp || resp.result !== 'ok'){
+        showToast('⚠ 照片上傳中斷（塊 ' + idx + '）');
+        return;
+      }
+      sendChunk(idx + 1);
+    });
+  }
+
+  sendChunk(0);
 }
 
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
