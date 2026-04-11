@@ -88,7 +88,7 @@ body{
 .tab{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;cursor:pointer;transition:color .15s;
-  color:var(--text2);font-size:12px;font-weight:500;
+  color:var(--text2);font-size:12px;font-weight:600;
   border:none;background:none;font-family:inherit;
   padding:6px 0 4px;
 }
@@ -104,7 +104,7 @@ body{
   background:var(--surface);
   /* no bottom border per request */
 }
-.repair-header h1{font-size:22px;font-weight:900;color:var(--text);font-family:'Noto Sans TC',sans-serif;letter-spacing:-.01em;}
+.repair-header h1{font-size:22px;font-weight:900;color:var(--text);font-family:'Noto Sans TC',sans-serif;}
 .repair-header-right{display:flex;align-items:center;gap:8px;}
 
 /* ── search bar (pill shape, above chips) ── */
@@ -147,9 +147,9 @@ body{
   display:flex;align-items:center;justify-content:space-between;
   padding:9px 13px;border-radius:10px 10px 0 0;
 }
-.cname{font-size:15px;font-weight:700;}
-.ccnt{font-size:13px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.28);}
-.col-body{border-radius:0 0 11px 11px;padding:9px 7px 11px;flex:1;min-height:70px;display:flex;flex-direction:column;gap:7px;}
+.cname{font-size:15px;font-weight:600;}
+.ccnt{font-size:13px;font-weight:600;padding:2px 9px;border-radius:20px}
+.col-body{padding:9px 7px 11px;flex:1;min-height:70px;display:flex;flex-direction:column;gap:7px;}
 
 .kcard{
   background:var(--surface);border:1px solid rgba(0,0,0,.06);
@@ -169,7 +169,12 @@ body{
 .kcard-info{flex:1;min-width:0;}
 .k-product{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
 .k-name{font-size:14px;color:var(--text2);font-weight:500;}
-.empty-col{border:1.5px dashed rgba(0,0,0,.13);border-radius:9px;padding:18px 10px;text-align:center;font-size:12px;color:var(--text3);}
+.k-timer{font-size:12px;font-weight:600;margin-top:3px;font-family:'DM Mono',monospace;}
+.k-timer.normal{color:var(--text3);}
+.k-timer.alert{color:#ef4444;}
+.k-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.k-tag{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);font-weight:600;}
+.empty-col{border-radius:9px;padding:18px 10px;text-align:center;font-size:12px;color:var(--text3);}
 
 /* ══ MODAL ══ */
 .moverlay{
@@ -194,7 +199,7 @@ body{
 .m-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:13px auto 0;}
 .m-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px 12px;border-bottom:1px solid var(--border);
+  padding:14px 20px 25px;border-bottom:1px solid var(--border);
   position:sticky;top:0;background:var(--surface);z-index:1;
 }
 .m-head-l{display:flex;align-items:center;gap:11px;}
@@ -213,7 +218,7 @@ body{
   padding:24px 20px 20px;
   border-radius:0;
 }
-.m-hero-id{font-size:32px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:2px;line-height:1;}
+.m-hero-id{font-size:32px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;}
 
 /* quick stage select in header */
 .m-quick-stage{
@@ -224,22 +229,32 @@ body{
   max-width:130px;
 }
 
+/* Section container */
 .msec{padding:16px 20px 2px;}
+
+/* Section title - bold, larger, with bottom divider */
 .msec-title{
   display:flex;align-items:center;gap:7px;
-  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--text2);margin-bottom:10px;
+  font-size:17px;font-weight:800;
+  color:var(--text);
+  margin-bottom:10px;
+  padding-bottom:8px;
+  border-bottom:2px solid var(--border);
 }
-.msec-title::after{content:none;} /* ← 移除橫線 */
-.msec-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.msec-title::after{content:none;}
+.msec-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 
-/* 2-col rows: no horizontal dividers, just vertical space */
-.trow{display:grid;grid-template-columns:90px 1fr;align-items:start;gap:4px 12px;padding:8px 0;}
-.trow:last-child{}  /* no border */
+/* 2-col rows */
+.trow{display:grid;grid-template-columns:82px 1fr;align-items:start;gap:4px 0;padding:7px 0;}
+.trow:last-child{}
 .trow.edit{grid-template-columns:1fr;gap:5px;}
-.tl{font-size:13px;color:var(--text2);font-weight:500;padding-top:2px;line-height:1.5;}
+
+/* Label - bold, smaller, muted */
+.tl{font-size:14px;color:var(--text);font-weight:700;padding-top:2px;line-height:1.6;}
 .trow.edit .tl{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);}
-.tv{font-size:15px;color:var(--text);line-height:1.5;word-break:break-word;font-weight:500;}
+
+/* Value - main text, indented via grid column */
+.tv{font-size:15px;color:var(--text);font-weight:500;padding-top:2px;line-height:1.5;padding-left:4px;}
 .tv.bold{font-weight:700;}
 .tv.mono{font-family:'DM Mono',monospace;}
 .pill{display:inline-flex;align-items:center;font-size:13px;font-weight:500;padding:3px 10px;border-radius:20px;}
@@ -249,7 +264,7 @@ body{
 .acc-wrap{display:flex;flex-wrap:wrap;gap:6px;padding-top:3px;}
 .acc-item{font-size:13px;padding:5px 12px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
 .acc-item.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:500;}
-.note-text{font-size:15px;color:var(--text2);line-height:1.6;}
+.note-text{font-size:15px;color:var(--text2);line-height:1.5;}
 .msel,.mta,.minput{
   width:100%;padding:11px 13px;font-size:15px;
   border:1px solid var(--border2);border-radius:10px;
@@ -258,6 +273,35 @@ body{
 }
 .msel:focus,.mta:focus,.minput:focus{border-color:var(--accent);}
 .mta{resize:vertical;min-height:72px;}
+
+/* inline editable field */
+.tv-edit{
+  font-size:15px;color:var(--text);font-weight:500;padding:2px 4px;line-height:1.5;
+  cursor:pointer;
+  border-radius:4px;
+  min-height:22px;display:inline-block;width:100%;box-sizing:border-box;
+  padding-left:4px;
+}
+.tv-edit:hover{background:var(--surface2);}
+.tv-edit:empty::before{content:'—';color:var(--text3);font-size:15px;}
+.tv-edit[contenteditable="true"]{
+  outline:none;
+  background:var(--surface);
+  border:1.5px solid var(--accent);
+  border-radius:6px;
+  color:var(--text);
+  padding:4px 8px;
+}
+
+/* modal select (repair result / sub-result) */
+.msel-result{
+  width:100%;padding:9px 10px;font-size:14px;
+  border:1.5px solid var(--border2);border-radius:10px;
+  background:var(--surface);color:var(--text);
+  font-family:inherit;outline:none;transition:border-color .15s;
+  cursor:pointer;margin-top:4px;
+}
+.msel-result:focus{border-color:var(--accent);}
 .two-inp{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 
 /* bottom confirm bar — hidden, auto-save on stage change */
@@ -292,23 +336,23 @@ body{
 
 /* 2-col form layout */
 .form-row{
-  display:grid;grid-template-columns:100px 1fr;
+  display:grid;grid-template-columns:150px 1fr;
   align-items:start;gap:10px 14px;
   margin-bottom:14px;
 }
 .form-row label{
   font-size:14px;font-weight:600;color:var(--text);
-  padding-top:10px;line-height:1.4;
+  padding-top:10px;line-height:1.5;
 }
 .form-row .form-sublabel{font-size:12px;color:var(--text3);font-weight:400;margin-top:2px;}
 .form-inp,.form-ta,.form-sel{
-  width:100%;padding:11px 13px;font-size:15px;
+  width:100%;padding:11px 13px;font-size:14px;
   border:1px solid var(--border2);border-radius:10px;
   background:var(--surface);color:var(--text);
   font-family:inherit;outline:none;transition:border-color .15s;
 }
 .form-inp:focus,.form-ta:focus,.form-sel:focus{border-color:var(--accent);}
-.form-ta{resize:vertical;min-height:80px;}
+.form-ta{resize:vertical}
 .match-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
 .match-item{
   display:flex;align-items:center;gap:10px;
@@ -378,19 +422,20 @@ input:checked+.slider::before{transform:translateX(20px);}
   border-radius:14px;padding:16px;box-shadow:var(--shadow);
 }
 .stat-card-title{
-  font-size:12px;font-weight:700;color:var(--text3);
+  font-size:15px;font-weight:700;color:var(--text);
   letter-spacing:.07em;text-transform:uppercase;
   margin-bottom:12px;
   display:flex;align-items:center;gap:6px;
 }
-.stat-card-title::before{content:'';display:inline-block;width:3px;height:12px;background:var(--accent);border-radius:2px;}
+.stat-card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--accent);border-radius:2px;}
 .kpi-mini{text-align:center;}
-.kpi-n{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;margin-bottom:2px;}
+.kpi-n{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;line-height:1.5PX;margin-bottom:2px;}
 .kpi-l{font-size:11px;color:var(--text3);}
+
 
 /* legacy stats (still used for bar-list fallback) */
 .stats-section{margin-bottom:14px;}
-.stats-section h3{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.stats-section h3{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
 .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 8px;text-align:center;box-shadow:var(--shadow);}
 .metric-num{font-size:20px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;margin-bottom:3px;}
@@ -461,16 +506,16 @@ input:checked+.slider::before{transform:translateX(20px);}
 <div class="page" id="page-interview">
   <div class="page-inner">
     <div class="page-header">
-      <h2>👋 訪問記錄</h2>
-      <p>輸入品項搜尋送修家電，綁定訪問內容</p>
+      <h2>訪問記錄</h2>
+
     </div>
 
     <!-- Search & bind -->
     <div class="card-box">
-      <h3>🔍 搜尋送修家電</h3>
+      <h3>搜尋送修者資訊</h3>
       <div class="form-row">
-        <label>品項 / 姓名 /<br>編號<div class="form-sublabel">輸入關鍵字</div></label>
-        <input class="form-inp" id="iv-search" type="text" placeholder="電風扇、王小明…" oninput="ivSearch()" autocomplete="off">
+        <label>品項/姓名/編號<div class="form-sublabel"></div></label>
+        <input class="form-inp" id="iv-search" type="text" placeholder="例：電風扇、王小明、#1 …" oninput="ivSearch()" autocomplete="off">
       </div>
       <div class="match-list" id="iv-matches"></div>
     </div>
@@ -484,7 +529,7 @@ input:checked+.slider::before{transform:translateX(20px);}
       </div>
 
       <div class="card-box" id="iv-questions">
-        <h3>📝 訪問問題</h3>
+        <h3>訪問問題</h3>
         <div class="form-row">
           <label>來源<div class="form-sublabel">為什麼知道我們的活動？</div></label>
           <textarea class="form-ta" id="iv-q1" placeholder="例：朋友介紹、社群媒體、路過看到…"></textarea>
@@ -514,8 +559,8 @@ input:checked+.slider::before{transform:translateX(20px);}
 <div class="page" id="page-settings">
   <div class="page-inner">
     <div class="page-header">
-      <h2>⚙️ 設定</h2>
-      <p>應用程式功能設定</p>
+      <h2>功能設定</h2>
+
     </div>
 
     <div class="card-box">
@@ -547,7 +592,7 @@ input:checked+.slider::before{transform:translateX(20px);}
     <div class="card-box">
       <h3 style="margin-bottom:14px;">資料來源</h3>
       <div class="form-row">
-        <label>Google Apps Script URL</label>
+        <label>Google Script URL</label>
         <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/…/exec" oninput="saveSettings()">
       </div>
       <div style="font-size:12px;color:var(--text3);margin-top:4px;">修改後重新整理即生效</div>
@@ -568,8 +613,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 <div class="page" id="page-stats">
   <div class="page-inner">
     <div class="page-header">
-      <h2>📊 統計</h2>
-      <p>維修工單與訪問資料摘要</p>
+      <h2>統計</h2>
     </div>
     <div id="stats-content"></div>
   </div>
@@ -628,7 +672,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 // ═══════════════════════════════════════════
 // CONFIG (可在設定頁修改)
 // ═══════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbxhcnu7yFewxa5AokNDGeO7s6Z2qjxAhqYRVSCn5Gbvf8SjgNhAieosR7muXyTq2h-4/exec';
+let GAS_URL = localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbxlzjnHcY-b-FQnT5zshoYW3YdaebaafCFiSZLBQu66JXTG_B4XRWoV3rTXZqYa1bmh/exec';
 
 const STAGES = [
   {key:'未報到',        ci:0},
@@ -636,11 +680,11 @@ const STAGES = [
   {key:'維修中',        ci:2},
   {key:'待領取',        ci:3},
   {key:'已領取',        ci:4},
-  {key:'轉診或待確認',  ci:5},
+  {key:'取消/轉診/退回',  ci:5},
 ];
 
 const PALETTE = [
-  {sc:'#fff',sbg:'#94a3b8',colBg:'#f1f5f9',circleBg:'#e2e8f0',circleColor:'#475569'},
+  {sc:'#fff',sbg:'#2e2e2e',colBg:'#DBDBDB',circleBg:'#DBDBDB',circleColor:'#2e2e2e'},
   {sc:'#fff',sbg:'#3b82f6',colBg:'#eff6ff',circleBg:'#dbeafe',circleColor:'#1d4ed8'},
   {sc:'#fff',sbg:'#f97316',colBg:'#fff7ed',circleBg:'#fed7aa',circleColor:'#c2410c'},
   {sc:'#fff',sbg:'#8b5cf6',colBg:'#f5f3ff',circleBg:'#ede9fe',circleColor:'#6d28d9'},
@@ -659,6 +703,59 @@ let interviewEnabled = true;
 let autoSync   = true;
 let selectedCard = null; // for interview binding
 let interviews = JSON.parse(localStorage.getItem('interviews')||'[]');
+
+// ── Stage timer tracking: { cardId: { stage, startTs } } ──
+let stageTimers = {};
+const TIMER_STAGES = new Set(['已報到等待維修','維修中']);
+const STOP_STAGES  = new Set(['待領取','已領取','取消/轉診/退回']);
+let timerInterval = null;
+
+function startTimerLoop(){
+  if(timerInterval) return;
+  timerInterval = setInterval(()=>{
+    document.querySelectorAll('.k-timer').forEach(el=>{
+      const id=el.dataset.tid;
+      const ts=stageTimers[id]?.startTs;
+      if(!ts) return;
+      const mins=Math.floor((Date.now()-ts)/60000);
+      el.textContent=mins+'分鐘';
+      el.className='k-timer '+(mins>=20?'alert':'normal');
+    });
+  },15000);
+}
+
+function setCardStage(card, newStage){
+  const id=card.id;
+  if(TIMER_STAGES.has(newStage)){
+    // restart timer only if stage changed
+    if(!stageTimers[id]||stageTimers[id].stage!==newStage){
+      stageTimers[id]={stage:newStage,startTs:Date.now()};
+    }
+  } else if(STOP_STAGES.has(newStage)){
+    delete stageTimers[id];
+  }
+  card.stage=newStage;
+}
+
+// ── Dropdown cache (loaded from GAS getDropdowns, fallback to static) ──
+let dropdownCache = {
+  resultOpts: ['OK_成功','NO_失敗','未送修','轉診或退回不受理'],
+  subOpts: {
+    'OK_成功':['OK 更換零件','OK 無更換零件: 清潔/重新組裝或固定','OK 非故障/不熟悉或不當操作','OK 沒有解釋說明','OK 物主自行購買更換零件','OK 維修但原有部分功能失效','OK 改裝&升級代替原有零件'],
+    'NO_失敗':['No 沒有零件','No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)','No 沒有解釋說明','No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)','No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)','No 物主放棄維修 (破損疑慮/費用疑慮等)'],
+    '轉診或退回不受理':['考量活動當下時間與資源轉介至專業維修店','保固期內建議送至原廠或經銷中心','配件不齊全無法檢測','No 已更換零件或清潔但無法正常使用','No 功能疑慮 不建議維修 (影響防水或精準)'],
+  },
+  // 產品分類/品項 fallback（GAS 載入前使用）
+  catOpts: ['生活家電','照明用具','影視娛樂','美容美體家電','廚房家電','兒童玩具'],
+  itemOpts: {
+    '生活家電': ['電風扇','電暖器','吸塵器','除濕機','掃地機器人','水氧機/ 噴霧機','計算機','電蚊拍/捕蚊燈','體重計/電子秤','碎紙機','緊急照明通訊組','延長線/充電器','熨斗/掛燙機','電話','(機械) 鬧鐘/時鐘/ 計時器/ 定時器','(電子) 鬧鐘/時鐘/ 計時器/ 定時器','電鑽/電動工具','空氣清淨機','遙控器','血壓器','耳溫槍','刮毛球機','免治馬桶','削鉛筆機','縫紉機','翻譯機','其他','香酚燈/香酚機','洗衣機'],
+    '照明用具': ['檯燈','立燈','夾燈','吸頂燈','露營燈','頭燈','感應燈','車用照明燈','情境燈','手電筒','其他/特殊用途燈'],
+    '影視娛樂': ['收音機/錄音機','手提/三件式音響','CD Player/MP3','有線喇叭','耳機','藍芽喇叭&音響','樂器','遊戲機','投影機','卡拉OK/伴唱機','電視螢幕','DVD Player','擴大機','麥克風','電腦周邊','行動電源/充電器','其他'],
+    '美容美體家電': ['吹風機','整髮梳/捲髮器','除毛刀/電剪','刮鬍刀','按摩器/熱敷器/電毯','洗牙器/電動牙刷','洗臉機','光療機'],
+    '廚房家電': ['廚房家電','加熱鍋具','食物料理機','烤箱/ 食物烘烤機','微波爐','鬆餅機/ 熱壓機','烤土司機','按壓式電熱水瓶','烘碗機/溫奶器','封口機','冰箱','飲水機/ 開飲機'],
+    '兒童玩具': ['車類玩具','音樂類玩具','其他'],
+  }
+};
 
 // ══ SETTINGS ══
 function loadSettings(){
@@ -772,6 +869,31 @@ function gasUpdate(params,onOk,onErr){
   document.head.appendChild(s);
 }
 
+// ══ FETCH DROPDOWNS FROM GAS ══
+function gasGetDropdowns(){
+  if(!GAS_URL||!GAS_URL.includes('script.google.com'))return;
+  const cb='_gd_'+Date.now();
+  const s=document.createElement('script');
+  s.src=GAS_URL+'?action=getDropdowns&callback='+cb+'&t='+Date.now();
+  let done=false;
+  window[cb]=function(resp){
+    done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];
+    if(resp){
+      if(resp.resultOpts&&resp.resultOpts.length){
+        dropdownCache.resultOpts=resp.resultOpts;
+        if(resp.subOpts)dropdownCache.subOpts=resp.subOpts;
+      }
+      if(resp.catOpts&&resp.catOpts.length){
+        dropdownCache.catOpts=resp.catOpts;
+        if(resp.itemOpts)dropdownCache.itemOpts=resp.itemOpts;
+      }
+    }
+  };
+  s.onerror=function(){if(!done){done=true;try{document.head.removeChild(s);}catch(e){}delete window[cb];}};
+  setTimeout(()=>{if(!done)s.onerror();},10000);
+  document.head.appendChild(s);
+}
+
 // ══ REPAIR: BUILD CHIPS ══
 function buildStageChips(){
   if(chipsBuilt)return;chipsBuilt=true;
@@ -814,16 +936,26 @@ function render(){
     const p=PALETTE[stage.ci];
     const sc=filtered.filter(c=>c.stage===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
-    const cHtml=sc.length?sc.map(c=>`
+    const cHtml=sc.length?sc.map(c=>{
+      const tid=c.id||('noid_'+c.name);
+      const showTimer=TIMER_STAGES.has(c.stage);
+      const timerTs=stageTimers[tid]?.startTs;
+      const timerMins=timerTs?Math.floor((Date.now()-timerTs)/60000):0;
+      const timerHtml=showTimer
+        ?`<div class="k-timer ${timerMins>=20?'alert':'normal'}" data-tid="${escH(tid)}">${timerMins}分鐘</div>`:'';
+      const tags=(c.noteTag||'').split(/[,，|]/).map(t=>t.trim()).filter(Boolean);
+      const tagsHtml=tags.length?`<div class="k-tags">${tags.map(t=>`<span class="k-tag">${escH(t)}</span>`).join('')}</div>`:'';
+      return`
       <div class="kcard" onclick="openModal('${escH(c.id||'__empty__')}','${escH(stage.key)}')">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
             <div class="k-product">${escH(c.endOfProduct||c.item||'—')}</div>
             <div class="k-name">${escH(c.name||'—')}</div>
+            ${timerHtml}${tagsHtml}
           </div>
         </div>
-      </div>`).join(''):`<div class="empty-col">暫無工單</div>`;
+      </div>`;}).join(''):`<div class="empty-col"> </div>`;
     return`<div class="col">
       <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
       <div class="col-body" style="background:${p.colBg};">${cHtml}</div>
@@ -860,76 +992,302 @@ function openModal(id,stageKey){
     return`<span class="pill pill-n">${escH(v)||'—'}</span>`;
   };
   const sid=c.id||'noid';
+
+  // ── Repair Result cascading dropdowns — use live cache from GAS ──
+  const curResult = c.repairResult||'';
+  const curDesc   = c.repairResultDesc||'';
+  const buildResultSel = (sel) => ['', ...dropdownCache.resultOpts].map(o=>`<option value="${escH(o)}"${sel===o?' selected':''}>${o||'— 選擇維修結果 —'}</option>`).join('');
+  const buildSubSel = (sel, selD) => {
+    const opts = dropdownCache.subOpts[sel]||[];
+    if(!opts.length) return `<select class="msel-result" id="mi-resdesc-${escH(sid)}" style="display:none;"></select>`;
+    return `<select class="msel-result" id="mi-resdesc-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['', ...opts].map(o=>`<option value="${escH(o)}"${selD===o?' selected':''}>${o||'— 選擇說明 —'}</option>`).join('')}</select>`;
+  };
+
   document.getElementById('m-body').innerHTML=`
-    <div class="m-hero-strip" style="background:${p.circleBg};">
-      <div>
-        <div style="font-size:11px;font-weight:500;color:${p.circleColor};opacity:.7;margin-bottom:4px;">掛號號碼</div>
-        <div class="m-hero-id" style="color:${p.circleColor};">${escH(c.regNum||c.id||'—')}</div>
-        <div style="font-size:14px;font-weight:500;color:${p.circleColor};opacity:.8;margin-top:5px;">${escH(c.endOfProduct||c.item||'—')}</div>
+    <div class="msec">
+      <div class="msec-title">送修資料</div>
+      <div class="trow">
+        <div class="tl">編號</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;width:100%;">
+          <span class="tv" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <span id="id-text-${escH(sid)}" style="font-family:'DM Mono',monospace;font-weight:600;">${escH(c.id||'—')}</span>
+            <button onclick="openIdEdit('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+            <input type="text" id="ei-id-${escH(sid)}" value="${escH(c.id||'')}" style="display:none;font-family:'DM Mono',monospace;font-size:14px;padding:3px 8px;border:1.5px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--text);outline:none;width:110px;"
+              onkeydown="if(event.key==='Enter'){closeIdEdit('${escH(sid)}');onIdChanged('${escH(sid)}');}" onblur="closeIdEdit('${escH(sid)}');onIdChanged('${escH(sid)}')">
+          </span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:2px;">
+            ${['候補','有配件','已電話通知'].map(tag=>{const checked=(c.noteTag||'').includes(tag);return`<label style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;"><input type="checkbox" data-tag="${tag}" ${checked?'checked':''} onchange="onTagChange('${escH(sid)}');markDirty('${escH(sid)}')" style="accent-color:var(--accent);width:14px;height:14px;">${tag}</label>`;}).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tl">姓名</div>
+        <span class="tv-edit" id="ei-name-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.name||'')}</span>
+      </div>
+      <div class="trow"><div class="tl">電話後3碼</div><span class="tv">${escH(c.phone3||'—')}</span></div>
+      <div class="trow">
+        <span class="tl">電話</span>
+        <span class="tv-edit" id="ei-phone-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.phone||'')}</span>
       </div>
     </div>
     <div class="msec">
-      <div class="msec-title"><div class="msec-icon" style="background:#eff4ff;color:#2563eb;">👤</div>客戶資訊</div>
-      <div class="trow"><span class="tl">送修者</span><span class="tv bold">${escH(c.name||'—')}</span></div>
-      <div class="trow"><span class="tl">電話後3碼</span><span class="tv mono" style="font-size:18px;font-weight:700;letter-spacing:2px;">${escH(c.phone3||'—')}</span></div>
-      ${c.phone?`<div class="trow"><span class="tl">聯絡電話</span><a class="call-link" href="tel:${escH(c.phone)}">📞 ${escH(c.phone)}</a></div>`:''}
-    </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#fff7ed;color:#c2410c;">📦</div>產品資訊</div>
-      <div class="trow"><span class="tl">End of 產品</span><span class="tv bold">${escH(c.endOfProduct||'—')}</span></div>
-      <div class="trow"><span class="tl">分類 / 品項</span><span class="tv">${escH(c.bigCat||'—')} / ${escH(c.item||'—')}</span></div>
-      <div class="trow"><span class="tl">品牌 / 型號</span><span class="tv">${escH(c.brand||'—')} <span class="mono">${escH(c.model||'—')}</span></span></div>
-      <div class="trow"><span class="tl">出廠 / 價格</span><span class="tv">${escH(c.mfgDate||'—')} / ${escH(c.price||'—')}</span></div>
+      <div class="msec-title">產品資訊</div>
+      <div class="trow"><span class="tl">End of 產品</span><span class="tv">${escH(c.endOfProduct||'—')}</span></div>
+      <div class="trow">
+        <span class="tl">分類</span>
+        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span id="bigcat-text-${escH(sid)}">${escH(c.bigCat||'—')}</span>
+          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;width:100%;margin-top:4px;"
+            onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
+            ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
+          </select>
+        </span>
+      </div>
+      <div class="trow">
+        <span class="tl">品項</span>
+        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
+          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
+          <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
+        </span>
+      </div>
+      <div class="trow"><span class="tl">品牌</span><span class="tv">${escH(c.brand||'—')}</span></div>
+      <div class="trow">
+        <span class="tl">型號</span>
+        <span class="tv-edit" id="ei-model-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.model||'')}</span>
+      </div>
+      <div class="trow">
+        <span class="tl">出廠日期</span>
+        <span class="tv-edit" id="ei-mfgdate-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.mfgDate||'')}</span>
+      </div>
+      <div class="trow">
+        <span class="tl">價格</span>
+        <span class="tv-edit" id="ei-price-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.price||'')}</span>
+      </div>
       <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
-      <div class="trow"><span class="tl">配件</span><span class="tv"><div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div></span></div>
+      <div class="trow">
+        <span class="tl">配件</span>
+        <span class="tv-edit" id="ei-acc-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+        >${escH(c.accessories||'')}</span>
+      </div>
     </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#fff1f2;color:#be123c;">⚠️</div>故障說明</div>
-      <div class="trow"><span class="tl">故障說明</span><span class="tv note-text">${escH(c.faultDesc||'—')}</span></div>
+    <div class="msec">
+      <div class="msec-title">故障說明</div>
+      <div class="trow">
+        <span class="tl">故障說明</span>
+        <span class="tv-edit note-text" id="ei-fault-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+        >${escH(c.faultDesc||'')}</span>
+      </div>
       <div class="trow"><span class="tl">產品備註</span><span class="tv note-text">${escH(c.itemNote||'—')}</span></div>
-      <div class="trow"><span class="tl">備註標籤</span><span class="tv" style="color:var(--text2);">${escH(c.noteTag||'—')}</span></div>
+
     </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#f0fdf4;color:#15803d;">🔧</div>維修紀錄</div>
-      <div class="trow edit"><span class="tl">結果分類 / 維修者</span>
-        <div class="two-inp"><input class="minput" id="mi-result-${escH(sid)}" value="${escH(c.repairResult)}" placeholder="結果分類">
-        <input class="minput" id="mi-repairman-${escH(sid)}" value="${escH(c.repairman)}" placeholder="維修者"></div>
+    <div class="msec">
+      <div class="msec-title">維修紀錄</div>
+      <div class="trow">
+        <span class="tl">維修結果</span>
+        <div style="width:100%;">
+          <select class="msel-result" id="mi-result-${escH(sid)}"
+            onchange="onResultChange('${escH(sid)}');markDirty('${escH(sid)}')">
+            ${buildResultSel(curResult)}
+          </select>
+          <div id="sub-wrap-${escH(sid)}" style="margin-top:6px;">
+            ${buildSubSel(curResult, curDesc)}
+          </div>
+        </div>
       </div>
-      <div class="trow edit"><span class="tl">結果說明</span><textarea class="mta" id="mi-resdesc-${escH(sid)}" placeholder="結果說明…">${escH(c.repairResultDesc)}</textarea></div>
-      <div class="trow edit"><span class="tl">補充備註</span><textarea class="mta" id="mi-repnote-${escH(sid)}" placeholder="補充備註…">${escH(c.repairNote)}</textarea></div>
-    </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#fefce8;color:#a16207;">💰</div>費用</div>
-      <div class="trow edit"><span class="tl">零件費 / 隨喜費</span>
-        <div class="two-inp"><input class="minput" id="mi-cost-${escH(sid)}" value="${escH(c.partCost)}" placeholder="零件費" inputmode="numeric">
-        <input class="minput" id="mi-donation-${escH(sid)}" value="${escH(c.donationFee)}" placeholder="隨喜費" inputmode="numeric"></div>
+      <div class="trow">
+        <span class="tl">維修備註</span>
+        <span class="tv-edit" id="ei-repnote-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+        >${escH(c.repairNote||'')}</span>
       </div>
-      <div class="trow"><span class="tl">減碳貢獻</span><span class="tv">${escH(c.ecoContrib||'—')}</span></div>
-      <div class="trow edit"><span class="tl">其他備註</span><textarea class="mta" id="mi-extra-${escH(sid)}" placeholder="其他備註…">${escH(c.extraNote)}</textarea></div>
+      <div class="trow">
+        <span class="tl">零件費</span>
+        <span class="tv-edit" id="ei-partcost-${escH(sid)}"
+          onclick="startEdit(this)"
+          onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.partCost||'')}</span>
+      </div>
+      <div class="trow"><span class="tl">其他備註</span><span class="tv">${escH(c.extraNote||'—')}</span></div>
     </div>
-    <!-- floating save for editable fields (not stage) -->
     <div style="padding:16px 20px 8px;display:flex;justify-content:center;">
-      <button class="save-btn-pill" id="save-btn-${escH(sid)}" onclick="saveCard('${escH(c.id||'')}','${escH(sid)}')">儲存其他編輯</button>
+      <button class="save-btn-pill" id="save-btn-${escH(sid)}"
+        onclick="saveCard('${escH(c.id||'')}','${escH(sid)}')" disabled>儲存</button>
     </div>`;
   document.getElementById('mov').style.display='flex';
   document.body.style.overflow='hidden';
+}
+
+// ── id edit helpers ──
+function openIdEdit(sid){
+  document.getElementById('id-text-'+sid).style.display='none';
+  const inp=document.getElementById('ei-id-'+sid);
+  if(inp){inp.style.display='inline-block';inp.focus();inp.select();}
+  markDirty(sid);
+}
+function closeIdEdit(sid){
+  const inp=document.getElementById('ei-id-'+sid);
+  const txt=document.getElementById('id-text-'+sid);
+  if(inp&&txt){
+    txt.textContent=inp.value||'—';
+    inp.style.display='none';
+    txt.style.display='';
+  }
+  markDirty(sid);
+}
+
+// ── inline edit helpers ──
+function startEdit(el){
+  el.setAttribute('contenteditable','true');
+  el.focus();
+  const range=document.createRange();
+  range.selectNodeContents(el);range.collapse(false);
+  const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+}
+function stopEdit(el,sid){
+  el.removeAttribute('contenteditable');
+  markDirty(sid);
+}
+function markDirty(sid){
+  const btn=document.getElementById('save-btn-'+sid);
+  if(btn&&btn.disabled){btn.disabled=false;btn.textContent='儲存';}
+}
+
+// ── noteTag checkbox helper ──
+function onTagChange(sid){
+  // just mark dirty; actual read happens in saveCard
+  markDirty(sid);
+}
+
+// ── auto-stage: 編號有值 → 已報到等待維修 ──
+function onIdChanged(sid){
+  const inp=document.getElementById('ei-id-'+sid);
+  if(!inp)return;
+  const val=inp.value.trim();
+  if(!val)return;
+  const qs=document.getElementById('m-quick-stage');
+  if(qs){
+    const target='已報到等待維修';
+    if(qs.value!==target){qs.value=target;quickStageChange(target);}
+  }
+}
+
+// ── cascading result dropdown — use live dropdownCache ──
+function onResultChange(sid){
+  const selResult=document.getElementById('mi-result-'+sid).value;
+  const wrap=document.getElementById('sub-wrap-'+sid);
+  if(!wrap)return;
+  const opts=dropdownCache.subOpts[selResult]||[];
+  if(!opts.length){wrap.innerHTML=`<select class="msel-result" id="mi-resdesc-${sid}" style="display:none;"></select>`;}
+  else{wrap.innerHTML=`<select class="msel-result" id="mi-resdesc-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${o}">${o||'— 選擇說明 —'}</option>`).join('')}</select>`;}
+  // auto-stage: 有維修結果 → 待領取
+  if(selResult){
+    const qs=document.getElementById('m-quick-stage');
+    if(qs&&qs.value!=='待領取'){qs.value='待領取';quickStageChange('待領取');}
+  }
+}
+
+// ── open cat/item selectors ──
+function openCatSel(sid){
+  // hide text, show select
+  const txtEl=document.getElementById('bigcat-text-'+sid);
+  if(txtEl)txtEl.style.display='none';
+  const sel=document.getElementById('mi-bigcat-'+sid);
+  if(sel){
+    // if cache arrived after modal opened, refresh options
+    if(dropdownCache.catOpts.length && sel.options.length<=1){
+      const cur=(txtEl?txtEl.textContent:'').trim();
+      sel.innerHTML=['', ...dropdownCache.catOpts].map(o=>`<option value="${o}"${cur===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('');
+    }
+    sel.style.display='block';
+  }
+  // also open item wrap
+  openItemSel(sid);
+}
+function openItemSel(sid){
+  const txt=document.getElementById('item-text-'+sid);
+  if(txt)txt.style.display='none';
+  const wrap=document.getElementById('item-wrap-'+sid);
+  if(wrap)wrap.style.display='block';
+}
+
+// ── cascading category → item dropdown ──
+function onCatChange(sid){
+  const selCat=document.getElementById('mi-bigcat-'+sid).value;
+  const wrap=document.getElementById('item-wrap-'+sid);
+  if(!wrap)return;
+  const opts=dropdownCache.itemOpts[selCat]||[];
+  wrap.style.display='block';
+  if(!opts.length){wrap.innerHTML=`<select class="msel-result" id="mi-item-${sid}"><option value="">— 無品項資料 —</option></select>`;return;}
+  wrap.innerHTML=`<select class="msel-result" id="mi-item-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${o}">${o||'— 選擇品項 —'}</option>`).join('')}</select>`;
 }
 
 function saveCard(id,sid){
   const c=id?allCards.find(x=>String(x.id)===String(id)):allCards.find(x=>!x.id&&x.stage===_modalStageKey);
   if(!c)return;
   const btn=document.getElementById('save-btn-'+sid);
-  const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';};
-  const newStage=g('mi-stage-'+sid)||c.stage;
-  const accWrap=document.getElementById('acc-'+sid);
-  const accOn=accWrap?[...accWrap.querySelectorAll('.acc-item.on')].map(el=>el.dataset.acc).join('、'):'';
-  c.stage=newStage;c.repairResult=g('mi-result-'+sid);c.repairResultDesc=g('mi-resdesc-'+sid);
-  c.repairNote=g('mi-repnote-'+sid);c.partCost=g('mi-cost-'+sid);c.extraNote=g('mi-extra-'+sid);
-  c.repairman=g('mi-repairman-'+sid);if(accOn)c.accessories=accOn;
+  const getEdit=eid=>{const el=document.getElementById(eid);return el?(el.innerText||el.textContent).trim():'';}
+  const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
+  // 配件: 直接讀 contenteditable
+  const newAccText = getEdit('ei-acc-'+sid) || c.accessories;
+  // 備註標籤 checkbox
+  const tagChecks=[...document.querySelectorAll(`[data-tag]`)].filter(el=>el.checked).map(el=>el.dataset.tag);
+  const newNoteTag = tagChecks.join('|') || c.noteTag;
+  const newId      = (()=>{const el=document.getElementById('ei-id-'+sid);return el?el.value.trim():'';})() || c.id;
+  const newName    = getEdit('ei-name-'+sid)     || c.name;
+  const newPhone   = getEdit('ei-phone-'+sid)    || c.phone;
+  const newModel   = getEdit('ei-model-'+sid)    || c.model;
+  const newMfgDate = getEdit('ei-mfgdate-'+sid)  || c.mfgDate;
+  const newPrice   = getEdit('ei-price-'+sid)    || c.price;
+  const newFault   = getEdit('ei-fault-'+sid)    || c.faultDesc;
+  const newRepNote = getEdit('ei-repnote-'+sid)  || c.repairNote;
+  const newPartCost= getEdit('ei-partcost-'+sid) || c.partCost;
+  const newResult  = g('mi-result-'+sid)         || c.repairResult;
+  const newResDesc = g('mi-resdesc-'+sid)        || c.repairResultDesc;
+  const newBigCat  = g('mi-bigcat-'+sid)         || c.bigCat;
+  const newItem    = g('mi-item-'+sid)           || c.item;
+  c.name=newName; c.phone=newPhone; c.model=newModel; c.mfgDate=newMfgDate;
+  c.price=newPrice; c.faultDesc=newFault; c.repairNote=newRepNote;
+  c.partCost=newPartCost; c.repairResult=newResult; c.repairResultDesc=newResDesc;
+  c.bigCat=newBigCat; c.item=newItem;
+  c.accessories=newAccText; c.noteTag=newNoteTag;
   btn.disabled=true;btn.textContent='同步中…';
-  gasUpdate({id:c.id,status:newStage,result:c.repairResult,notes:c.repairResultDesc,repairNote:c.repairNote,repairman:c.repairman,cost:c.partCost,extraNote:c.extraNote,accessories:c.accessories},
-    resp=>{btn.disabled=false;btn.textContent='儲存其他編輯';showToast('✓ 已同步（列 '+resp.row+'）');closeModal();render();},
-    ()=>{btn.disabled=false;btn.textContent='儲存其他編輯';showToast('⚠ 本機已更新，同步失敗');closeModal();render();}
+  gasUpdate({
+    id:c.id, newId:newId, status:c.stage,
+    name:newName, phone:newPhone,
+    model:newModel, mfgDate:newMfgDate,
+    price:newPrice, faultDesc:newFault,
+    bigCat:newBigCat, item:newItem,
+    result:newResult, notes:newResDesc,
+    repairNote:newRepNote, cost:newPartCost,
+    accessories:newAccText,
+    noteTag:newNoteTag
+  },
+    resp=>{btn.disabled=false;btn.textContent='儲存';showToast('✓ 已同步（列 '+resp.row+'）');closeModal();render();},
+    ()=>{btn.disabled=false;btn.textContent='儲存';showToast('⚠ 本機已更新，同步失敗');closeModal();render();}
   );
 }
 function closeModal(){document.getElementById('mov').style.display='none';document.body.style.overflow='';}
@@ -956,8 +1314,8 @@ function quickStageChange(newStage){
   const qs=document.getElementById('m-quick-stage');
   if(qs){qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;}
 
-  // update local card
-  c.stage=newStage;
+  // update local card + timer
+  setCardStage(c, newStage);
 
   // collect other fields
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';};
@@ -1092,7 +1450,7 @@ function renderStats(){
 
   const total=allCards.length;
   const done=allCards.filter(c=>c.stage==='已領取').length;
-  const referred=allCards.filter(c=>c.stage==='轉診或待確認').length;
+  const referred=allCards.filter(c=>c.stage==='取消/轉診/退回').length;
   const inProgress=allCards.filter(c=>c.stage==='維修中').length;
   const waiting=allCards.filter(c=>c.stage==='已報到等待維修').length;
   const pending=allCards.filter(c=>c.stage==='未報到').length;
@@ -1181,7 +1539,7 @@ function renderStats(){
       <div class="kpi-mini"><div class="kpi-n" style="color:#f97316;">${inProgress}</div><div class="kpi-l">維修中</div></div>
       <div class="kpi-mini"><div class="kpi-n" style="color:#8b5cf6;">${readyPickup}</div><div class="kpi-l">待領取</div></div>
       <div class="kpi-mini"><div class="kpi-n" style="color:#10b981;">${done}</div><div class="kpi-l">已領取</div></div>
-      <div class="kpi-mini"><div class="kpi-n" style="color:#94a3b8;">${pending}</div><div class="kpi-l">未報到</div></div>
+      <div class="kpi-mini"><div class="kpi-n" style="color:#2e2e2e;">${pending}</div><div class="kpi-l">未報到</div></div>
       <div class="kpi-mini"><div class="kpi-n" style="color:#ef4444;">${referred}</div><div class="kpi-l">轉診</div></div>
     </div>
   </div>
@@ -1279,7 +1637,7 @@ function loadDemo(){
   const prods=['電風扇','吹風機','電鍋','果汁機','咖啡機','吸塵器','烤麵包機','電熨斗'];
   const brands=['Panasonic','LG','TECO','Hitachi','Sharp'];
   const cats=['生活電器','廚房電器','視聽電器'];
-  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','轉診或待確認'];
+  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','取消/轉診/退回'];
   const r=a=>a[Math.floor(Math.random()*a.length)];
   allCards=Array.from({length:20},(_,i)=>({
     id:i%5===0?'':String(i+1).padStart(3,'0'),
@@ -1306,7 +1664,8 @@ document.getElementById('q').addEventListener('input',function(){searchQ=this.va
 
 // ══ INIT ══
 loadSettings();
-if(GAS_URL&&GAS_URL.includes('script.google.com')){fetchData();startAuto();}
+if(GAS_URL&&GAS_URL.includes('script.google.com')){fetchData();gasGetDropdowns();startAuto();}
+startTimerLoop();
 else{setSyncState('err','請設定 GAS URL');loadDemo();}
 renderInterviewLog();
 </script>
