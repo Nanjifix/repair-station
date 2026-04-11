@@ -148,7 +148,7 @@ body{
   padding:9px 13px;border-radius:10px 10px 0 0;
 }
 .cname{font-size:15px;font-weight:700;}
-.ccnt{font-size:13px;font-weight:700;padding:2px 9px;border-radius:20px;background:#F0F0F5;}
+.ccnt{font-size:13px;font-weight:700;padding:2px 9px;border-radius:20px}
 .col-body{border-radius:0 0 11px 11px;padding:9px 7px 11px;flex:1;min-height:70px;display:flex;flex-direction:column;gap:7px;}
 
 .kcard{
@@ -378,7 +378,7 @@ input:checked+.slider::before{transform:translateX(20px);}
   border-radius:14px;padding:16px;box-shadow:var(--shadow);
 }
 .stat-card-title{
-  font-size:14px;font-weight:700;color:var(--text3);
+  font-size:15px;font-weight:700;color:var(--text);
   letter-spacing:.07em;text-transform:uppercase;
   margin-bottom:12px;
   display:flex;align-items:center;gap:6px;
@@ -387,6 +387,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 .kpi-mini{text-align:center;}
 .kpi-n{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;margin-bottom:2px;}
 .kpi-l{font-size:11px;color:var(--text3);}
+
 
 /* legacy stats (still used for bar-list fallback) */
 .stats-section{margin-bottom:14px;}
@@ -462,7 +463,7 @@ input:checked+.slider::before{transform:translateX(20px);}
   <div class="page-inner">
     <div class="page-header">
       <h2>訪問記錄</h2>
-      <p>輸入品項搜尋送修家電，綁定訪問內容</p>
+
     </div>
 
     <!-- Search & bind -->
@@ -514,8 +515,8 @@ input:checked+.slider::before{transform:translateX(20px);}
 <div class="page" id="page-settings">
   <div class="page-inner">
     <div class="page-header">
-      <h2>⚙️ 設定</h2>
-      <p>應用程式功能設定</p>
+      <h2>功能設定</h2>
+
     </div>
 
     <div class="card-box">
@@ -569,7 +570,6 @@ input:checked+.slider::before{transform:translateX(20px);}
   <div class="page-inner">
     <div class="page-header">
       <h2>統計</h2>
-      <p>維修與訪問摘要</p>
     </div>
     <div id="stats-content"></div>
   </div>
@@ -861,12 +861,7 @@ function openModal(id,stageKey){
   };
   const sid=c.id||'noid';
   document.getElementById('m-body').innerHTML=`
-    <div class="m-hero-strip" style="background:${p.circleBg};">
-      <div>
-        <div style="font-size:11px;font-weight:500;color:${p.circleColor};opacity:.7;margin-bottom:4px;">掛號號碼</div>
-        <div class="m-hero-id" style="color:${p.circleColor};">${escH(c.regNum||c.id||'—')}</div>
-        <div style="font-size:14px;font-weight:500;color:${p.circleColor};opacity:.8;margin-top:5px;">${escH(c.endOfProduct||c.item||'—')}</div>
-      </div>
+
     </div>
     <div class="msec">
         <div class="msec-title">客戶資料</div>
@@ -874,6 +869,7 @@ function openModal(id,stageKey){
         <div class="trow"><div class="tl">電話後3碼</div><span class="tv">${escH(c.phone3||'—')}</span></div>
         <div class="trow"><div class="tl">電話</div><span class="tv">${escH(c.phone||'—')}</span></div>
         <div class="trow"><span class="tl">電話</span><a class="call-link" href="tel:${escH(c.phone)}">${escH(c.phone)}</a></div>
+      </div>
       </div>
     <div class="msec">
       <div class="msec-title">產品資訊</div>
@@ -896,22 +892,6 @@ function openModal(id,stageKey){
       <div class="trow"><span class="tl">維修備註</span><span class="tv" style="color:var(--text2);">${escH(c.repairNote||'—')}</span></div>
        <div class="trow"><span class="tl">零件費</span><span class="tv" style="color:var(--text2);">${escH(c.partCost||'—')}</span></div>
     </div>
-    <div class="msec">
-      <div class="msec-title">維修紀錄</div>   
-      <div class="trow edit"><span class="tl">結果分類 / 維修者</span>
-        <div class="two-inp"><input class="minput" id="mi-result-${escH(sid)}" value="${escH(c.repairResult)}" placeholder="結果分類">
-        <input class="minput" id="mi-repairman-${escH(sid)}" value="${escH(c.repairman)}" placeholder="維修者"></div>
-      </div>
-      <div class="trow edit"><span class="tl">結果說明</span><textarea class="mta" id="mi-resdesc-${escH(sid)}" placeholder="結果說明…">${escH(c.repairResultDesc)}</textarea></div>
-      <div class="trow edit"><span class="tl">補充備註</span><textarea class="mta" id="mi-repnote-${escH(sid)}" placeholder="補充備註…">${escH(c.repairNote)}</textarea></div>
-    </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#fefce8;color:#a16207;">💰</div>費用</div>
-      <div class="trow edit"><span class="tl">零件費 / 隨喜費</span>
-        <div class="two-inp"><input class="minput" id="mi-cost-${escH(sid)}" value="${escH(c.partCost)}" placeholder="零件費" inputmode="numeric">
-        <input class="minput" id="mi-donation-${escH(sid)}" value="${escH(c.donationFee)}" placeholder="隨喜費" inputmode="numeric"></div>
-      </div>
-      <div class="trow"><span class="tl">減碳貢獻</span><span class="tv">${escH(c.ecoContrib||'—')}</span></div>
       <div class="trow edit"><span class="tl">其他備註</span><textarea class="mta" id="mi-extra-${escH(sid)}" placeholder="其他備註…">${escH(c.extraNote)}</textarea></div>
     </div>
     <!-- floating save for editable fields (not stage) -->
