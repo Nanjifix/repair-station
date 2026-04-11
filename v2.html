@@ -1030,9 +1030,7 @@ function openModal(id,stageKey){
         >${escH(c.price||'')}</span>
       </div>
       <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
-      <div class="trow"><span class="tl">配件</span><span class="tv"><div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div></span></div>
-    </div>
-          <div class="trow">
+       <div class="trow">
         <span class="tl">配件</span>
         <span class="tv-edit" id="ei-price-${escH(sid)}"
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
