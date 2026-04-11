@@ -636,7 +636,7 @@ const STAGES = [
   {key:'維修中',        ci:2},
   {key:'待領取',        ci:3},
   {key:'已領取',        ci:4},
-  {key:'轉診或待確認',  ci:5},
+  {key:'取消/轉診/退回',  ci:5},
 ];
 
 const PALETTE = [
@@ -823,7 +823,7 @@ function render(){
             <div class="k-name">${escH(c.name||'—')}</div>
           </div>
         </div>
-      </div>`).join(''):`<div class="empty-col">暫無工單</div>`;
+      </div>`).join(''):`<div class="empty-col"> </div>`;
     return`<div class="col">
       <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
       <div class="col-body" style="background:${p.colBg};">${cHtml}</div>
@@ -871,19 +871,12 @@ function openModal(id,stageKey){
     <div class="msec">
         <div class="msec-title">客戶資料</div>
         <div class="trow"><div class="tl">姓名</div><span class="tv">${escH(c.name||'—')}</span></div>
-        <div class="trow"><div class="tl">電話</div><span class="tv">${escH(c.phone||'—')}</span></div>
         <div class="trow"><div class="tl">電話後3碼</div><span class="tv">${escH(c.phone3||'—')}</span></div>
+        <div class="trow"><div class="tl">電話</div><span class="tv">${escH(c.phone||'—')}</span></div>
+        <div class="trow"><span class="tl">電話</span><a class="call-link" href="tel:${escH(c.phone)}">${escH(c.phone)}</a></div>
       </div>
 
-    <div class="msec">
-      <div class="msec-title"><div class="msec-icon" style="background:#eff4ff;color:#2563eb;">👤</div>客戶資訊</div>
-      <div class="trow"><span class="tl">送修者</span><span class="tv bold">${escH(c.name||'—')}</span></div>
-      <div class="trow"><span class="tl">電話後3碼</span><span class="tv mono" style="font-size:18px;font-weight:700;letter-spacing:2px;">${escH(c.phone3||'—')}</span></div>
-      ${c.phone?`<div class="trow"><span class="tl">聯絡電話</span><a class="call-link" href="tel:${escH(c.phone)}">📞 ${escH(c.phone)}</a></div>`:''}
-    </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
       <div class="msec-title">產品資訊</div>
-      <div class="msec-title"><div class="msec-icon" style="background:#fff7ed;color:#c2410c;">📦</div>產品資訊</div>
       <div class="trow"><span class="tl">End of 產品</span><span class="tv">${escH(c.endOfProduct||'—')}</span></div>
       <div class="trow"><span class="tl">分類 / 品項</span><span class="tv">${escH(c.bigCat||'—')} / ${escH(c.item||'—')}</span></div>
       <div class="trow"><span class="tl">品牌 / 型號</span><span class="tv">${escH(c.brand||'—')} <span class="mono">${escH(c.model||'—')}</span></span></div>
@@ -891,14 +884,19 @@ function openModal(id,stageKey){
       <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
       <div class="trow"><span class="tl">配件</span><span class="tv"><div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div></span></div>
     </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#fff1f2;color:#be123c;">⚠️</div>故障說明</div>
+      <div class="msec-title">故障說明</div>
       <div class="trow"><span class="tl">故障說明</span><span class="tv note-text">${escH(c.faultDesc||'—')}</span></div>
       <div class="trow"><span class="tl">產品備註</span><span class="tv note-text">${escH(c.itemNote||'—')}</span></div>
       <div class="trow"><span class="tl">備註標籤</span><span class="tv" style="color:var(--text2);">${escH(c.noteTag||'—')}</span></div>
     </div>
-    <div class="msec" style="border-top:1px solid var(--border);padding-top:16px;">
-      <div class="msec-title"><div class="msec-icon" style="background:#f0fdf4;color:#15803d;">🔧</div>維修紀錄</div>
+
+      <div class="msec-title">維修紀錄</div>
+      <div class="trow"><span class="tl">結果 / 說明</span><span class="tv">${escH(c.repairResult||'—')} / ${escH(c.repairResultDesc||'—')}</span></div>
+      <div class="trow"><span class="tl">維修備註</span><span class="tv" style="color:var(--text2);">${escH(c.repairNote||'—')}</span></div>
+       <div class="trow"><span class="tl">零件費</span><span class="tv" style="color:var(--text2);">${escH(c.partCost||'—')}</span></div>
+    </div>
+
+      <div class="msec-title">維修紀錄</div>   
       <div class="trow edit"><span class="tl">結果分類 / 維修者</span>
         <div class="two-inp"><input class="minput" id="mi-result-${escH(sid)}" value="${escH(c.repairResult)}" placeholder="結果分類">
         <input class="minput" id="mi-repairman-${escH(sid)}" value="${escH(c.repairman)}" placeholder="維修者"></div>
@@ -1100,7 +1098,7 @@ function renderStats(){
 
   const total=allCards.length;
   const done=allCards.filter(c=>c.stage==='已領取').length;
-  const referred=allCards.filter(c=>c.stage==='轉診或待確認').length;
+  const referred=allCards.filter(c=>c.stage==='取消/轉診/退回').length;
   const inProgress=allCards.filter(c=>c.stage==='維修中').length;
   const waiting=allCards.filter(c=>c.stage==='已報到等待維修').length;
   const pending=allCards.filter(c=>c.stage==='未報到').length;
@@ -1287,7 +1285,7 @@ function loadDemo(){
   const prods=['電風扇','吹風機','電鍋','果汁機','咖啡機','吸塵器','烤麵包機','電熨斗'];
   const brands=['Panasonic','LG','TECO','Hitachi','Sharp'];
   const cats=['生活電器','廚房電器','視聽電器'];
-  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','轉診或待確認'];
+  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','取消/轉診/退回'];
   const r=a=>a[Math.floor(Math.random()*a.length)];
   allCards=Array.from({length:20},(_,i)=>({
     id:i%5===0?'':String(i+1).padStart(3,'0'),
