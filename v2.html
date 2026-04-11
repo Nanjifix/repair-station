@@ -217,7 +217,7 @@ body{
 
 /* quick stage select in header */
 .m-quick-stage{
-  padding:5px 10px;font-size:13px;font-weight:600;
+  padding:5px 36px 5px 10px;font-size:13px;font-weight:600;
   border:1.5px solid var(--border2);border-radius:20px;
   background:var(--surface);color:var(--text);
   font-family:inherit;outline:none;cursor:pointer;
@@ -272,7 +272,7 @@ body{
   width: fit-content;    /* 讓寬度隨文字內容長度自動調整，不再撐死 */
   min-width: 120px;      /* 設定一個最小寬度，避免選單太縮 */
   max-width: 160px;      /* 限制最大寬度，避免擋到其他元件 */
-  padding: 8px 30px 8px 12px; /* 增加右側內距 (30px)，為箭頭留空間 */
+  padding: 8px 44px 8px 12px; /* 加大右側內距，讓箭頭靠左、右邊留白更多 */
   font-size: 15px;
   border: 1px solid var(--border2);
   border-radius: 10px;
@@ -778,23 +778,7 @@ function mapCard(raw){
   let phone3  = String(raw.phone3||raw['電話後3碼']||'');
   if(!phone3&&phone){ const d=phone.replace(/\D/g,''); phone3=d.length>=3?d.slice(-3):d; }
   const rawId = String(raw.id||raw['編號']||'').trim();
-  const rawRepairResult = (raw.repairResult||raw['維修_結果分類']||'').trim();
-  const rawName    = (raw.name||raw['送修者姓名']||raw['姓名']||'').trim();
-  const rawBigCat  = (raw.bigCat||raw['家電大分類']||raw['產品分類']||'').trim();
-  const rawItem    = (raw.item||raw['產品品項']||'').trim();
-  const rawItemNote= (raw.itemNote||raw['產品備註']||raw['備註說明']||'').trim();
-  const rawPhone2  = String(raw.phone||raw['送件者電話']||'').trim();
-  // ── Auto-compute stage based on rules ──
-  let stage;
-  if(rawRepairResult){
-    stage = '維修中';
-  } else if(rawId){
-    stage = '已報到等待維修';
-  } else if(rawName||rawPhone2||rawBigCat||rawItem||rawItemNote){
-    stage = '未報到';
-  } else {
-    stage = (raw.stage||raw['流程階段']||raw.status||'').trim()||'未報到';
-  }
+  const stage = (raw.stage||raw['流程階段']||raw.status||'').trim()||'未報到';
   return{
     id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
     phone3, name:raw.name||raw['送修者姓名']||raw['姓名']||'',
@@ -1061,6 +1045,7 @@ function openModal(id,stageKey){
           onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.accessories||'')}</span>
+              </div>
       <div class="trow"><span class="tl">是否拆過</span><span class="tv">${boolPill(c.opened)}</span></div>
       </div>
       </div>  
@@ -1587,30 +1572,22 @@ function loadDemo(){
   const prods=['電風扇','吹風機','電鍋','果汁機','咖啡機','吸塵器','烤麵包機','電熨斗'];
   const brands=['Panasonic','LG','TECO','Hitachi','Sharp'];
   const cats=['生活電器','廚房電器','視聽電器'];
+  const stgList=['未報到','已報到等待維修','維修中','待領取','已領取','取消/轉診/退回'];
   const r=a=>a[Math.floor(Math.random()*a.length)];
-  allCards=Array.from({length:20},(_,i)=>{
-    const demoId=i%5===0?'':String(i+1).padStart(3,'0');
-    const demoResult=i%7===0?r(['OK_成功','NO_失敗']):'';
-    const demoName=r(names),demoPhone='0912'+String(Math.floor(Math.random()*9000)+1000);
-    const demoBigCat=r(cats),demoItem=r(prods);
-    let demoStage;
-    if(demoResult){demoStage='維修中';}
-    else if(demoId){demoStage='已報到等待維修';}
-    else{demoStage='未報到';}
-    return{
-      id:demoId,name:demoName,phone:demoPhone,
-      phone3:String(Math.floor(Math.random()*900)+100),
-      endOfProduct:r(prods),item:demoItem,subItem:'家用型',
-      bigCat:demoBigCat,brand:r(brands),
-      model:'M'+String(Math.floor(Math.random()*9000)+1000),
-      accessories:'電源線、遙控器',mfgDate:'2020-01',price:'',
-      faultDesc:'無法正常啟動',itemNote:'',noteTag:'',
-      opened:Math.random()>.5?'是':'否',regNum:String(i+1).padStart(4,'0'),
-      extraNote:'',repairResult:demoResult,repairResultDesc:'',
-      repairNote:'',repairman:'',partCost:'',donationFee:'',ecoContrib:'',
-      stage:demoStage,
-    };
-  });
+  allCards=Array.from({length:20},(_,i)=>({
+    id:i%5===0?'':String(i+1).padStart(3,'0'),
+    name:r(names),phone:'0912'+String(Math.floor(Math.random()*9000)+1000),
+    phone3:String(Math.floor(Math.random()*900)+100),
+    endOfProduct:r(prods),item:r(prods),subItem:'家用型',
+    bigCat:r(cats),brand:r(brands),
+    model:'M'+String(Math.floor(Math.random()*9000)+1000),
+    accessories:'電源線、遙控器',mfgDate:'2020-01',price:'',
+    faultDesc:'無法正常啟動',itemNote:'',noteTag:'',
+    opened:Math.random()>.5?'是':'否',regNum:String(i+1).padStart(4,'0'),
+    extraNote:'',repairResult:'',repairResultDesc:'',
+    repairNote:'',repairman:'',partCost:'',donationFee:'',ecoContrib:'',
+    stage:i%5===0?'未報到':r(stgList),
+  }));
   setSyncState('err','示範資料');
   buildStageChips();render();
 }
