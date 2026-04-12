@@ -244,13 +244,20 @@ body{
   font-size:11px;font-weight:700;color:#a06000;
   flex-shrink:0;white-space:nowrap;
 }
-/* End of 產品 副標 */
+/* header 副標 — noteTag chips */
 .m-head-sub{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  min-height:20px;
 }
-.m-endprod{
-  font-size:13px;color:var(--text3);font-weight:400;
+.m-tag-chip{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:20px;
+  font-size:11px;font-weight:600;white-space:nowrap;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text2);
 }
+.m-tag-chip.has-acc{background:#fff8ec;border-color:#ffab2d;color:#a06000;}
+.m-tag-chip.notified{background:#eaf7ff;border-color:#41bbff;color:#0068a0;}
+.m-tag-chip.standby{background:#f0eeff;border-color:#7c63ec;color:#4a30b0;}
 .mclose{
   width:30px;height:30px;border-radius:50%;
   border:1px solid var(--border2);background:var(--surface2);
@@ -703,9 +710,7 @@ input:checked+.slider::before{transform:translateX(20px);}
           <button class="mclose" onclick="closeModal()">✕</button>
         </div>
       </div>
-      <div class="m-head-sub">
-        <span id="m-endprod" class="m-endprod"></span>
-      </div>
+      <div class="m-head-sub" id="m-notetags"></div>
     </div>
     <div class="m-body" id="m-body"></div>
   </div>
@@ -945,7 +950,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwHSaXsBjm_NbY_PdvxwD_5xL6vCMktZgz3QTSZVouBC20_nYi4zG93YlDqA-aF4sM2/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwnQkR8GSOG39sjtgaz3DQRdp1vyojxbpq0FnqEfavE_OZ79tz-ChOKO5gNSC7wb-cG/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1121,14 +1126,23 @@ function openModal(id, rowNum, stageKey){
   const idD=String(c.id||'').replace(/\D/g,'');
   mc.textContent=idD?idD.slice(-2):'?';
   mc.style.background=p.circleBg;mc.style.color=p.circleColor;
-  // 主標改為 End of 產品
+  // 主標：End of 產品
   document.getElementById('m-title').textContent=(c.endOfProduct||c.item||'—');
-  // 副標改為送修者姓名
-  document.getElementById('m-endprod').textContent = c.name||'—';
-  // 配件 badge
-  const hasAcc = (c.noteTag||'').includes('有配件') || (c.accessories && c.accessories.trim() && c.accessories.trim()!=='無');
+  // 副標：noteTag chips（對齊排列）
+  const tagDefs = [
+    {match:'有配件', cls:'has-acc',  label:'📦 配件'},
+    {match:'電話已通知', cls:'notified', label:'📞 已通知'},
+    {match:'候補',   cls:'standby',  label:'候補'},
+  ];
+  const noteTags = (c.noteTag||'').split(/[,，、]+/).map(t=>t.trim()).filter(Boolean);
+  const tagHtml = noteTags.map(t=>{
+    const def = tagDefs.find(d=>t.includes(d.match));
+    return `<span class="m-tag-chip${def?' '+def.cls:''}">${def?def.label:escH(t)}</span>`;
+  }).join('');
+  document.getElementById('m-notetags').innerHTML = tagHtml;
+  // 配件 badge 移除（已整合進 noteTag chips）
   const accBadge = document.getElementById('m-acc-badge');
-  accBadge.style.display = hasAcc ? 'inline-flex' : 'none';
+  if(accBadge) accBadge.style.display = 'none';
   const qs=document.getElementById('m-quick-stage');
   qs.innerHTML=STAGES.map(s=>`<option value="${s.key}"${c.stage===s.key?' selected':''}>${s.key}</option>`).join('');
   qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;
@@ -1535,21 +1549,36 @@ async function quickStageChange(newStage){
 
   // ── 時間戳記錄 ──
   const now = Date.now();
+  const postExtra = {};   // 附帶寫入 GAS 的時間欄位
+
   if(newStage === '維修中'){
-    // 記錄維修開始；若還沒有 tsReg（直接跳維修中），補記
     const patch = { tsRepStart: now };
     if(!getTs(c.rowNum).tsReg) patch.tsReg = now;
     setTs(c.rowNum, patch);
+    // 等候維修時間確定 → 寫入 AA 欄
+    const ts = getTs(c.rowNum);
+    if(ts.tsReg){
+      postExtra.waitMin = Math.floor((now - ts.tsReg) / 60000);
+    }
   }
-  if(newStage === '待領取'){
-    setTs(c.rowNum, { tsRepDone: now });
+  if(newStage === '待領取' || newStage === '已領取' || newStage === '取消/轉診/退回'){
+    const tsCur = getTs(c.rowNum);
+    if(newStage === '待領取' && tsCur.tsRepStart && !tsCur.tsRepDone){
+      setTs(c.rowNum, { tsRepDone: now });
+    }
+    // 維修過程時間確定 → 寫入 AB 欄（切換到待領取時）
+    if(newStage === '待領取'){
+      const tsAfter = getTs(c.rowNum);
+      if(tsAfter.tsRepStart){
+        postExtra.repairMin = Math.floor((now - tsAfter.tsRepStart) / 60000);
+      }
+    }
   }
 
   render();
-  // 重新渲染 modal 計時器區
   refreshTimerDisplay(rowNum);
   try {
-    await gasPost({ action:'updateStage', rowNum:c.rowNum, stage:newStage });
+    await gasPost({ action:'updateStage', rowNum:c.rowNum, stage:newStage, ...postExtra });
     showToast('✓ 階段已同步');
   } catch(err) {
     c.stage=oldStage;
