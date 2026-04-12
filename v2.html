@@ -85,9 +85,10 @@ body{
   background:var(--surface);
   border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  z-index:60;
+  z-index:9999;
   box-shadow:0 -2px 12px rgba(28,35,80,.07);
   padding-bottom:env(safe-area-inset-bottom);
+  isolation:isolate;
 }
 .tab{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -130,7 +131,7 @@ body{
 .chip.on{color:#fff;border-color:transparent;}
 .chip:hover:not(.on){background:var(--surface2);}
 
-.board-wrap{overflow-x:auto;padding:14px 14px 24px;}
+.board-wrap{overflow-x:auto;padding:14px 14px 24px;-webkit-overflow-scrolling:touch;}
 .board-wrap::-webkit-scrollbar{height:5px;}
 .board-wrap::-webkit-scrollbar-track{background:var(--border);border-radius:10px;}
 .board-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
@@ -950,7 +951,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwnQkR8GSOG39sjtgaz3DQRdp1vyojxbpq0FnqEfavE_OZ79tz-ChOKO5gNSC7wb-cG/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOjKWjNh6yS2Jg6l_IeA8GuKPBmcDDUEtL_EB3z9esX1bUmja58Ra1CLiBO1wESsov/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
