@@ -164,7 +164,7 @@ body{
 .k-product{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .k-name{font-size:13px;color:var(--text2);font-weight:500;}
 .k-tag{
-  font-size:11px;color:var(--text3);margin-top:3px;
+  font-size:11px;color:var(--text3);margin-top:4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   display:flex;align-items:center;gap:5px;
 }
@@ -176,6 +176,22 @@ body{
 }
 .k-tag-chip.warn{background:#fff8ec;border-color:#ffab2d;color:#a06000;}
 .k-tag-chip.info{background:#eaf7ff;border-color:#41bbff;color:#0068a0;}
+/* 卡片計時器 */
+.k-timer{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;font-family:'DM Mono',monospace;
+  padding:1px 7px;border-radius:20px;
+  white-space:nowrap;
+}
+.k-timer.t-dim   {color:var(--text3);background:var(--surface2);border:1px solid var(--border);}
+.k-timer.t-normal{color:var(--text);background:var(--surface2);border:1px solid var(--border2);}
+.k-timer.t-warn  {color:#ff6d48;background:#fff0ec;border:1px solid #ffab2d;}
+.k-timer.t-alert {color:#c0391a;background:#fff0ec;border:2px solid #ff6d48;box-shadow:0 0 0 1px #ff6d4844;}
+.k-timer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.t-dim    .k-timer-dot{background:var(--text3);}
+.t-normal .k-timer-dot{background:var(--text);}
+.t-warn   .k-timer-dot{background:#ff6d48;}
+.t-alert  .k-timer-dot{background:#c0391a;}
 /* 時間計時器 */
 .timer-row{
   display:flex;align-items:center;gap:12px;
@@ -980,6 +996,46 @@ function updateAllChip(){
   else{btn.classList.remove('on');btn.style.background='';btn.style.color='';}
 }
 
+// ══ 卡片計時器（第三列）══
+function buildCardTimer(c){
+  // 只在特定階段顯示
+  const ts = getTs(c.rowNum);
+  let startMs = null;
+  let label = '';
+
+  if(c.stage === '已報到等待維修'){
+    startMs = ts.tsReg || null;
+    label = '等候';
+  } else if(c.stage === '維修中'){
+    startMs = ts.tsRepStart || null;
+    label = '維修';
+  } else {
+    return ''; // 其他階段不顯示計時
+  }
+
+  if(!startMs) return ''; // 尚無時間戳
+
+  const elapsedMs  = Date.now() - startMs;
+  const totalMin   = Math.floor(elapsedMs / 60000);
+  const h          = Math.floor(totalMin / 60);
+  const m          = totalMin % 60;
+  const timeStr    = h > 0
+    ? h + 'h ' + String(m).padStart(2,'0') + 'm'
+    : m + 'm';
+
+  // 開始時間格式 HH:MM
+  const d     = new Date(startMs);
+  const startStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+
+  // 顏色級別
+  let cls = 't-dim';
+  if(totalMin >= 40)      cls = 't-alert';
+  else if(totalMin >= 25) cls = 't-warn';
+  else if(totalMin >= 15) cls = 't-normal';
+
+  return `<span class="k-timer ${cls}"><span class="k-timer-dot"></span>${startStr} · ${timeStr}</span>`;
+}
+
 // ══ 看板渲染 ══
 function render(){
   const q=searchQ.toLowerCase();
@@ -994,16 +1050,18 @@ function render(){
     const sc=filtered.filter(c=>c.stage===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
     const cHtml=sc.length?sc.map(c=>{
-      // 提醒備註 chips
+      // 第三列：計時中階段顯示計時器，其他顯示備註 chips
+      const timer = buildCardTimer(c);
       const tagChips = (c.noteTag||'').split(/[,，、]+/).filter(Boolean)
-        .map(t=>`<span class="k-tag-chip${t==='候補'?'':t==='電話已通知'?' info':' warn'}">${escH(t.trim())}</span>`).join('');
+        .map(t=>`<span class="k-tag-chip${t==='電話已通知'?' info':' warn'}">${escH(t.trim())}</span>`).join('');
+      const thirdRow = timer || tagChips || '<span style="color:var(--border2);font-size:11px;">—</span>';
       return`<div class="kcard" onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
             <div class="k-product">${escH(c.endOfProduct||c.item||'—')}</div>
             <div class="k-name">${escH(c.name||'—')}</div>
-            <div class="k-tag">${tagChips||'<span style="color:var(--border2)">—</span>'}</div>
+            <div class="k-tag">${thirdRow}</div>
           </div>
         </div>
       </div>`;
@@ -1892,6 +1950,8 @@ document.getElementById('sync-pill').style.display = 'flex';
 document.getElementById('q').addEventListener('input',function(){searchQ=this.value.trim();render();});
 // 開啟即拉取真實資料，每 10 秒自動同步
 fetchData().then(()=>startAutoSync());
+// 每分鐘重新渲染看板，讓計時數字更新
+setInterval(()=>{ if(allCards.length) render(); }, 60000);
 </script>
 </body>
 </html>
