@@ -180,13 +180,12 @@ body{
 .k-timer{
   display:inline-flex;align-items:center;gap:4px;
   font-size:11px;font-weight:600;font-family:'DM Mono',monospace;
-  padding:1px 7px;border-radius:20px;
   white-space:nowrap;
 }
-.k-timer.t-dim   {color:var(--text3);background:var(--surface2);border:1px solid var(--border);}
-.k-timer.t-normal{color:var(--text);background:var(--surface2);border:1px solid var(--border2);}
-.k-timer.t-warn  {color:#ff6d48;background:#fff0ec;border:1px solid #ffab2d;}
-.k-timer.t-alert {color:#c0391a;background:#fff0ec;border:2px solid #ff6d48;box-shadow:0 0 0 1px #ff6d4844;}
+.k-timer.t-dim   {color:var(--text3);}
+.k-timer.t-normal{color:var(--text);}
+.k-timer.t-warn  {color:#ff6d48;}
+.k-timer.t-alert {color:#c0391a;}
 .k-timer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 .t-dim    .k-timer-dot{background:var(--text3);}
 .t-normal .k-timer-dot{background:var(--text);}
@@ -255,7 +254,7 @@ body{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
 }
 .m-endprod{
-  font-size:13px;color:var(--text2);font-weight:500;
+  font-size:13px;color:var(--text3);font-weight:400;
 }
 .mclose{
   width:30px;height:30px;border-radius:50%;
@@ -1047,9 +1046,9 @@ function buildCardTimer(c){
   const totalMin   = Math.floor(elapsedMs / 60000);
   const h          = Math.floor(totalMin / 60);
   const m          = totalMin % 60;
-  const timeStr    = h > 0
-    ? h + 'h ' + String(m).padStart(2,'0') + 'm'
-    : m + 'm';
+  const elapsed    = h > 0
+    ? String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' (' + totalMin + 'm)'
+    : '00:' + String(m).padStart(2,'0') + ' (' + m + 'm)';
 
   // 開始時間格式 HH:MM
   const d     = new Date(startMs);
@@ -1061,7 +1060,7 @@ function buildCardTimer(c){
   else if(totalMin >= 25) cls = 't-warn';
   else if(totalMin >= 15) cls = 't-normal';
 
-  return `<span class="k-timer ${cls}"><span class="k-timer-dot"></span>${startStr} · ${timeStr}</span>`;
+  return `<span class="k-timer ${cls}"><span class="k-timer-dot"></span>${startStr} ${elapsed}</span>`;
 }
 
 // ══ 看板渲染 ══
@@ -1078,11 +1077,9 @@ function render(){
     const sc=filtered.filter(c=>c.stage===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
     const cHtml=sc.length?sc.map(c=>{
-      // 第三列：計時中階段顯示計時器，其他顯示備註 chips
+      // 第三列：只顯示計時器（等待維修 / 維修中），其他階段顯示 —
       const timer = buildCardTimer(c);
-      const tagChips = (c.noteTag||'').split(/[,，、]+/).filter(Boolean)
-        .map(t=>`<span class="k-tag-chip${t==='電話已通知'?' info':' warn'}">${escH(t.trim())}</span>`).join('');
-      const thirdRow = timer || tagChips || '<span style="color:var(--border2);font-size:11px;">—</span>';
+      const thirdRow = timer || '<span style="color:var(--border2);font-size:11px;">—</span>';
       return`<div class="kcard" onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
@@ -1115,10 +1112,11 @@ function openModal(id, rowNum, stageKey){
   const idD=String(c.id||'').replace(/\D/g,'');
   mc.textContent=idD?idD.slice(-2):'?';
   mc.style.background=p.circleBg;mc.style.color=p.circleColor;
-  document.getElementById('m-title').textContent=(c.name||'—');
-  // End of 產品 副標
-  document.getElementById('m-endprod').textContent = c.endOfProduct||c.item||'';
-  // 配件 badge：C 欄 noteTag 含「有配件」或 accessories 有內容時顯示
+  // 主標改為 End of 產品
+  document.getElementById('m-title').textContent=(c.endOfProduct||c.item||'—');
+  // 副標改為送修者姓名
+  document.getElementById('m-endprod').textContent = c.name||'—';
+  // 配件 badge
   const hasAcc = (c.noteTag||'').includes('有配件') || (c.accessories && c.accessories.trim() && c.accessories.trim()!=='無');
   const accBadge = document.getElementById('m-acc-badge');
   accBadge.style.display = hasAcc ? 'inline-flex' : 'none';
