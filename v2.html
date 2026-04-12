@@ -186,11 +186,6 @@ body{
 .k-timer.t-normal{color:var(--text);}
 .k-timer.t-warn  {color:#ff6d48;}
 .k-timer.t-alert {color:#c0391a;}
-.k-timer-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-.t-dim    .k-timer-dot{background:var(--text3);}
-.t-normal .k-timer-dot{background:var(--text);}
-.t-warn   .k-timer-dot{background:#ff6d48;}
-.t-alert  .k-timer-dot{background:#c0391a;}
 /* 時間計時器 */
 .timer-row{
   display:flex;align-items:center;gap:12px;
@@ -252,9 +247,7 @@ body{
 /* End of 產品 副標 */
 .m-head-sub{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-}
-.m-endprod{
-  font-size:13px;color:var(--text3);font-weight:400;
+
 }
 .mclose{
   width:30px;height:30px;border-radius:50%;
@@ -709,7 +702,7 @@ input:checked+.slider::before{transform:translateX(20px);}
         </div>
       </div>
       <div class="m-head-sub">
-        <span id="m-endprod" class="m-endprod"></span>
+
       </div>
     </div>
     <div class="m-body" id="m-body"></div>
@@ -950,7 +943,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbylOEv3i5MjQzL-DG2DZV7yBwaewAA0am8GrcNlbXQTEtZ0VUZKmam69c190UFY438B/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwHSaXsBjm_NbY_PdvxwD_5xL6vCMktZgz3QTSZVouBC20_nYi4zG93YlDqA-aF4sM2/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -980,9 +973,25 @@ function startAutoSync() {
 async function gasPost(body) {
   const res = await fetch(GAS_URL, {
     method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(body)
   });
   return res.json();
+}
+
+async function gasPostPhoto(body) {
+  // 照片上傳用獨立函式，回傳詳細錯誤
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(body)
+  });
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    throw new Error('GAS 回傳非 JSON：' + text.slice(0, 100));
+  }
 }
 
 // ══ 載入外部資料 ══
@@ -1046,12 +1055,10 @@ function buildCardTimer(c){
   const totalMin   = Math.floor(elapsedMs / 60000);
   const h          = Math.floor(totalMin / 60);
   const m          = totalMin % 60;
-  const elapsed    = h > 0
-    ? String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' (' + totalMin + 'm)'
-    : '00:' + String(m).padStart(2,'0') + ' (' + m + 'm)';
+  const elapsedStr = h > 0 ? `${h}h${m}m` : `${totalMin}m`;
 
   // 開始時間格式 HH:MM
-  const d     = new Date(startMs);
+  const d        = new Date(startMs);
   const startStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 
   // 顏色級別
@@ -1060,7 +1067,7 @@ function buildCardTimer(c){
   else if(totalMin >= 25) cls = 't-warn';
   else if(totalMin >= 15) cls = 't-normal';
 
-  return `<span class="k-timer ${cls}"><span class="k-timer-dot"></span>${startStr} ${elapsed}</span>`;
+  return `<span class="k-timer ${cls}">${startStr} (${elapsedStr})</span>`;
 }
 
 // ══ 看板渲染 ══
@@ -1910,11 +1917,12 @@ function triggerPhotoInput(sid, zone, maxCount){
           showToast('✓ 照片已上傳');
         } else {
           entry.status = 'fail';
-          showToast('⚠️ 上傳失敗，請重試');
+          const errMsg = r && r.error ? r.error : '未知錯誤';
+          showToast('⚠️ ' + errMsg);
         }
       } catch(e){
         entry.status = 'fail';
-        showToast('⚠️ 上傳失敗：' + e.message);
+        showToast('⚠️ ' + e.message);
       }
       refreshPhotoThumbs(sid, zone, maxCount);
     });
@@ -1969,11 +1977,12 @@ async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
   const ext  = (file.type || 'image/jpeg').split('/')[1] || 'jpg';
   const name = `${cardId}_${zone}_${idx+1}.${ext}`;
   const base64 = dataUrl.split(',')[1];
-  return await gasPost({
+  if(!base64) throw new Error('base64 資料為空');
+  return await gasPostPhoto({
     action:   'uploadPhoto',
     folderId: PHOTO_FOLDER_ID,
     fileName: name,
-    mimeType: file.type || 'image/jpeg',
+    mimeType: 'image/jpeg',
     base64:   base64
   });
 }
