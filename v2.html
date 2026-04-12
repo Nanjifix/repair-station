@@ -676,9 +676,6 @@ let autoSync   = true;
 let selectedCard = null;
 let interviews = JSON.parse(localStorage.getItem('interviews')||'[]');
 
-// 您的 GAS 部署網址 (依據您的提供 )
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw7SvF8enRlgtQH5BDBh7913X7bu6od5q2dtwz_ScrQJyrlRWsXad5t3EyVneqmOa5H/exec';
-
 const STAGES = [
   {key:'未報到',        ci:0},
   {key:'已報到等待維修',ci:1},
@@ -688,16 +685,29 @@ const STAGES = [
   {key:'取消/轉診/退回',  ci:5},
 ];
 
+// 六階段狀態色系統
+// ci:0 未報到        → 深灰  #2e2e2e
+// ci:1 已報到等待維修 → 橘紅  #ff6d48
+// ci:2 維修中        → 琥珀  #ffab2d
+// ci:3 待領取        → 綠    #0dae42
+// ci:4 已領取        → 藍    #41bbff
+// ci:5 取消/轉診/退回 → 紫    #7c63ec
 const PALETTE = [
+  // 未報到：深灰系
   {sc:'#fff', sbg:'#2e2e2e', circleBg:'#d0d0d0', circleColor:'#2e2e2e'},
+  // 已報到等待維修：橘紅系
   {sc:'#fff', sbg:'#ff6d48', circleBg:'#ffd4c8', circleColor:'#c0391a'},
+  // 維修中：琥珀系
   {sc:'#fff', sbg:'#ffab2d', circleBg:'#ffe3a8', circleColor:'#a06000'},
+  // 待領取：綠色系
   {sc:'#fff', sbg:'#0dae42', circleBg:'#b8f0cc', circleColor:'#076828'},
+  // 已領取：天藍系
   {sc:'#fff', sbg:'#41bbff', circleBg:'#bde9ff', circleColor:'#0068a0'},
+  // 取消/轉診/退回：紫色系
   {sc:'#fff', sbg:'#7c63ec', circleBg:'#d8d0ff', circleColor:'#4a30b0'},
 ];
 
-// 下拉選單快取
+// 下拉選單快取（fallback）
 let dropdownCache = {
   resultOpts: ['OK_成功','NO_失敗','轉診或退回不受理'],
   subOpts: {
@@ -716,27 +726,27 @@ let dropdownCache = {
   }
 };
 
-// ══ 設定處理 ══
+// ══ 設定 ══
 function loadSettings(){
-  const gs = localStorage.getItem('gasUrl') || GAS_URL;
-  document.getElementById('gas-url-input').value = gs;
+  const gs = localStorage.getItem('gasUrl');
+  if(gs){ document.getElementById('gas-url-input').value=gs; }
   const ie = localStorage.getItem('interviewEnabled');
-  interviewEnabled = ie === null ? true : ie === 'true';
+  interviewEnabled = ie===null ? true : ie==='true';
   document.getElementById('toggle-interview').checked = interviewEnabled;
   const as = localStorage.getItem('autoSync');
-  autoSync = as === null ? true : as === 'true';
+  autoSync = as===null ? true : as==='true';
   document.getElementById('toggle-autosync').checked = autoSync;
   applyInterviewSetting();
 }
 function saveSettings(){
   const url = document.getElementById('gas-url-input').value.trim();
-  if(url) localStorage.setItem('gasUrl', url);
+  if(url) { localStorage.setItem('gasUrl',url); }
   interviewEnabled = document.getElementById('toggle-interview').checked;
   localStorage.setItem('interviewEnabled', interviewEnabled);
   autoSync = document.getElementById('toggle-autosync').checked;
   localStorage.setItem('autoSync', autoSync);
   applyInterviewSetting();
-  startAutoSync();
+  startAutoSync(); // 重啟或停止自動同步
 }
 function applyInterviewSetting(){
   const ivTab = document.getElementById('tab-interview');
@@ -744,69 +754,109 @@ function applyInterviewSetting(){
   document.getElementById('iv-form-wrap').style.display = interviewEnabled ? '' : 'none';
 }
 
-// ══ 資料同步核心 ══
+// ══ 分頁切換 ══
+const PAGE_TITLES = {
+  repair:    '維修看板',
+  interview: '訪問記錄',
+  stats:     '統計',
+  settings:  '設定',
+};
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  // 更新 topbar 標題
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[tab] || '';
+  // sync-pill 只在維修頁顯示
+  const isRepair = tab === 'repair';
+  document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
+  if(tab==='stats') renderStats();
+  if(tab==='interview') renderInterviewLog();
+}
+
+// ══ 資料對應 ══
+function mapCard(raw){
+  const phone = String(raw.phone||raw['送件者電話']||'');
+  let phone3  = String(raw.phone3||raw['電話後3碼']||'');
+  if(!phone3&&phone){ const d=phone.replace(/\D/g,''); phone3=d.length>=3?d.slice(-3):d; }
+  const rawId = String(raw.id||raw['編號']||'').trim();
+  const rawStage = (raw.stage||raw['流程階段']||raw.status||'').trim();
+  const stage = rawId
+    ? (rawStage || '已報到等待維修')
+    : '未報到';
+  return{
+    rowNum:raw.rowNum||0,
+    id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
+    phone3, name:raw.name||raw['送修者姓名']||raw['姓名']||'',
+    phone, regNum:raw.regNum||rawId||'',
+    stage, noteTag:raw.noteTag||raw['備註標籤']||'',
+    bigCat:raw.bigCat||raw['家電大分類']||raw['產品分類']||'',
+    item:raw.item||raw['產品品項']||'',
+    subItem:raw.subItem||raw['產品細項']||'',
+    itemNote:raw.itemNote||raw['產品備註']||raw['備註說明']||'',
+    brand:raw.brand||raw['品牌']||'',
+    model:raw.model||raw['型號']||'',
+    accessories:String(raw.accessories||raw['配件']||''),
+    mfgDate:raw.mfgDate||raw['出廠日期']||'',
+    price:raw.price||raw['產品價格']||'',
+    faultDesc:raw.faultDesc||raw['故障說明']||'',
+    opened:raw.opened||raw['是否拆過']||'',
+    extraNote:raw.extraNote||raw['其他備註']||'',
+    repairResult:raw.repairResult||raw['維修_結果分類']||'',
+    repairResultDesc:raw.repairResultDesc||raw['維修_結果說明']||'',
+    repairNote:raw.repairNote||raw['維修_補充備註']||'',
+    repairman:raw.repairman||raw['維修者']||'',
+    partCost:String(raw.partCost||raw['零件費']||''),
+    donationFee:String(raw.donationFee||raw['隨喜費']||''),
+    ecoContrib:raw.ecoContrib||raw['減碳貢獻']||'',
+  };
+}
+
+// ══ GAS API 設定 ══
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTAs34DhJI5Ve1ophwaGuWXSYTCnJatZE0A4FM3pVHg0CnUYy9cPkhnOSQGvx59t0Q/exec';
+
+// ══ 資料同步 ══
 let _syncTimer = null;
+
 async function fetchData() {
-  const currentUrl = localStorage.getItem('gasUrl') || GAS_URL;
-  if (!currentUrl) return;
-  setSyncState('syncing');
+  if (!GAS_URL) return;
+  setSyncState('syncing', '同步中…');
   setLBar(true);
   try {
-    const res = await fetch(currentUrl + '?t=' + Date.now());
+    const res  = await fetch(GAS_URL + '?t=' + Date.now());
     const json = await res.json();
     if (json.error) throw new Error(json.error);
-    
-    // 將抓到的資料傳入載入函數 [cite: 7, 11]
     loadExternalData(json.cards || []);
-    
-    const now = new Date();
-    setSyncState('ok');
   } catch(err) {
-    setSyncState('err');
-    showToast('⚠️ 同步失敗，請檢查網路或 GAS 權限');
+    setSyncState('err', '同步失敗');
+    showToast('⚠️ 無法連線 Google Sheets');
   } finally {
     setLBar(false);
   }
 }
+
 function startAutoSync() {
   clearInterval(_syncTimer);
-  if (autoSync) _syncTimer = setInterval(fetchData, 30000);
+  if (autoSync) _syncTimer = setInterval(fetchData, 10000);
 }
+
 async function gasPost(body) {
-  const currentUrl = localStorage.getItem('gasUrl') || GAS_URL;
-  const res = await fetch(currentUrl, { method: 'POST', body: JSON.stringify(body) });
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
   return res.json();
 }
 
-// ══ 資料對應與渲染 (保留所有功能邏輯) ══
-function mapCard(raw){
-  const phone = String(raw.phone || '');
-  let phone3 = String(raw.phone3 || '');
-  if(!phone3 && phone){ 
-    const d = phone.replace(/\D/g,''); 
-    phone3 = d.length >= 3 ? d.slice(-3) : d; 
-  }
-  return {
-    rowNum: raw.rowNum || 0,
-    id: String(raw.id || '').trim(),
-    endOfProduct: raw.endOfProduct || raw.item || '',
-    phone3, name: raw.name || '', phone,
-    stage: raw.stage || '未報到',
-    noteTag: raw.noteTag || '',
-    bigCat: raw.bigCat || '', item: raw.item || '', subItem: raw.subItem || '',
-    brand: raw.brand || '', model: raw.model || '',
-    accessories: String(raw.accessories || ''),
-    mfgDate: raw.mfgDate || '', faultDesc: raw.faultDesc || '',
-    repairResult: raw.repairResult || '', repairResultDesc: raw.repairResultDesc || '',
-    repairNote: raw.repairNote || '', repairman: raw.repairman || '',
-    partCost: String(raw.partCost || ''), ecoContrib: raw.ecoContrib || ''
-  };
-}
-
+// ══ 載入外部資料 ══
 function loadExternalData(cards){
   allCards = cards.map(mapCard);
   buildStageChips();
   render();
+  const now = new Date();
+  setSyncState('ok', now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 同步');
 }
 
 // ══ 篩選chip ══
@@ -1129,49 +1179,9 @@ function onCatChange(sid){
   wrap.innerHTML=`<select class="msel-result" id="mi-item-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${o}">${o||'— 選擇品項 —'}</option>`).join('')}</select>`;
 }
 
-async function saveCard(id, sid) {
-  const c = id ? allCards.find(x => String(x.id) === String(id)) : allCards.find(x => !x.id && x.stage === _modalStageKey);
-  if (!c) return;
-
-  const btn = document.getElementById('save-btn-' + sid);
-  btn.disabled = true;
-  btn.textContent = '處理中...';
-
-  try {
-    // ══ 第一階段：上傳照片 ══
-    const zones = ['外觀', '配件', '內部'];
-    for (const zone of zones) {
-      const cacheKey = sid + '__' + zone;
-      const photos = photoCache[cacheKey] || [];
-      
-      for (let i = 0; i < photos.length; i++) {
-        showToast(`🚀 正在上傳 ${zone} 照片 ${i+1}...`);
-        
-        // 依照要求格式命名：掛號號碼_分類名稱_序號
-        const fileName = `${c.id || '無編號'}_${zone}_${i+1}.jpg`;
-        
-        const photoResp = await gasPost({
-          action: 'uploadPhoto',
-          fileName: fileName,
-          photoData: photos[i].dataUrl
-        });
-
-        if (!photoResp.success) throw new Error(`${zone}照片上傳失敗: ` + photoResp.error);
-      }
-    }
-
-    // ══ 第二階段：更新試算表資料 ══
-    // ... 這裡接您原本 saveCard 裡面的 gasPost({ action: 'updateRow', ... }) 邏輯 ...
-    
-    showToast('✅ 照片與資料皆已同步成功！');
-    closeModal();
-    render();
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = '儲存';
-    showToast('⚠️ 失敗：' + err.message);
-  }
-}
+async function saveCard(id,sid){
+  const c=id?allCards.find(x=>String(x.id)===String(id)):allCards.find(x=>!x.id&&x.stage===_modalStageKey);
+  if(!c)return;
   const btn=document.getElementById('save-btn-'+sid);
   const getEdit=eid=>{const el=document.getElementById(eid);return el?(el.innerText||el.textContent).trim():'';}
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
@@ -1197,6 +1207,13 @@ async function saveCard(id, sid) {
   btn.textContent='儲存中…';
 
   try {
+    // 先上傳所有照片到 Drive
+    if (newId) {
+      btn.textContent='上傳照片…';
+      await uploadAllPhotos(newId);
+    }
+    btn.textContent='同步資料…';
+
     const result = await gasPost({
       action: 'updateRow',
       rowNum: c.rowNum,
@@ -1630,6 +1647,47 @@ function openLightbox(dataUrl){
   document.body.appendChild(lb);
 }
 
+// ══ 照片上傳（POST base64 → GAS → Drive）══
+const PHOTO_FOLDER_ID = '1SHI--kvSIul84RBgOC8efGtU7fuFmBTl';
+
+async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
+  const ext  = (file.type || 'image/jpeg').split('/')[1] || 'jpg';
+  const name = `${cardId}_${zone}_${idx+1}.${ext}`;
+  const base64 = dataUrl.split(',')[1];
+  return await gasPost({
+    action:   'uploadPhoto',
+    folderId: PHOTO_FOLDER_ID,
+    fileName: name,
+    mimeType: file.type || 'image/jpeg',
+    base64:   base64
+  });
+}
+
+async function uploadAllPhotos(cardId) {
+  const zones = ['外觀','配件','內部'];
+  const links = [];
+  for (const zone of zones) {
+    const key    = getPhotoCacheKey(cardId, zone);
+    const photos = photoCache[key] || [];
+    for (let i = 0; i < photos.length; i++) {
+      const p = photos[i];
+      if (p.uploaded) continue;
+      try {
+        showToast(`📤 上傳 ${zone} 照片 ${i+1}/${photos.length}…`);
+        const r = await uploadPhotoToGAS(cardId, zone, i, p.file, p.dataUrl);
+        if (r && r.fileId) {
+          p.uploaded = true;
+          p.fileId   = r.fileId;
+          links.push(r.fileUrl);
+        }
+      } catch(e) {
+        showToast(`⚠️ ${zone} 照片 ${i+1} 上傳失敗`);
+      }
+    }
+  }
+  return links;
+}
+
 // ══ 工具 ══
 function setSyncState(st,lbl){
   const d=document.getElementById('sdot');
@@ -1647,39 +1705,13 @@ function showToast(msg){
 }
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ══ DEMO 資料 ══
-const DEMO_CARDS = [
-  {rowNum:2,  id:'01', name:'王小明', phone:'0912345678', phone3:'678', stage:'未報到',         noteTag:'',       bigCat:'生活家電',     item:'電風扇',   endOfProduct:'電風扇',   brand:'大同',   model:'T-16',  accessories:'無',     mfgDate:'2019', faultDesc:'轉速變慢，噪音大',            repairResult:'',        repairResultDesc:'', repairNote:'', repairman:'', partCost:''},
-  {rowNum:3,  id:'02', name:'李美華', phone:'0923456789', phone3:'789', stage:'已報到等待維修',  noteTag:'有配件', bigCat:'美容美體家電', item:'吹風機',   endOfProduct:'吹風機',   brand:'Panasonic', model:'EH-NA0J', accessories:'風嘴×2', mfgDate:'2021', faultDesc:'加熱不均勻，時常自動關機',     repairResult:'',        repairResultDesc:'', repairNote:'', repairman:'', partCost:''},
-  {rowNum:4,  id:'03', name:'陳大偉', phone:'0934567890', phone3:'890', stage:'已報到等待維修',  noteTag:'候補',   bigCat:'廚房家電',     item:'電鍋',     endOfProduct:'電鍋',     brand:'象印',   model:'NS-LAH10', accessories:'量杯', mfgDate:'2017', faultDesc:'內鍋塗層脫落，不確定能否維修',   repairResult:'',        repairResultDesc:'', repairNote:'', repairman:'阿哲', partCost:''},
-  {rowNum:5,  id:'04', name:'張雅婷', phone:'0945678901', phone3:'901', stage:'維修中',          noteTag:'',       bigCat:'生活家電',     item:'吸塵器',   endOfProduct:'吸塵器',   brand:'Dyson',  model:'V8',    accessories:'吸頭×3', mfgDate:'2020', faultDesc:'吸力明顯下降，濾網已清',       repairResult:'',        repairResultDesc:'', repairNote:'疑似馬達問題', repairman:'阿哲', partCost:''},
-  {rowNum:6,  id:'05', name:'林志遠', phone:'0956789012', phone3:'012', stage:'維修中',          noteTag:'',       bigCat:'影視娛樂',     item:'藍芽喇叭&音響', endOfProduct:'藍芽音響', brand:'JBL', model:'Flip 5', accessories:'充電線', mfgDate:'2022', faultDesc:'左聲道無聲',                  repairResult:'',        repairResultDesc:'', repairNote:'焊點斷裂確認中', repairman:'小英', partCost:'80'},
-  {rowNum:7,  id:'06', name:'吳佳穎', phone:'0967890123', phone3:'123', stage:'待領取',          noteTag:'電話已通知', bigCat:'廚房家電', item:'果汁機',  endOfProduct:'果汁機',   brand:'飛利浦', model:'HR2100', accessories:'杯蓋',  mfgDate:'2018', faultDesc:'馬達空轉，無法攪拌',          repairResult:'OK_成功', repairResultDesc:'OK 更換零件', repairNote:'更換碳刷', repairman:'阿哲', partCost:'150'},
-  {rowNum:8,  id:'07', name:'黃建國', phone:'0978901234', phone3:'234', stage:'待領取',          noteTag:'電話已通知', bigCat:'美容美體家電', item:'電動牙刷', endOfProduct:'電動牙刷', brand:'Oral-B', model:'Pro 2', accessories:'充電座', mfgDate:'2020', faultDesc:'充電後無法開機',             repairResult:'OK_成功', repairResultDesc:'OK 無更換零件: 清潔/重新組裝或固定', repairNote:'接點清潔', repairman:'小英', partCost:'0'},
-  {rowNum:9,  id:'08', name:'蔡淑芬', phone:'0989012345', phone3:'345', stage:'已領取',          noteTag:'',       bigCat:'照明用具',     item:'檯燈',     endOfProduct:'檯燈',     brand:'IKEA',   model:'Forså', accessories:'',       mfgDate:'2016', faultDesc:'開關失靈',                    repairResult:'OK_成功', repairResultDesc:'OK 更換零件', repairNote:'更換撥動開關', repairman:'阿哲', partCost:'30'},
-  {rowNum:10, id:'09', name:'許明德', phone:'0990123456', phone3:'456', stage:'已領取',          noteTag:'',       bigCat:'廚房家電',     item:'烤土司機', endOfProduct:'烤土司機', brand:'Panasonic', model:'NT-D700', accessories:'', mfgDate:'2015', faultDesc:'加熱管不均勻，一側不熱',       repairResult:'OK_成功', repairResultDesc:'OK 更換零件', repairNote:'加熱管已更換', repairman:'小英', partCost:'200'},
-  {rowNum:11, id:'10', name:'鄭怡君', phone:'0901234567', phone3:'567', stage:'已領取',          noteTag:'',       bigCat:'生活家電',     item:'電暖器',   endOfProduct:'電暖器',   brand:'北方',   model:'PH-885', accessories:'',      mfgDate:'2018', faultDesc:'通電後無反應',                repairResult:'NO_失敗', repairResultDesc:'No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)', repairNote:'內部嚴重燒焦', repairman:'阿哲', partCost:''},
-  {rowNum:12, id:'11', name:'洪俊豪', phone:'0912098765', phone3:'765', stage:'取消/轉診/退回', noteTag:'',       bigCat:'影視娛樂',     item:'遊戲機',   endOfProduct:'遊戲機',   brand:'Nintendo', model:'Switch', accessories:'充電器', mfgDate:'2023', faultDesc:'Joy-Con 漂移嚴重',           repairResult:'取消轉診退回', repairResultDesc:'考量活動當下時間與資源轉介至專業維修店', repairNote:'建議送任天堂原廠', repairman:'小英', partCost:''},
-  {rowNum:13, id:'',   name:'',     phone:'',           phone3:'',    stage:'未報到',         noteTag:'',       bigCat:'',             item:'',          endOfProduct:'',         brand:'',       model:'',      accessories:'',       mfgDate:'',     faultDesc:'',                            repairResult:'',        repairResultDesc:'', repairNote:'', repairman:'', partCost:''},
-];
-
-// 插入 demo 訪問記錄
-interviews = [
-  {id:1700000001, cardId:'06', name:'吳佳穎', product:'果汁機', stage:'待領取', q1:'朋友介紹，說這裡修得很好', q2:'希望可以增加修縫紉機的服務', time:'03/15 10:23'},
-  {id:1700000002, cardId:'08', name:'蔡淑芬', product:'檯燈',   stage:'已領取', q1:'在社群媒體看到活動貼文',  q2:'場地可以再大一點，今天等比較久', time:'03/15 11:05'},
-  {id:1700000003, cardId:'05', name:'林志遠', product:'藍芽音響',stage:'維修中', q1:'路過看到攤位就進來了',   q2:'很棒的活動，希望繼續辦下去！', time:'03/15 11:42'},
-];
-localStorage.setItem('interviews', JSON.stringify(interviews));
-
-// ══ 初始化 (最重要的修正：移除手寫 Demo 資料) ══
+// ══ 初始化 ══
 loadSettings();
 renderInterviewLog();
 document.getElementById('sync-pill').style.display = 'flex';
-document.getElementById('q').addEventListener('input', function(){ searchQ = this.value.trim(); render(); });
-
-// 修正點：移除原本的 loadExternalData(DEMO_CARDS)，改為呼叫 API [cite: 6]
-fetchData(); 
-startAutoSync();
+document.getElementById('q').addEventListener('input',function(){searchQ=this.value.trim();render();});
+// 開啟即拉取真實資料，每 10 秒自動同步
+fetchData().then(()=>startAutoSync());
 </script>
 </body>
 </html>
