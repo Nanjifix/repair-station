@@ -161,8 +161,36 @@ body{
   font-family:'DM Mono',monospace;
 }
 .kcard-info{flex:1;min-width:0;}
-.k-product{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.k-name{font-size:14px;color:var(--text2);font-weight:500;}
+.k-product{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.k-name{font-size:13px;color:var(--text2);font-weight:500;}
+.k-tag{
+  font-size:11px;color:var(--text3);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:5px;
+}
+.k-tag-chip{
+  display:inline-block;padding:1px 6px;border-radius:20px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:10px;font-weight:600;color:var(--text2);
+  white-space:nowrap;
+}
+.k-tag-chip.warn{background:#fff8ec;border-color:#ffab2d;color:#a06000;}
+.k-tag-chip.info{background:#eaf7ff;border-color:#41bbff;color:#0068a0;}
+/* 時間計時器 */
+.timer-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px;
+}
+.timer-block{flex:1;text-align:center;}
+.timer-label{font-size:11px;color:var(--text3);margin-bottom:2px;}
+.timer-val{
+  font-size:18px;font-weight:700;font-family:'DM Mono',monospace;
+  color:var(--text);letter-spacing:.03em;
+}
+.timer-val.running{color:#ff6d48;}
+.timer-val.done{color:#0dae42;}
+.timer-val.pending{color:var(--text3);}
+.timer-divider{width:1px;height:32px;background:var(--border);}
 .empty-col{border-radius:9px;padding:18px 10px;text-align:center;font-size:12px;color:var(--text3);}
 
 /* ══ MODAL ══ */
@@ -459,8 +487,22 @@ input:checked+.slider::before{transform:translateX(20px);}
 .photo-thumb-wrap{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
 .photo-thumb-wrap img{width:100%;height:100%;object-fit:cover;cursor:pointer;transition:opacity .15s;}
 .photo-thumb-wrap img:hover{opacity:.85;}
-.photo-del-btn{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(239,68,68,.85);color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
-.photo-add-btn{width:72px;height:72px;border-radius:8px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:var(--text2);font-size:11px;font-weight:500;flex-shrink:0;transition:all .15s;}
+.photo-del-btn{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(30,30,30,.7);color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+/* 上傳狀態徽章 */
+.photo-status{
+  position:absolute;bottom:3px;left:3px;
+  height:18px;min-width:18px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;padding:0 4px;gap:2px;
+  pointer-events:none;
+}
+.photo-status.pending{background:rgba(0,0,0,.55);color:#ccc;}
+.photo-status.uploading{background:rgba(255,171,45,.9);color:#fff;}
+.photo-status.done{background:rgba(13,174,66,.92);color:#fff;}
+.photo-status.fail{background:rgba(255,109,72,.9);color:#fff;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite;}
+.photo-add-btn{width:72px;height:72px;border-radius:8px;border:1.5px dashed var(--border2);background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;color:var(--text2);font-size:11px;font-weight:500;flex-shrink:0;transition:all .15s;}
 .photo-add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
 .photo-add-btn svg{width:22px;height:22px;}
 .photo-uploading{opacity:.5;pointer-events:none;}
@@ -726,8 +768,55 @@ let dropdownCache = {
   }
 };
 
-// ══ 設定 ══
-function loadSettings(){
+// ══ 時間戳管理 ══
+// 以 rowNum 為 key 存入 localStorage
+// tsReg: 填入掛號號碼時刻
+// tsRepStart: 切換「維修中」時刻
+// tsRepDone: 切換「待領取」時刻
+function tsKey(rowNum){ return 'ts_' + rowNum; }
+function getTs(rowNum){
+  try{ return JSON.parse(localStorage.getItem(tsKey(rowNum))) || {}; }
+  catch(e){ return {}; }
+}
+function setTs(rowNum, patch){
+  const cur = getTs(rowNum);
+  localStorage.setItem(tsKey(rowNum), JSON.stringify({...cur, ...patch}));
+}
+// 格式化毫秒差為 hh:mm
+function fmtElapsed(ms){
+  if(!ms || ms < 0) return '—';
+  const totalMin = Math.floor(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+}
+// 取得等候維修時間（已填號 → 維修中）
+function getWaitDuration(rowNum){
+  const ts = getTs(rowNum);
+  if(!ts.tsReg) return null;
+  const end = ts.tsRepStart || null;
+  return end ? end - ts.tsReg : Date.now() - ts.tsReg;
+}
+// 取得維修過程時間（維修中 → 待領取）
+function getRepairDuration(rowNum){
+  const ts = getTs(rowNum);
+  if(!ts.tsRepStart) return null;
+  const end = ts.tsRepDone || null;
+  return end ? end - ts.tsRepStart : Date.now() - ts.tsRepStart;
+}
+// 計時器狀態：pending / running / done / na
+function getWaitState(c){
+  const ts = getTs(c.rowNum);
+  if(!ts.tsReg) return 'pending';
+  if(ts.tsRepStart) return 'done';
+  return 'running';
+}
+function getRepairState(c){
+  const ts = getTs(c.rowNum);
+  if(!ts.tsRepStart) return 'pending';
+  if(ts.tsRepDone) return 'done';
+  return 'running';
+}
   const gs = localStorage.getItem('gasUrl');
   if(gs){ document.getElementById('gas-url-input').value=gs; }
   const ie = localStorage.getItem('interviewEnabled');
@@ -787,7 +876,7 @@ function mapCard(raw){
     ? (rawStage || '已報到等待維修')
     : '未報到';
   return{
-    rowNum:raw.rowNum||0,
+    rowNum:Number(raw.rowNum)||0,
     id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
     phone3, name:raw.name||raw['送修者姓名']||raw['姓名']||'',
     phone, regNum:raw.regNum||rawId||'',
@@ -901,16 +990,21 @@ function render(){
     const p=PALETTE[stage.ci];
     const sc=filtered.filter(c=>c.stage===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
-    const cHtml=sc.length?sc.map(c=>`
-      <div class="kcard" onclick="openModal('${escH(c.id||'__empty__')}','${escH(stage.key)}')">
+    const cHtml=sc.length?sc.map(c=>{
+      // 提醒備註 chips
+      const tagChips = (c.noteTag||'').split(/[,，、]+/).filter(Boolean)
+        .map(t=>`<span class="k-tag-chip${t==='候補'?'':t==='電話已通知'?' info':' warn'}">${escH(t.trim())}</span>`).join('');
+      return`<div class="kcard" onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
             <div class="k-product">${escH(c.endOfProduct||c.item||'—')}</div>
             <div class="k-name">${escH(c.name||'—')}</div>
+            <div class="k-tag">${tagChips||'<span style="color:var(--border2)">—</span>'}</div>
           </div>
         </div>
-      </div>`).join(''):`<div class="empty-col"> </div>`;
+      </div>`;
+    }).join(''):`<div class="empty-col"> </div>`;
     return`<div class="col">
       <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
       <div class="col-body">${cHtml}</div>
@@ -920,16 +1014,17 @@ function render(){
 
 // ══ Modal ══
 let _modalStageKey='';
-function openModal(id,stageKey){
-  _modalStageKey=stageKey||'';
-  const isEmpty=id==='__empty__';
-  const c=isEmpty?allCards.find(x=>!x.id&&x.stage===stageKey):allCards.find(x=>String(x.id)===String(id));
-  if(!c)return;
+function openModal(id, rowNum, stageKey){
+  _modalStageKey = stageKey || '';
+  // 用 rowNum 精準定位卡片（id 可能空白，rowNum 永遠唯一）
+  const c = allCards.find(x => x.rowNum === rowNum);
+  if(!c){ showToast('⚠️ 找不到卡片，請重新整理'); return; }
+  if(!c.rowNum){ showToast('⚠️ 此卡片缺少列號，請確認 Google Sheets 資料'); return; }
   const ci=STAGES.findIndex(s=>s.key===c.stage);
   const p=PALETTE[ci<0?0:ci];
   const mc=document.getElementById('m-circle');
   const idD=String(c.id||'').replace(/\D/g,'');
-  mc.textContent=idD?idD.slice(-2):'';
+  mc.textContent=idD?idD.slice(-2):'?';
   mc.style.background=p.circleBg;mc.style.color=p.circleColor;
   document.getElementById('m-title').textContent=(c.name||'—');
   const qs=document.getElementById('m-quick-stage');
@@ -937,7 +1032,8 @@ function openModal(id,stageKey){
   qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;
   const accList=c.accessories?c.accessories.split(/[,，、\s]+/).filter(Boolean):[];
   const accHtml=accList.length?accList.map(a=>`<span class="acc-item on" onclick="this.classList.toggle('on')" data-acc="${escH(a)}">${escH(a)}</span>`).join(''):'<span style="font-size:12px;color:var(--text3)">無</span>';
-  const sid=c.id||'noid';
+  // sid 用 rowNum 確保唯一，不再依賴 id
+  const sid = String(rowNum);
   const curResult = c.repairResult||'';
   const curDesc   = c.repairResultDesc||'';
   const buildResultSel = (sel) => ['', ...dropdownCache.resultOpts].map(o=>`<option value="${escH(o)}"${sel===o?' selected':''}>${o||'— 選擇維修結果 —'}</option>`).join('');
@@ -1084,6 +1180,9 @@ function openModal(id,stageKey){
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
         >${escH(c.partCost||'')}</span>
       </div>
+      <div class="timer-row" id="timer-row-${escH(sid)}">
+        ${buildTimerHTML(c)}
+      </div>
       </div>
     </div>
     <div class="msec">
@@ -1180,8 +1279,14 @@ function onCatChange(sid){
 }
 
 async function saveCard(id,sid){
-  const c=id?allCards.find(x=>String(x.id)===String(id)):allCards.find(x=>!x.id&&x.stage===_modalStageKey);
-  if(!c)return;
+  // sid 現在是 rowNum 字串，用它精準找卡片
+  const rowNum = parseInt(sid);
+  const c = allCards.find(x => x.rowNum === rowNum);
+  if(!c) return;
+  if(!c.rowNum || c.rowNum < 2){
+    showToast('⚠️ 卡片缺少有效列號，無法儲存');
+    return;
+  }
   const btn=document.getElementById('save-btn-'+sid);
   const getEdit=eid=>{const el=document.getElementById(eid);return el?(el.innerText||el.textContent).trim():'';}
   const g=eid=>{const el=document.getElementById(eid);return el?el.value.trim():'';}
@@ -1202,6 +1307,11 @@ async function saveCard(id,sid){
   // 計算新 stage
   let newStage = c.stage;
   if(newId && (!c.stage || c.stage === '未報到')) newStage = '已報到等待維修';
+
+  // 若是第一次填入掛號號碼，記錄等候開始時間
+  if(newId && !c.id){
+    if(!getTs(c.rowNum).tsReg) setTs(c.rowNum, { tsReg: Date.now() });
+  }
 
   btn.disabled=true;
   btn.textContent='儲存中…';
@@ -1254,7 +1364,40 @@ async function saveCard(id,sid){
     showToast('⚠️ 儲存失敗：' + err.message);
   }
 }
-function toggleMsec(titleEl){
+function buildTimerHTML(c){
+  const ws  = getWaitState(c);
+  const rs  = getRepairState(c);
+  const wd  = getWaitDuration(c.rowNum);
+  const rd  = getRepairDuration(c.rowNum);
+  const wVal = ws==='pending' ? '—' : fmtElapsed(wd);
+  const rVal = rs==='pending' ? '—' : fmtElapsed(rd);
+  const wCls = ws==='running'?'running':ws==='done'?'done':'pending';
+  const rCls = rs==='running'?'running':rs==='done'?'done':'pending';
+  return `
+    <div class="timer-block">
+      <div class="timer-label">等候維修</div>
+      <div class="timer-val ${wCls}">${wVal}</div>
+    </div>
+    <div class="timer-divider"></div>
+    <div class="timer-block">
+      <div class="timer-label">維修過程</div>
+      <div class="timer-val ${rCls}">${rVal}</div>
+    </div>`;
+}
+function refreshTimerDisplay(rowNum){
+  const c = allCards.find(x=>x.rowNum===rowNum);
+  if(!c) return;
+  const sid = String(rowNum);
+  const el = document.getElementById('timer-row-'+sid);
+  if(el) el.innerHTML = buildTimerHTML(c);
+}
+// 每分鐘更新 modal 中正在計時的數字
+setInterval(()=>{
+  const el = document.querySelector('[id^="timer-row-"]');
+  if(!el) return;
+  const sid = el.id.replace('timer-row-','');
+  refreshTimerDisplay(parseInt(sid));
+}, 60000);
   const body = titleEl.nextElementSibling;
   const chev = titleEl.querySelector('.msec-chevron');
   const isOpen = !body.classList.contains('collapsed');
@@ -1277,9 +1420,8 @@ async function quickStageChange(newStage){
   const saveBtnEl=document.querySelector('[id^="save-btn-"]');
   if(!saveBtnEl)return;
   const sid=saveBtnEl.id.replace('save-btn-','');
-  const c=sid&&sid!=='noid'
-    ?allCards.find(x=>String(x.id)===String(sid))
-    :allCards.find(x=>!x.id&&x.stage===_modalStageKey);
+  const rowNum=parseInt(sid);
+  const c=allCards.find(x=>x.rowNum===rowNum);
   if(!c)return;
   const ci=STAGES.findIndex(s=>s.key===newStage);
   const p=PALETTE[ci<0?0:ci];
@@ -1287,12 +1429,27 @@ async function quickStageChange(newStage){
   if(qs){qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;}
   const oldStage=c.stage;
   c.stage=newStage;
+
+  // ── 時間戳記錄 ──
+  const now = Date.now();
+  if(newStage === '維修中'){
+    // 記錄維修開始；若還沒有 tsReg（直接跳維修中），補記
+    const patch = { tsRepStart: now };
+    if(!getTs(c.rowNum).tsReg) patch.tsReg = now;
+    setTs(c.rowNum, patch);
+  }
+  if(newStage === '待領取'){
+    setTs(c.rowNum, { tsRepDone: now });
+  }
+
   render();
+  // 重新渲染 modal 計時器區
+  refreshTimerDisplay(rowNum);
   try {
     await gasPost({ action:'updateStage', rowNum:c.rowNum, stage:newStage });
     showToast('✓ 階段已同步');
   } catch(err) {
-    c.stage=oldStage; // rollback
+    c.stage=oldStage;
     showToast('⚠️ 階段更新失敗');
     render();
   }
@@ -1607,14 +1764,22 @@ function triggerPhotoInput(sid, zone, maxCount){
     const reader = new FileReader();
     reader.onload = function(e){
       const dataUrl = e.target.result;
-      photoCache[key].push({ dataUrl, file });
+      photoCache[key].push({ dataUrl, file, status:'pending' });
       refreshPhotoThumbs(sid, zone, maxCount);
-      showToast('📷 照片已暫存（第二階段將上傳）');
+      showToast('📷 照片已加入，儲存時自動上傳');
     };
     reader.readAsDataURL(file);
   };
   inp.click();
 }
+
+function photoStatusBadge(p){
+  if(p.status==='done')     return `<div class="photo-status done">✓ 已上傳</div>`;
+  if(p.status==='uploading')return `<div class="photo-status uploading"><span class="spin">↻</span> 上傳中</div>`;
+  if(p.status==='fail')     return `<div class="photo-status fail">✗ 失敗</div>`;
+  return `<div class="photo-status pending">待上傳</div>`;
+}
+
 function refreshPhotoThumbs(sid, zone, maxCount){
   const key = getPhotoCacheKey(sid, zone);
   const photos = photoCache[key] || [];
@@ -1623,13 +1788,14 @@ function refreshPhotoThumbs(sid, zone, maxCount){
   const thumbs = photos.map((p, i) => `
     <div class="photo-thumb-wrap">
       <img src="${p.dataUrl}" onclick="openLightbox('${p.dataUrl}')">
-      <button class="photo-del-btn" onclick="deletePhoto('${sid}','${zone}',${i})">×</button>
+      ${p.status!=='uploading'?`<button class="photo-del-btn" onclick="deletePhoto('${sid}','${zone}',${i})" title="移除">×</button>`:''}
+      ${photoStatusBadge(p)}
     </div>`).join('');
   const canAdd = photos.length < maxCount;
   const addBtn = canAdd ? `
     <div class="photo-add-btn" onclick="triggerPhotoInput('${sid}','${zone}',${maxCount})">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.5 7H18l-2-3H8L6 7H3.5A1.5 1.5 0 002 8.5v11A1.5 1.5 0 003.5 21h17a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0020.5 7z"/></svg>
-      <span>照片${zone}</span>
+      <span>新增照片</span>
     </div>` : '';
   container.innerHTML = thumbs + addBtn;
 }
@@ -1665,27 +1831,37 @@ async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
 
 async function uploadAllPhotos(cardId) {
   const zones = ['外觀','配件','內部'];
-  const links = [];
+  let successCount = 0, failCount = 0;
   for (const zone of zones) {
     const key    = getPhotoCacheKey(cardId, zone);
     const photos = photoCache[key] || [];
     for (let i = 0; i < photos.length; i++) {
       const p = photos[i];
-      if (p.uploaded) continue;
+      if (p.status === 'done') continue; // 已上傳跳過
+      // 設為上傳中，刷新徽章
+      p.status = 'uploading';
+      refreshPhotoThumbs(cardId, zone, 2);
       try {
-        showToast(`📤 上傳 ${zone} 照片 ${i+1}/${photos.length}…`);
         const r = await uploadPhotoToGAS(cardId, zone, i, p.file, p.dataUrl);
         if (r && r.fileId) {
-          p.uploaded = true;
-          p.fileId   = r.fileId;
-          links.push(r.fileUrl);
+          p.status  = 'done';
+          p.fileId  = r.fileId;
+          p.fileUrl = r.fileUrl;
+          successCount++;
+        } else {
+          p.status = 'fail';
+          failCount++;
         }
       } catch(e) {
-        showToast(`⚠️ ${zone} 照片 ${i+1} 上傳失敗`);
+        p.status = 'fail';
+        failCount++;
       }
+      // 刷新縮圖顯示最新狀態
+      refreshPhotoThumbs(cardId, zone, 2);
     }
   }
-  return links;
+  if (failCount > 0) showToast(`⚠️ ${failCount} 張照片上傳失敗，其餘 ${successCount} 張成功`);
+  else if (successCount > 0) showToast(`✓ ${successCount} 張照片已上傳至 Drive`);
 }
 
 // ══ 工具 ══
