@@ -641,7 +641,7 @@ input:checked+.slider::before{transform:translateX(20px);}
             ontouchstart="startLongPress(event,'iv-ql1')"
             ontouchend="cancelLongPress()"
             ontouchmove="cancelLongPress()">
-            為什麼知道我們的活動？
+            是什麼時候購買的？當初花多少錢買？
           </div>
           <textarea class="form-ta" id="iv-q1" placeholder="請輸入回應…" rows="2" oninput="autoResize(this)"></textarea>
         </div>
@@ -653,7 +653,7 @@ input:checked+.slider::before{transform:translateX(20px);}
             ontouchstart="startLongPress(event,'iv-ql2')"
             ontouchend="cancelLongPress()"
             ontouchmove="cancelLongPress()">
-            希望活動做得更好？
+            為什麼想修而不是丟掉？這台小家電對您或您的家庭有什麼特別意義？
           </div>
           <textarea class="form-ta" id="iv-q2" placeholder="請輸入回應…" rows="2" oninput="autoResize(this)"></textarea>
         </div>
@@ -1900,39 +1900,6 @@ function renderStats(){
       <div style="font-size:52px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${total}</div>
       <div style="font-size:13px;color:var(--text3);padding-bottom:8px;font-weight:500;">件送修</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ff6d48;">
-          <div style="font-size:22px;font-weight:700;color:#ff6d48;font-family:'DM Mono',monospace;line-height:1;">${waiting}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">已報到等待維修</div>
-        </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ffab2d;">
-          <div style="font-size:22px;font-weight:700;color:#ffab2d;font-family:'DM Mono',monospace;line-height:1;">${inProgress}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
-        </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #0dae42;">
-          <div style="font-size:22px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${readyPickup}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #41bbff;">
-          <div style="font-size:22px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${done}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
-        </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #2e2e2e;">
-          <div style="font-size:22px;font-weight:700;color:#2e2e2e;font-family:'DM Mono',monospace;line-height:1;">${pending}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
-        </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #7c63ec;">
-          <div style="font-size:22px;font-weight:700;color:#7c63ec;font-family:'DM Mono',monospace;line-height:1;">${referred}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="stat-card" style="margin-bottom:12px;">
-    <div class="stat-card-title">維修率分析</div>
     <div style="display:flex;justify-content:space-around;align-items:flex-start;padding:8px 0 4px;">
       ${ringChart(total?Math.round(attempted/total*100):0,'#41bbff','整體維修率',attempted+' / '+total+' 件')}
       ${ringChart(successRate,'#0dae42','成功維修率',repaired+' 件已領取')}
