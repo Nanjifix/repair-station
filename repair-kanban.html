@@ -659,7 +659,7 @@ input:checked+.slider::before{transform:translateX(20px);}
         </div>
 
         <div style="display:flex;justify-content:center;">
-          <button class="submit-btn" id="iv-submit" onclick="submitInterview()" disabled>提交訪問記錄</button>
+          <button class="submit-btn" id="iv-submit" onclick="submitInterview()" disabled>儲存</button>
         </div>
       </div>
     </div>
@@ -1286,10 +1286,10 @@ function openModal(id, rowNum, stageKey){
         <div class="acc-wrap" id="acc-${escH(sid)}">${accHtml}</div>
       </div>
       </div>
-    </div>
+      
     <div class="msec">
       <div class="msec-title" onclick="toggleMsec(this)">
-        <span class="msec-title-l">故障說明</span>
+        <span class="msec-title-l">維修紀錄</span>
         <span class="msec-chevron">▼</span>
       </div>
       <div class="msec-body collapsed" style="max-height:0;">
@@ -1303,11 +1303,6 @@ function openModal(id, rowNum, stageKey){
       <div class="trow"><span class="tl">備註標籤</span><span class="tv">${escH(c.noteTag||'—')}</span></div>
       </div>
     </div>
-    <div class="msec">
-      <div class="msec-title" onclick="toggleMsec(this)">
-        <span class="msec-title-l">維修紀錄</span>
-        <span class="msec-chevron">▼</span>
-      </div>
       <div class="msec-body collapsed" style="max-height:0;">
       <div class="trow">
         <span class="tl">維修結果</span>
@@ -1649,8 +1644,8 @@ function editQuestion(e, elId){
   }
 }
 
-let _ivQ1Label = '為什麼知道我們的活動？';
-let _ivQ2Label = '希望活動做得更好？';
+let _ivQ1Label = '是什麼時候購買的？當初花多少錢買的?';
+let _ivQ2Label = '為什麼想修而不是丟掉？這台小家電對您或您的家庭有什麼特別意義？';
 
 function autoResize(el){
   el.style.height = 'auto';
