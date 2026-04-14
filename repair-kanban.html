@@ -1900,13 +1900,13 @@ function renderStats(){
       <div style="flex:1;border-right:1px solid var(--border);padding-right:12px;">
         <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${total}</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">件送修</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
       </div>
       <!-- 右：成功維修率 -->
       <div style="flex:1;padding-left:4px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
+        <div style="font-size:52px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
       </div>
     </div>
   </div>
@@ -1947,7 +1947,7 @@ function renderStats(){
   </div>
 
   <!-- 第三區塊：成功和失敗維修分析 -->
-  <div class="stat-card" style="margin-bottom:12px;">
+  <div class="stat-card" style="margin-bottom:13px;">
     <div class="stat-card-title">成功與失敗分析</div>
     ${(()=>{
       const groups=[
@@ -1982,7 +1982,7 @@ function renderStats(){
           <text x="${cx}" y="${cy-7}" text-anchor="middle" dominant-baseline="central"
             font-size="18" font-weight="800" fill="${g.accent}" font-family="DM Mono,monospace">${cnt}</text>
           <text x="${cx}" y="${cy+10}" text-anchor="middle" dominant-baseline="central"
-            font-size="10" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
+            font-size="13" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
         </svg>`;
       }
 
@@ -2016,13 +2016,13 @@ function renderStats(){
   </div>
 
   <!-- 第四區塊：送修家電分類 -->
-  ${catList.length?`<div class="stat-card" style="margin-bottom:12px;">
+  ${catList.length?`<div class="stat-card" style="margin-bottom:13px;">
     <div class="stat-card-title">送修家電分類</div>
-    ${colChart(catList.slice(0,7),maxCat,()=>'#41bbff')}
+    ${colChart(catList.slice(0,7),maxCat,()=>'#2e2e2e')}
   </div>`:''}
 
   <!-- 第五區塊：送修品項分析 -->
-  ${itemList.length?`<div class="stat-card" style="margin-bottom:12px;">
+  ${itemList.length?`<div class="stat-card" style="margin-bottom:13px;">
     <div class="stat-card-title">送修品項分析</div>
     <div id="treemap-wrap" style="margin-top:8px;">${buildTreemap(itemList)}</div>
   </div>`:''}
@@ -2040,7 +2040,7 @@ function renderStats(){
         return`<span style="font-size:${sz}px;font-weight:${c>1?700:500};color:${col};opacity:${op.toFixed(2)};cursor:default;" title="${c}次">${escH(w)}</span>`;
       }).join('')}
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-top:4px;">共 ${ivTotal} 筆訪問・${Object.keys(wordMap).length} 個關鍵詞</div>
+    <div style="font-size:13px;color:var(--text3);margin-top:4px;">共 ${ivTotal} 筆訪問・${Object.keys(wordMap).length} 個關鍵詞</div>
     `:`<div style="text-align:center;padding:24px 0;font-size:14px;color:var(--text3);">尚無訪問資料</div>`}
   </div>
   `;}
