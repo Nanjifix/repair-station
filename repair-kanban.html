@@ -804,7 +804,7 @@ let interviews = JSON.parse(localStorage.getItem('interviews')||'[]');
 
 const STAGES = [
   {key:'未報到',        ci:0},
-  {key:'已報到等待維修',ci:1},
+  {key:'等待維修',ci:1},
   {key:'維修中',        ci:2},
   {key:'待領取',        ci:3},
   {key:'已領取',        ci:4},
@@ -813,7 +813,7 @@ const STAGES = [
 
 // 六階段狀態色系統
 // ci:0 未報到        → 深灰  #2e2e2e
-// ci:1 已報到等待維修 → 橘紅  #ff6d48
+// ci:1 等待維修 → 橘紅  #ff6d48
 // ci:2 維修中        → 琥珀  #ffab2d
 // ci:3 待領取        → 綠    #0dae42
 // ci:4 已領取        → 藍    #41bbff
@@ -821,7 +821,7 @@ const STAGES = [
 const PALETTE = [
   // 未報到：深灰系
   {sc:'#fff', sbg:'#2e2e2e', circleBg:'#d0d0d0', circleColor:'#2e2e2e'},
-  // 已報到等待維修：橘紅系
+  // 等待維修：橘紅系
   {sc:'#fff', sbg:'#ff6d48', circleBg:'#ffd4c8', circleColor:'#c0391a'},
   // 維修中：琥珀系
   {sc:'#fff', sbg:'#ffab2d', circleBg:'#ffe3a8', circleColor:'#a06000'},
@@ -960,7 +960,7 @@ function mapCard(raw){
   const rawId = String(raw.id||raw['編號']||'').trim();
   const rawStage = (raw.stage||raw['流程階段']||raw.status||'').trim();
   const stage = rawId
-    ? (rawStage || '已報到等待維修')
+    ? (rawStage || '等待維修')
     : '未報到';
   return{
     rowNum:Number(raw.rowNum)||0,
@@ -1047,6 +1047,7 @@ function loadExternalData(cards){
   allCards = cards.map(mapCard);
   buildStageChips();
   render();
+  updateChipCounts();
   const now = new Date();
   setSyncState('ok', now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 同步');
 }
@@ -1059,10 +1060,33 @@ function buildStageChips(){
     const p=PALETTE[s.ci];
     const btn=document.createElement('button');
     btn.className='chip';btn.dataset.key=s.key;btn.dataset.ci=s.ci;
-    btn.textContent=s.key;btn.onclick=function(){toggleStage(s.key,this);};
+    btn.innerHTML=`${s.key} <span class="chip-cnt" style="opacity:.7;font-weight:700;">0</span>`;
+    btn.onclick=function(){toggleStage(s.key,this);};
     fbar.appendChild(btn);
   });
   updateAllChip();
+}
+function updateChipCounts(){
+  document.querySelectorAll('#fbar .chip[data-key]').forEach(btn=>{
+    const key=btn.dataset.key;
+    const cnt=allCards.filter(c=>c.stage===key).length;
+    const span=btn.querySelector('.chip-cnt');
+    if(span) span.textContent=cnt;
+  });
+  // 全部 chip 顯示總數
+  const allBtn=document.getElementById('chip-all');
+  if(allBtn){
+    let span=allBtn.querySelector('.chip-cnt');
+    if(!span){
+      span=document.createElement('span');
+      span.className='chip-cnt';
+      span.style.opacity='.8';
+      span.style.fontWeight='700';
+      allBtn.appendChild(document.createTextNode(' '));
+      allBtn.appendChild(span);
+    }
+    span.textContent=allCards.length;
+  }
 }
 function toggleStage(key,el){
   if(activeKeys.has(key)){activeKeys.delete(key);el.classList.remove('on');el.style.background='';el.style.color='';}
@@ -1087,7 +1111,7 @@ function buildCardTimer(c){
   let startMs = null;
   let label = '';
 
-  if(c.stage === '已報到等待維修'){
+  if(c.stage === '等待維修'){
     startMs = ts.tsReg || null;
     label = '等候';
   } else if(c.stage === '維修中'){
@@ -1455,7 +1479,7 @@ async function saveCard(id,sid){
   const newItem    = g('mi-item-'+sid)           || c.item;
   // 計算新 stage
   let newStage = c.stage;
-  if(newId && (!c.stage || c.stage === '未報到')) newStage = '已報到等待維修';
+  if(newId && (!c.stage || c.stage === '未報到')) newStage = '等待維修';
 
   // 若是第一次填入掛號號碼，記錄等候開始時間
   if(newId && !c.id){
@@ -1830,7 +1854,7 @@ function renderStats(){
   const done=allCards.filter(c=>c.stage==='已領取').length;
   const referred=allCards.filter(c=>c.stage==='取消/轉診/退回').length;
   const inProgress=allCards.filter(c=>c.stage==='維修中').length;
-  const waiting=allCards.filter(c=>c.stage==='已報到等待維修').length;
+  const waiting=allCards.filter(c=>c.stage==='等待維修').length;
   const pending=allCards.filter(c=>c.stage==='未報到').length;
   const readyPickup=allCards.filter(c=>c.stage==='待領取').length;
   const repaired=done;
@@ -1877,17 +1901,17 @@ function renderStats(){
     </div>`;
   }
   function colChart(items,maxVal,colorFn){
-    return`<div style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 4px;">
+    return`<div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px;">
       ${items.map(([k,v])=>{
-        const h=Math.max(4,Math.round(v/maxVal*80));
+        const h=Math.max(4,Math.round(v/maxVal*88));
         return`<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;">
-          <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px;">${v}</div>
-          <div style="width:100%;max-width:36px;height:${h}px;background:${colorFn(k,v)};border-radius:4px 4px 0 0;"></div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">${v}</div>
+          <div style="width:100%;max-width:40px;height:${h}px;background:${colorFn(k,v)};border-radius:4px 4px 0 0;"></div>
         </div>`;
       }).join('')}
     </div>
-    <div style="display:flex;gap:6px;padding:4px 4px 0;border-top:1px solid var(--border);margin-top:4px;">
-      ${items.map(([k])=>`<div style="flex:1;min-width:0;font-size:10px;color:var(--text3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(k)}</div>`).join('')}
+    <div style="display:flex;gap:6px;padding:6px 4px 0;border-top:1px solid var(--border);margin-top:4px;">
+      ${items.map(([k])=>`<div style="flex:1;min-width:0;font-size:13px;color:var(--text2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(k)}</div>`).join('')}
     </div>`;
   }
 
@@ -1900,13 +1924,13 @@ function renderStats(){
       <div style="flex:1;border-right:1px solid var(--border);padding-right:12px;">
         <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${total}</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">件送修</div>
-        <div style="font-size:13px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
       </div>
       <!-- 右：成功維修率 -->
       <div style="flex:1;padding-left:4px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:52px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
+        <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
-        <div style="font-size:13px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
       </div>
     </div>
   </div>
@@ -1918,7 +1942,7 @@ function renderStats(){
       <div style="display:flex;gap:7px;">
         <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ff6d48;">
           <div style="font-size:22px;font-weight:700;color:#ff6d48;font-family:'DM Mono',monospace;line-height:1;">${waiting}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">已報到等待維修</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
         </div>
         <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ffab2d;">
           <div style="font-size:22px;font-weight:700;color:#ffab2d;font-family:'DM Mono',monospace;line-height:1;">${inProgress}</div>
@@ -1947,7 +1971,7 @@ function renderStats(){
   </div>
 
   <!-- 第三區塊：成功和失敗維修分析 -->
-  <div class="stat-card" style="margin-bottom:13px;">
+  <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">成功與失敗分析</div>
     ${(()=>{
       const groups=[
@@ -1982,7 +2006,7 @@ function renderStats(){
           <text x="${cx}" y="${cy-7}" text-anchor="middle" dominant-baseline="central"
             font-size="18" font-weight="800" fill="${g.accent}" font-family="DM Mono,monospace">${cnt}</text>
           <text x="${cx}" y="${cy+10}" text-anchor="middle" dominant-baseline="central"
-            font-size="13" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
+            font-size="10" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
         </svg>`;
       }
 
@@ -2016,13 +2040,13 @@ function renderStats(){
   </div>
 
   <!-- 第四區塊：送修家電分類 -->
-  ${catList.length?`<div class="stat-card" style="margin-bottom:13px;">
+  ${catList.length?`<div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">送修家電分類</div>
-    ${colChart(catList.slice(0,7),maxCat,()=>'#2e2e2e')}
+    ${colChart(catList.slice(0,7),maxCat,()=>'#41bbff')}
   </div>`:''}
 
   <!-- 第五區塊：送修品項分析 -->
-  ${itemList.length?`<div class="stat-card" style="margin-bottom:13px;">
+  ${itemList.length?`<div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">送修品項分析</div>
     <div id="treemap-wrap" style="margin-top:8px;">${buildTreemap(itemList)}</div>
   </div>`:''}
@@ -2040,7 +2064,7 @@ function renderStats(){
         return`<span style="font-size:${sz}px;font-weight:${c>1?700:500};color:${col};opacity:${op.toFixed(2)};cursor:default;" title="${c}次">${escH(w)}</span>`;
       }).join('')}
     </div>
-    <div style="font-size:13px;color:var(--text3);margin-top:4px;">共 ${ivTotal} 筆訪問・${Object.keys(wordMap).length} 個關鍵詞</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px;">共 ${ivTotal} 筆訪問・${Object.keys(wordMap).length} 個關鍵詞</div>
     `:`<div style="text-align:center;padding:24px 0;font-size:14px;color:var(--text3);">尚無訪問資料</div>`}
   </div>
   `;}
