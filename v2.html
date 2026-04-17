@@ -1008,7 +1008,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxR35eFyG33dOZPacch7ICsRpdgnRQPCQ9ugyvJYJG45doHteBnSEVPTaHncFI3wxHk/exec';
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwjXEH59bJB-C-y05ROxiT6wrDIsELAb1Nbx_mddN4f2sUjgcw2DEk9tePvJizUtr7H/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -2305,7 +2305,6 @@ async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
   if(!base64) throw new Error('base64 資料為空');
   return await gasPostPhoto({
     action:   'uploadPhoto',
-    folderId: PHOTO_FOLDER_ID,
     fileName: name,
     mimeType: 'image/jpeg',
     base64:   base64
