@@ -1049,6 +1049,7 @@ function mapCard(raw){
     partCost:String(raw.partCost||raw['零件費']||''),
     donationFee:String(raw.donationFee||raw['隨喜費']||''),
     ecoContrib:raw.ecoContrib||raw['減碳貢獻']||'',
+    ecoContribCO2:raw.ecoContribCO2||raw['減碳貢獻CO2e']||'',
     waitStart:raw.waitStart||'',   // AA 欄：等候開始 ISO 時間
     repStart:raw.repStart||'',     // AC 欄：維修開始 ISO 時間
   };
@@ -2181,6 +2182,14 @@ function renderStats(){
   const totalRepaired=attempted;
   const successRate=attempted?Math.round(repaired/attempted*100):0;
   const failRate=attempted?Math.round(failed/attempted*100):0;
+  // 環保貢獻：只計算 OK_成功 的卡片
+  const okCards = allCards.filter(c=>c.repairResult==='OK_成功');
+  const totalEcoKg   = okCards.reduce((s,c)=>s+parseFloat(c.ecoContrib   ||0), 0);
+  const totalCO2Kg   = okCards.reduce((s,c)=>s+parseFloat(c.ecoContribCO2||0), 0);
+  const truckLoad    = 3000; // 1輛垃圾車約 3 公噸 = 3000 kg
+  const treeAbsorb   = 22;   // 1棵樹每年吸收約 22 kg CO2
+  const truckCount   = totalEcoKg > 0 ? (totalEcoKg / truckLoad).toFixed(3) : 0;
+  const treeCount    = totalCO2Kg > 0 ? Math.round(totalCO2Kg / treeAbsorb) : 0;
   // 送修家電分類、品項分析：只計算 OK_成功 + NO_失敗
   const repairedCards = allCards.filter(c=>c.repairResult==='OK_成功'||c.repairResult==='NO_失敗');
   const catMap={};
@@ -2252,6 +2261,19 @@ function renderStats(){
         <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
         <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件已登記成功</div>
+      </div>
+    </div>
+    <!-- 環保貢獻 -->
+    <div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px 12px;border-left:3px solid #0dae42;">
+        <div style="font-size:20px;font-weight:800;color:#0dae42;font-family:'DM Mono',monospace;line-height:1.2;">${totalEcoKg.toFixed(1)}<span style="font-size:13px;font-weight:600;margin-left:3px;">kg</span></div>
+        <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:4px;">減少廢棄物</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">約 ${truckCount} 輛垃圾車進垃圾場</div>
+      </div>
+      <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px 12px;border-left:3px solid #41bbff;">
+        <div style="font-size:20px;font-weight:800;color:#41bbff;font-family:'DM Mono',monospace;line-height:1.2;">${totalCO2Kg.toFixed(1)}<span style="font-size:13px;font-weight:600;margin-left:3px;">kg</span></div>
+        <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:4px;">減少碳排放 CO₂e</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">約種植了 ${treeCount} 棵樹</div>
       </div>
     </div>
   </div>
