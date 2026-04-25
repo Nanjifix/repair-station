@@ -2012,12 +2012,14 @@ function renderStats(){
   const totalRepaired=attempted;
   const successRate=attempted?Math.round(repaired/attempted*100):0;
   const failRate=attempted?Math.round(failed/attempted*100):0;
+  // 送修家電分類、品項分析：只計算 OK_成功 + NO_失敗
+  const repairedCards = allCards.filter(c=>c.repairResult==='OK_成功'||c.repairResult==='NO_失敗');
   const catMap={};
-  allCards.forEach(c=>{const k=c.bigCat||'未分類';catMap[k]=(catMap[k]||0)+1;});
+  repairedCards.forEach(c=>{const k=c.bigCat||'未分類';catMap[k]=(catMap[k]||0)+1;});
   const catList=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
   const maxCat=Math.max(...catList.map(x=>x[1]),1);
   const itemMap={};
-  allCards.forEach(c=>{const k=c.item||c.endOfProduct||'未知';itemMap[k]=(itemMap[k]||0)+1;});
+  repairedCards.forEach(c=>{const k=c.item||c.endOfProduct||'未知';itemMap[k]=(itemMap[k]||0)+1;});
   const itemList=Object.entries(itemMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxItem=Math.max(...itemList.map(x=>x[1]),1);
   const stageData=STAGES.map(s=>({label:s.key,count:allCards.filter(c=>c.stage===s.key).length,p:PALETTE[s.ci]}));
@@ -2134,7 +2136,7 @@ function renderStats(){
       function buildDonut(descList, cnt, totalAll, g){
         const R=42, cx=52, cy=52;
         const circ=2*Math.PI*R;
-        const pctAll=Math.round(cnt/totalAll*100);
+        const pctAll=totalAll?Math.round(cnt/totalAll*100):0;
         if(!descList.length) return '';
         let paths='', offset=0;
         descList.forEach(([k,v],i)=>{
@@ -2179,7 +2181,7 @@ function renderStats(){
         return `<div style="margin-bottom:18px;padding-bottom:4px;border-bottom:2px solid var(--border);">
           <div style="font-size:13px;font-weight:700;color:${g.accent};margin-bottom:10px;">${g.label}</div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
-            ${buildDonut(descList,cnt,total,g)}
+            ${buildDonut(descList, cnt, attempted, g)}
             <div style="flex:1;min-width:0;">${legend}</div>
           </div>
         </div>`;
