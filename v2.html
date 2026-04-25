@@ -2004,9 +2004,12 @@ function renderStats(){
   const waiting=allCards.filter(c=>c.stage==='等待維修').length;
   const pending=allCards.filter(c=>c.stage==='未報到').length;
   const readyPickup=allCards.filter(c=>c.stage==='待領取').length;
-  const repaired=done;
-  const failed=referred;
+  // 成功維修率：分子=OK_成功，分母=OK_成功+NO_失敗，不論階段
+  const repaired=allCards.filter(c=>c.repairResult==='OK_成功').length;
+  const failed=allCards.filter(c=>c.repairResult==='NO_失敗').length;
   const attempted=repaired+failed;
+  // 整體維修概況：件送修 = OK_成功 + NO_失敗
+  const totalRepaired=attempted;
   const successRate=attempted?Math.round(repaired/attempted*100):0;
   const failRate=attempted?Math.round(failed/attempted*100):0;
   const catMap={};
@@ -2069,7 +2072,7 @@ function renderStats(){
     <div style="display:flex;gap:12px;align-items:stretch;">
       <!-- 左：送修件數 -->
       <div style="flex:1;border-right:1px solid var(--border);padding-right:12px;">
-        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${total}</div>
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalRepaired}</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">件送修</div>
         <div style="font-size:12px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
       </div>
@@ -2077,7 +2080,7 @@ function renderStats(){
       <div style="flex:1;padding-left:4px;display:flex;flex-direction:column;justify-content:center;">
         <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件已登記成功</div>
       </div>
     </div>
   </div>
@@ -2126,8 +2129,6 @@ function renderStats(){
          palette:['#0dae42','#5dca7a','#a8e8be','#c8c8c8']},
         {key:'NO_失敗',      label:'失敗',      accent:'#ff6d48',
          palette:['#ff6d48','#ff9b78','#ffc9b8','#c8c8c8']},
-        {key:'取消轉診退回', label:'轉診/退回', accent:'#7c63ec',
-         palette:['#7c63ec','#a394f5','#cec7fb','#c8c8c8']},
       ];
 
       function buildDonut(descList, cnt, totalAll, g){
