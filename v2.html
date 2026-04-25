@@ -154,6 +154,20 @@ body{
 }
 .kcard:hover{box-shadow:0 4px 12px rgba(0,0,0,.11);transform:translateY(-2px);}
 .kcard:active{transform:scale(.97);}
+.kcard.dragging{opacity:.4;transform:scale(.95);}
+.kcard.drag-preview{
+  position:fixed;pointer-events:none;z-index:9999;
+  opacity:.9;transform:scale(1.04) rotate(1.5deg);
+  box-shadow:0 12px 32px rgba(0,0,0,.25);
+  border-radius:10px;background:var(--surface);
+  padding:10px 12px;min-width:160px;
+}
+.col.drag-over .col-body{
+  background:var(--accent-bg);
+  border:2px dashed var(--accent);
+  border-radius:8px;
+  transition:background .2s;
+}
 .kcard-inner{display:flex;align-items:center;gap:10px;}
 .knum-circle{
   width:40px;height:40px;border-radius:50%;
@@ -1256,10 +1270,31 @@ function render(){
     const sc=filtered.filter(c=>c.stage===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
     const cHtml=sc.length?sc.map(c=>{
-      // 第三列：只顯示計時器（等待維修 / 維修中），其他階段顯示 —
+      // 第三列：待領取顯示 noteTag，等待維修/維修中顯示計時器，其他顯示 —
       const timer = buildCardTimer(c);
-      const thirdRow = timer || '<span style="color:var(--border2);font-size:11px;">—</span>';
-      return`<div class="kcard" onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')">
+      let thirdRow;
+      if(stage.key==='待領取' && c.noteTag){
+        const TAG_STYLES = {
+          '候補':   'background:#f0eeff;border-color:#7c63ec;color:#4a30b0;',
+          '已通知': 'background:#eaf7ff;border-color:#41bbff;color:#0068a0;',
+          '配件':   'background:#fff8ec;border-color:#ffab2d;color:#a06000;',
+          '特殊商品':'background:#fff0ec;border-color:#ff6d48;color:#c0391a;',
+        };
+        const chips = c.noteTag.split(/[,，、]+/).map(t=>t.trim()).filter(Boolean)
+          .map(t=>`<span class="k-tag-chip" style="${TAG_STYLES[t]||''}">${escH(t)}</span>`).join('');
+        thirdRow = chips || '<span style="color:var(--border2);font-size:11px;">—</span>';
+      } else {
+        thirdRow = timer || '<span style="color:var(--border2);font-size:11px;">—</span>';
+      }
+      return`<div class="kcard"
+        draggable="true"
+        onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')"
+        ondragstart="dragStart(event,${c.rowNum})"
+        ondragend="dragEnd(event)"
+        oncontextmenu="return false"
+        ontouchstart="touchStart(event,${c.rowNum},this)"
+        ontouchmove="touchMove(event)"
+        ontouchend="touchEnd(event)">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
@@ -1270,11 +1305,145 @@ function render(){
         </div>
       </div>`;
     }).join(''):`<div class="empty-col"> </div>`;
-    return`<div class="col">
+    return`<div class="col" id="col-${escH(stage.key)}"
+      ondragover="dragOver(event)"
+      ondragleave="dragLeave(event)"
+      ondrop="drop(event,'${escH(stage.key)}')">
       <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
       <div class="col-body">${cHtml}</div>
     </div>`;
   }).join('');
+}
+
+// ══ 拖移換階段 ══
+let _dragRowNum = null;
+let _touchTimer  = null;
+let _touchPreview= null;
+let _touchActive = false;
+let _touchRowNum = null;
+
+// ── 桌面拖移 ──
+function dragStart(e, rowNum){
+  _dragRowNum = rowNum;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragEnd(e){
+  _dragRowNum = null;
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.closest('.col')?.classList.add('drag-over');
+}
+function dragLeave(e){
+  if(!e.currentTarget.contains(e.relatedTarget)){
+    e.currentTarget.closest?.('.col')?.classList.remove('drag-over');
+  }
+}
+async function drop(e, newStage){
+  e.preventDefault();
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(_dragRowNum === null) return;
+  await moveCardToStage(_dragRowNum, newStage);
+}
+
+// ── 手機長按拖移 ──
+function touchStart(e, rowNum, el){
+  _touchRowNum = rowNum;
+  _touchTimer = setTimeout(()=>{
+    _touchActive = true;
+    // 建立浮動預覽
+    const rect = el.getBoundingClientRect();
+    _touchPreview = el.cloneNode(true);
+    _touchPreview.classList.add('drag-preview');
+    _touchPreview.style.width  = rect.width + 'px';
+    _touchPreview.style.left   = rect.left  + 'px';
+    _touchPreview.style.top    = rect.top   + 'px';
+    document.body.appendChild(_touchPreview);
+    el.classList.add('dragging');
+    if(navigator.vibrate) navigator.vibrate(30);
+  }, 500);
+}
+function touchMove(e){
+  if(!_touchActive) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  if(_touchPreview){
+    _touchPreview.style.left = (t.clientX - 80) + 'px';
+    _touchPreview.style.top  = (t.clientY - 40) + 'px';
+  }
+  // 高亮懸停的欄
+  document.querySelectorAll('.col').forEach(col=>{
+    const r = col.getBoundingClientRect();
+    if(t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom){
+      col.classList.add('drag-over');
+    } else {
+      col.classList.remove('drag-over');
+    }
+  });
+}
+async function touchEnd(e){
+  clearTimeout(_touchTimer);
+  if(_touchPreview){ _touchPreview.remove(); _touchPreview=null; }
+  document.querySelectorAll('.kcard.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(!_touchActive){ _touchActive=false; _touchRowNum=null; return; }
+  _touchActive = false;
+  const t = e.changedTouches[0];
+  // 找放下的目標欄
+  let targetStage = null;
+  document.querySelectorAll('.col').forEach(col=>{
+    const r = col.getBoundingClientRect();
+    if(t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom){
+      const id = col.id.replace('col-','');
+      targetStage = decodeURIComponent(id);
+    }
+  });
+  if(targetStage && _touchRowNum !== null){
+    await moveCardToStage(_touchRowNum, targetStage);
+  }
+  _touchRowNum = null;
+}
+
+// ── 共用：執行換階段 ──
+async function moveCardToStage(rowNum, newStage){
+  const c = allCards.find(x=>x.rowNum===rowNum);
+  if(!c || c.stage===newStage) return;
+  const oldStage = c.stage;
+  c.stage = newStage;
+  render();
+  showToast(`→ ${newStage}`);
+  const now = Date.now();
+  const postExtra = {};
+  if(newStage==='未報到'){
+    localStorage.removeItem(tsKey(c.rowNum));
+    postExtra.clearTime = true;
+  }
+  if(newStage==='等待維修' && !getTs(c.rowNum).tsReg){
+    setTs(c.rowNum,{tsReg:now});
+    postExtra.waitStart = new Date(now).toISOString();
+  }
+  if(newStage==='維修中'){
+    const patch={tsRepStart:now};
+    if(!getTs(c.rowNum).tsReg) patch.tsReg=now;
+    setTs(c.rowNum,patch);
+    const ts=getTs(c.rowNum);
+    if(ts.tsReg) postExtra.waitMin=Math.floor((now-ts.tsReg)/60000);
+  }
+  if(newStage==='待領取'){
+    const ts=getTs(c.rowNum);
+    if(ts.tsRepStart) postExtra.repairMin=Math.floor((now-ts.tsRepStart)/60000);
+    setTs(c.rowNum,{tsRepDone:now});
+  }
+  try{
+    await gasPost({action:'updateStage', rowNum:c.rowNum, stage:newStage, ...postExtra});
+  }catch(err){
+    showToast('⚠️ 同步失敗，請手動重整');
+    c.stage = oldStage; render();
+  }
 }
 
 // ══ Modal ══
