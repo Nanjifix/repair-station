@@ -1064,7 +1064,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwwuajrPSK2VQr6wy8Od7aDn2bFGh7KFS0zpCXktcjWQW1LJ1AnTWVhuly6_6TzdXBX/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxGwxEHBLuZO2dp2JDzle6yxKHm0Ssz8mgSGgOEFA95Cj-NNG7kczfEbjI2FBEoidhu/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1550,28 +1550,24 @@ function openModal(id, rowNum, stageKey){
       <div class="trow"><span class="tl">End of 產品</span><span class="tv">${escH(c.endOfProduct||'—')}</span></div>
       <div class="trow">
         <span class="tl">分類</span>
-        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span id="bigcat-text-${escH(sid)}">${escH(c.bigCat||'—')}</span>
-          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
-          <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;width:100%;margin-top:4px;"
-            onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
-            ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
-          </select>
-        </span>
+        <select class="msel-result" id="mi-bigcat-${escH(sid)}"
+          onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
+          ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
+        </select>
       </div>
       <div class="trow">
         <span class="tl">品項</span>
-        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
-          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
-          <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
-        </span>
+        <div id="item-wrap-${escH(sid)}" style="width:100%;">${(()=>{
+          const opts=dropdownCache.itemOpts[c.bigCat||'']||[];
+          if(!opts.length) return `<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')"><option value="">— 請先選分類 —</option></select>`;
+          return `<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;
+        })()}</div>
       </div>
       <div class="trow">
         <span class="tl">產品細項</span>
         <div id="subitem-wrap-${escH(sid)}" style="width:100%;">${(()=>{
           const opts=dropdownCache.subItemOpts[c.item||'']||[];
-          if(!opts.length) return `<span class="tv" style="color:var(--text3);font-size:13px;">${escH(c.subItem||'—')}</span>`;
+          if(!opts.length) return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')"><option value="${escH(c.subItem||'')}">${escH(c.subItem||'— 選擇細項 —')}</option></select>`;
           return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.subItem||'')===o?' selected':''}>${o||'— 選擇細項 —'}</option>`).join('')}</select>`;
         })()}</div>
       </div>
@@ -2290,7 +2286,7 @@ function renderStats(){
   <!-- 第一區塊：整體維修概況 -->
   <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">整體維修概況</div>
-    <div style="display:flex;flex-wrap:wrap;gap:16px 20px;">
+    <div style="display:flex;flex-wrap:wrap;gap:16px 40px;">
       <!-- 件送修 -->
       <div style="min-width:0;">
         <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalRepaired}</div>
@@ -2305,13 +2301,13 @@ function renderStats(){
       </div>
       <!-- 減少廢棄物 -->
       <div style="min-width:0;">
-        <div style="font-size:56px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${totalEcoKg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalEcoKg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少廢棄物</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">約 ${truckCount} 輛垃圾車進垃圾場</div>
       </div>
       <!-- 減少碳排放 -->
       <div style="min-width:0;">
-        <div style="font-size:56px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${totalCO2Kg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalCO2Kg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少碳排放 CO₂e</div>
         <div style="font-size:12px;color:var(--text3);margin-top:6px;">約種植了 ${treeCount} 棵樹</div>
       </div>
@@ -2322,30 +2318,30 @@ function renderStats(){
   <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">各階段分佈</div>
     <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px;">
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ff6d48;">
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ff6d48;font-family:'DM Mono',monospace;line-height:1;">${waiting}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ffab2d;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ffab2d;font-family:'DM Mono',monospace;line-height:1;">${inProgress}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #0dae42;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${readyPickup}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
         </div>
       </div>
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #41bbff;">
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${done}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #2e2e2e;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#2e2e2e;font-family:'DM Mono',monospace;line-height:1;">${pending}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #7c63ec;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#7c63ec;font-family:'DM Mono',monospace;line-height:1;">${referred}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
         </div>
