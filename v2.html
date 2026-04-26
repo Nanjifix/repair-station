@@ -739,7 +739,7 @@ input:checked+.slider::before{transform:translateX(20px);}
       <h3 style="margin-bottom:14px;">資料來源</h3>
       <div class="form-row">
         <label>Google Script URL</label>
-        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycby6RaeHnAEwj-vtITiZe7ZvmIycT98ak7ttW1yB_sGndnFr4Mbe7VQAGA6-ifaMyJqa/exec" oninput="saveSettings()">
+        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycbzmZAwcOmA9s8uQipxHKk9u6u_8sKQ1No2TwZE2gXMMoe07NGVF-7EfhL8NqWm9BzKq/exec" oninput="saveSettings()">
       </div>
       <div class="form-row" style="margin-top:10px;">
         <label>連動試算表</label>
@@ -1060,11 +1060,12 @@ function mapCard(raw){
     ecoContribCO2:raw.ecoContribCO2||raw['減碳貢獻CO2e']||'',
     waitStart:raw.waitStart||'',   // AA 欄：等候開始 ISO 時間
     repStart:raw.repStart||'',     // AC 欄：維修開始 ISO 時間
+    photos:raw.photos||'',         // AE 欄：照片 fileId 清單（JSON）
   };
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby6RaeHnAEwj-vtITiZe7ZvmIycT98ak7ttW1yB_sGndnFr4Mbe7VQAGA6-ifaMyJqa/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzmZAwcOmA9s8uQipxHKk9u6u_8sKQ1No2TwZE2gXMMoe07NGVF-7EfhL8NqWm9BzKq/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1169,6 +1170,37 @@ function loadExternalData(cards){
     if(Object.keys(patch).length) setTs(c.rowNum, patch);
   });
   buildStageChips();
+  // 把 Sheets AE 欄的照片清單同步到 photoCache（跨裝置共享）
+  allCards.forEach(c=>{
+    if(!c.rowNum || !c.photos) return;
+    try {
+      const list = JSON.parse(c.photos);
+      if(!Array.isArray(list) || !list.length) return;
+      // 依 zone 分組寫入 photoCache（只補不覆蓋本機已有的）
+      const zones = ['外觀','配件','內部'];
+      zones.forEach(zone=>{
+        const key = getPhotoCacheKey(String(c.rowNum), zone);
+        const zonePhotos = list.filter(p=>p.zone===zone);
+        if(!zonePhotos.length) return;
+        if(!photoCache[key]) photoCache[key] = [];
+        zonePhotos.forEach(p=>{
+          const alreadyHave = photoCache[key].some(x=>x.fileId===p.fileId);
+          if(!alreadyHave){
+            photoCache[key].push({
+              dataUrl: '',
+              file: null,
+              status: 'done',
+              fileId: p.fileId,
+              fileUrl: p.fileUrl,
+              name: p.name||''
+            });
+          }
+        });
+        // 同步更新 localStorage
+        savePhotoMeta(String(c.rowNum), zone);
+      });
+    } catch(e){}
+  });
   render();
   updateChipCounts();
   const now = new Date();
@@ -2576,7 +2608,7 @@ function triggerPhotoInput(sid, zone, maxCount){
       entry.status = 'uploading';
       refreshPhotoThumbs(sid, zone, maxCount);
       try {
-        const r = await uploadPhotoToGAS(cardId, zone, idx, file, compressedDataUrl);
+        const r = await uploadPhotoToGAS(cardId, zone, idx, file, compressedDataUrl, c ? c.rowNum : null);
         // 顯示完整回傳（診斷用）
         showToast('回傳:' + JSON.stringify(r).slice(0, 120), 6000);
         if(r && !r.error){
@@ -2648,7 +2680,7 @@ function openLightbox(dataUrl){
 // ══ 照片上傳（POST base64 → GAS → Drive）══
 const PHOTO_FOLDER_ID = '1SHI--kvSIul84RBgOC8efGtU7fuFmBTl';
 
-async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
+async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl, rowNum) {
   const ext  = (file.type || 'image/jpeg').split('/')[1] || 'jpg';
   const name = `${cardId}_${zone}_${idx+1}.${ext}`;
   const base64 = dataUrl.split(',')[1];
@@ -2657,7 +2689,9 @@ async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
     action:   'uploadPhoto',
     fileName: name,
     mimeType: 'image/jpeg',
-    base64:   base64
+    base64:   base64,
+    rowNum:   rowNum,
+    zone:     zone
   });
 }
 
