@@ -892,6 +892,13 @@ let dropdownCache = {
     '美容美體家電': ['吹風機','整髮梳/捲髮器','除毛刀/電剪','刮鬍刀','按摩器/熱敷器/電毯','洗牙器/電動牙刷','洗臉機','光療機'],
     '廚房家電': ['廚房家電','加熱鍋具','食物料理機','烤箱/ 食物烘烤機','微波爐','鬆餅機/ 熱壓機','烤土司機','按壓式電熱水瓶','烘碗機/溫奶器','封口機','冰箱','飲水機/ 開飲機'],
     '兒童玩具': ['車類玩具','音樂類玩具','其他'],
+  },
+  // 品項 → 細項（產品細項）
+  subItemOpts: {
+    '電風扇':   ['立扇','箱扇','大廈扇','無葉扇','桌扇','循環扇','壁掛/吊扇/吸頂扇','工業扇','車用/手持扇','冷暖兩用風扇','抽風機/排風扇','USB風扇','水冷扇','其他'],
+    '電暖器':   ['烘被器/烘鞋機','葉片式','煤油式','充電式','鹵素燈','陶瓷式','石英管/電熱絲','其他'],
+    '加熱鍋具': ['電鍋','電子鍋','電水壺/快煮鍋/快煮壺','卡式爐','燒烤盤/燒烤爐','電磁爐','黑晶爐','氣炸鍋','壓力鍋','其他'],
+    '食物料理機':['食物處理機/攪拌機/奶泡機','果汁機/榨汁機','豆漿機','咖啡機','磨豆機','麵包機','發酵機器'],
   }
 };
 
@@ -1033,6 +1040,7 @@ function mapCard(raw){
     bigCat:raw.bigCat||raw['家電大分類']||raw['產品分類']||'',
     item:raw.item||raw['產品品項']||'',
     subItem:raw.subItem||raw['產品細項']||'',
+    prodName:raw.prodName||raw['產品名稱']||'',
     itemNote:raw.itemNote||raw['產品備註']||raw['備註說明']||'',
     brand:raw.brand||raw['品牌']||'',
     model:raw.model||raw['型號']||'',
@@ -1056,7 +1064,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzBWv2xBTHTLhWeuri5JyhWjJ8mVb0ZzvmL6xav_adgfYfZQpXPNRrj55sHiYdzuHa3/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwwuajrPSK2VQr6wy8Od7aDn2bFGh7KFS0zpCXktcjWQW1LJ1AnTWVhuly6_6TzdXBX/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1556,8 +1564,23 @@ function openModal(id, rowNum, stageKey){
         <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
           <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
-          <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
+          <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
         </span>
+      </div>
+      <div class="trow">
+        <span class="tl">產品細項</span>
+        <div id="subitem-wrap-${escH(sid)}" style="width:100%;">${(()=>{
+          const opts=dropdownCache.subItemOpts[c.item||'']||[];
+          if(!opts.length) return `<span class="tv" style="color:var(--text3);font-size:13px;">${escH(c.subItem||'—')}</span>`;
+          return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.subItem||'')===o?' selected':''}>${o||'— 選擇細項 —'}</option>`).join('')}</select>`;
+        })()}</div>
+      </div>
+      <div class="trow">
+        <span class="tl">產品名稱</span>
+        <span class="tv-edit" id="ei-prodname-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.prodName||'')}</span>
       </div>
       <div class="trow"><span class="tl">品牌</span><span class="tv">${escH(c.brand||'—')}</span></div>
       <div class="trow">
@@ -1725,7 +1748,20 @@ function openItemSel(sid){
   if(wrap)wrap.style.display='block';
 }
 
-function onCatChange(sid){
+function onItemChange(sid){
+  const selItem = document.getElementById('mi-item-'+sid);
+  if(!selItem) return;
+  const newItem = selItem.value;
+  const wrap = document.getElementById('subitem-wrap-'+sid);
+  if(!wrap) return;
+  const opts = dropdownCache.subItemOpts[newItem]||[];
+  if(!opts.length){
+    wrap.innerHTML = `<span class="tv" style="color:var(--text3);font-size:13px;">—</span>`;
+  } else {
+    wrap.innerHTML = `<select class="msel-result" id="mi-subitem-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${escH(o)}">${o||'— 選擇細項 —'}</option>`).join('')}</select>`;
+  }
+  markDirty(sid);
+}
   const selCat=document.getElementById('mi-bigcat-'+sid).value;
   const wrap=document.getElementById('item-wrap-'+sid);
   if(!wrap)return;
@@ -1771,6 +1807,8 @@ async function saveCard(id,sid){
   const newResDesc = g('mi-resdesc-'+sid)        || c.repairResultDesc;
   const newBigCat  = g('mi-bigcat-'+sid)         || c.bigCat;
   const newItem    = g('mi-item-'+sid)           || c.item;
+  const newSubItem = g('mi-subitem-'+sid)        || c.subItem;
+  const newProdName= getEdit('ei-prodname-'+sid) || c.prodName;
   const newNoteTag = getSelectedNoteTags(sid);
   // 計算新 stage
   let newStage = c.stage;
@@ -1807,6 +1845,8 @@ async function saveCard(id,sid){
         repairResultDesc:newResDesc,
         bigCat:          newBigCat,
         item:            newItem,
+        subItem:         newSubItem,
+        prodName:        newProdName,
         accessories:     newAcc,
         noteTag:         newNoteTag,
         stage:           newStage,
@@ -1819,8 +1859,8 @@ async function saveCard(id,sid){
     c.id=newId; c.name=newName; c.model=newModel;
     c.mfgDate=newMfgDate; c.faultDesc=newFault; c.repairNote=newRepNote;
     c.partCost=newPartCost; c.repairResult=newResult; c.repairResultDesc=newResDesc;
-    c.bigCat=newBigCat; c.item=newItem; c.stage=newStage; c.noteTag=newNoteTag;
-    c.accessories=newAcc;
+    c.bigCat=newBigCat; c.item=newItem; c.subItem=newSubItem; c.prodName=newProdName;
+    c.stage=newStage; c.noteTag=newNoteTag; c.accessories=newAcc;
     c.regNum=newId;
 
     btn.textContent='✓ 已儲存';
