@@ -739,7 +739,7 @@ input:checked+.slider::before{transform:translateX(20px);}
       <h3 style="margin-bottom:14px;">資料來源</h3>
       <div class="form-row">
         <label>Google Script URL</label>
-        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycbzmZAwcOmA9s8uQipxHKk9u6u_8sKQ1No2TwZE2gXMMoe07NGVF-7EfhL8NqWm9BzKq/exec" oninput="saveSettings()">
+        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec" oninput="saveSettings()">
       </div>
       <div class="form-row" style="margin-top:10px;">
         <label>連動試算表</label>
@@ -1065,7 +1065,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzmZAwcOmA9s8uQipxHKk9u6u_8sKQ1No2TwZE2gXMMoe07NGVF-7EfhL8NqWm9BzKq/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1809,6 +1809,21 @@ function getSelectedNoteTags(sid){
   if(!wrap) return '';
   return [...wrap.querySelectorAll('.notetag-chip.on')].map(el=>el.dataset.tag).join(',');
 }
+// 把目前 photoCache 的所有照片組成 JSON 寫回 Sheets
+function buildPhotosJson(sid){
+  const zones = ['外觀','配件','內部'];
+  const list = [];
+  zones.forEach(zone=>{
+    const key = getPhotoCacheKey(sid, zone);
+    (photoCache[key]||[]).forEach(p=>{
+      if(p.status==='done' && p.fileId){
+        list.push({ fileId:p.fileId, fileUrl:p.fileUrl||'', zone, name:p.name||'' });
+      }
+    });
+  });
+  return JSON.stringify(list);
+}
+
 async function saveCard(id,sid){
   // sid 現在是 rowNum 字串，用它精準找卡片
   const rowNum = parseInt(sid);
@@ -1879,6 +1894,7 @@ async function saveCard(id,sid){
         accessories:     newAcc,
         noteTag:         newNoteTag,
         stage:           newStage,
+        photos:          buildPhotosJson(sid),  // 更新 AE 欄照片清單
       }
     });
 
@@ -2668,6 +2684,7 @@ function deletePhoto(sid, zone, idx){
   photoCache[key].splice(idx, 1);
   savePhotoMeta(sid, zone);
   refreshPhotoThumbs(sid, zone, 2);
+  markDirty(sid);  // 讓儲存按鍵變可按
 }
 function openLightbox(dataUrl){
   const lb = document.createElement('div');
