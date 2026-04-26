@@ -742,14 +742,14 @@ input:checked+.slider::before{transform:translateX(20px);}
         <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec" oninput="saveSettings()">
       </div>
       <div class="form-row" style="margin-top:10px;">
-        <label>連動試算表</label>
+        <label>連動表單</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input class="form-inp" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/…" oninput="saveSettings()" style="flex:1;">
           <button onclick="openLink('sheet-url-input')" style="padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;">開啟 ↗</button>
         </div>
       </div>
       <div class="form-row" style="margin-top:10px;">
-        <label>照片資料夾（Google Drive）</label>
+        <label>照片雲端</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input class="form-inp" id="photo-folder-input" placeholder="https://drive.google.com/drive/folders/…" oninput="saveSettings()" style="flex:1;">
           <button onclick="openLink('photo-folder-input')" style="padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;">開啟 ↗</button>
@@ -1003,7 +1003,7 @@ function applyInterviewSetting(){
 const PAGE_TITLES = {
   repair:    '維修看板',
   interview: '訪問記錄',
-  stats:     '統計',
+  stats:     '維修統計',
   settings:  '設定',
 };
 function switchTab(tab){
@@ -1596,7 +1596,7 @@ function openModal(id, rowNum, stageKey){
         })()}</div>
       </div>
       <div class="trow">
-        <span class="tl">產品細項</span>
+        <span class="tl">細項</span>
         <div id="subitem-wrap-${escH(sid)}" style="width:100%;">${(()=>{
           const opts=dropdownCache.subItemOpts[c.item||'']||[];
           if(!opts.length) return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')"><option value="${escH(c.subItem||'')}">${escH(c.subItem||'— 選擇細項 —')}</option></select>`;
@@ -2369,29 +2369,29 @@ function renderStats(){
       <div style="display:flex;gap:16px;">
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ff6d48;font-family:'DM Mono',monospace;line-height:1;">${waiting}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
         </div>
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ffab2d;font-family:'DM Mono',monospace;line-height:1;">${inProgress}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
         </div>
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${readyPickup}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
         </div>
       </div>
       <div style="display:flex;gap:16px;">
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${done}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
         </div>
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#2e2e2e;font-family:'DM Mono',monospace;line-height:1;">${pending}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
         </div>
         <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#7c63ec;font-family:'DM Mono',monospace;line-height:1;">${referred}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
         </div>
       </div>
     </div>
@@ -2431,7 +2431,7 @@ function renderStats(){
           <text x="${cx}" y="${cy-7}" text-anchor="middle" dominant-baseline="central"
             font-size="18" font-weight="800" fill="${g.accent}" font-family="DM Mono,monospace">${cnt}</text>
           <text x="${cx}" y="${cy+10}" text-anchor="middle" dominant-baseline="central"
-            font-size="10" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
+            font-size="13" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
         </svg>`;
       }
 
@@ -2449,7 +2449,7 @@ function renderStats(){
           return `<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--border);">
             <div style="width:9px;height:9px;border-radius:2px;background:${color};flex-shrink:0;"></div>
             <div style="flex:1;font-size:12px;color:var(--text2);min-width:0;">${escH(k)}</div>
-            <div style="font-size:12px;font-weight:700;color:${color};font-family:'DM Mono',monospace;flex-shrink:0;white-space:nowrap;">${v} <span style="font-weight:400;color:var(--text3);">(${p2}%)</span></div>
+            <div style="font-size:13px;font-weight:700;color:${color};font-family:'DM Mono',monospace;flex-shrink:0;white-space:nowrap;">${v} <span style="font-weight:400;color:var(--text3);">(${p2}%)</span></div>
           </div>`;
         }).join('');
 
