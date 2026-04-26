@@ -2249,31 +2249,30 @@ function renderStats(){
   <!-- 第一區塊：整體維修概況 -->
   <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">整體維修概況</div>
-    <div style="display:flex;gap:12px;align-items:stretch;">
-      <!-- 左：送修件數 -->
-      <div style="flex:1;border-right:1px solid var(--border);padding-right:12px;">
+    <div style="display:flex;flex-wrap:wrap;gap:16px 20px;">
+      <!-- 件送修 -->
+      <div style="min-width:0;">
         <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalRepaired}</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">件送修</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">${waiting+inProgress+readyPickup} 件進行中</div>
       </div>
-      <!-- 右：成功維修率 -->
-      <div style="flex:1;padding-left:4px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
+      <!-- 成功維修率 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件已登記成功</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">${repaired} 件已登記成功</div>
       </div>
-    </div>
-    <!-- 環保貢獻 -->
-    <div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-      <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px 12px;border-left:3px solid #0dae42;">
-        <div style="font-size:20px;font-weight:800;color:#0dae42;font-family:'DM Mono',monospace;line-height:1.2;">${totalEcoKg.toFixed(1)}<span style="font-size:13px;font-weight:600;margin-left:3px;">kg</span></div>
-        <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:4px;">減少廢棄物</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">約 ${truckCount} 輛垃圾車進垃圾場</div>
+      <!-- 減少廢棄物 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${totalEcoKg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少廢棄物</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">約 ${truckCount} 輛垃圾車進垃圾場</div>
       </div>
-      <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px 12px;border-left:3px solid #41bbff;">
-        <div style="font-size:20px;font-weight:800;color:#41bbff;font-family:'DM Mono',monospace;line-height:1.2;">${totalCO2Kg.toFixed(1)}<span style="font-size:13px;font-weight:600;margin-left:3px;">kg</span></div>
-        <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:4px;">減少碳排放 CO₂e</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">約種植了 ${treeCount} 棵樹</div>
+      <!-- 減少碳排放 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${totalCO2Kg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少碳排放 CO₂e</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">約種植了 ${treeCount} 棵樹</div>
       </div>
     </div>
   </div>
