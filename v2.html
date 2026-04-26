@@ -1762,6 +1762,7 @@ function onItemChange(sid){
   }
   markDirty(sid);
 }
+function onCatChange(sid){
   const selCat=document.getElementById('mi-bigcat-'+sid).value;
   const wrap=document.getElementById('item-wrap-'+sid);
   if(!wrap)return;
