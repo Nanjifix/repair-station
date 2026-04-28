@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>酷澎鍋具採購 · 每日情資看板</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f2f1ee;
+    --border: rgba(0,0,0,0.10);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1a1917;
+    --text2: #6b6860;
+    --text3: #a09e98;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --red-bg: #FCEBEB; --red-border: #F7C1C1; --red-text: #A32D2D;
+    --amber-bg: #FAEEDA; --amber-border: #FAC775; --amber-text: #854F0B;
+    --blue-bg: #E6F1FB; --blue-border: #B5D4F4; --blue-text: #185FA5;
+    --teal-bg: #E1F5EE; --teal-border: #9FE1CB; --teal-text: #0F6E56;
+    --green-bg: #EAF3DE; --green-border: #C0DD97; --green-text: #3B6D11;
+    --gray-bg: #F1EFE8; --gray-border: #D3D1C7; --gray-text: #5F5E5A;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1917;
+      --surface: #242320;
+      --surface2: #2e2d2a;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --text: #f0ede8;
+      --text2: #9c9a93;
+      --text3: #6b6860;
+      --red-bg:#501313; --red-border:#791F1F; --red-text:#F09595;
+      --amber-bg:#412402; --amber-border:#633806; --amber-text:#FAC775;
+      --blue-bg:#042C53; --blue-border:#0C447C; --blue-text:#85B7EB;
+      --teal-bg:#04342C; --teal-border:#085041; --teal-text:#5DCAA5;
+      --green-bg:#173404; --green-border:#27500A; --green-text:#97C459;
+      --gray-bg:#2C2C2A; --gray-border:#444441; --gray-text:#B4B2A9;
+    }
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: -apple-system, 'Hiragino Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Layout ── */
+  .app { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 10px; }
+  .header-left {}
+  .brand { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); font-weight: 500; }
+  .main-title { font-size: 22px; font-weight: 500; color: var(--text); margin-top: 4px; }
+  .date-badge { font-size: 12px; color: var(--text2); background: var(--surface); padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border); }
+
+  /* ── Search + Filter ── */
+  .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap input {
+    width: 100%; padding: 8px 12px 8px 36px;
+    border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
+    background: var(--surface); color: var(--text); font-size: 13px; outline: none;
+  }
+  .search-wrap input:focus { border-color: #378ADD; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+  .cats { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cat-btn {
+    font-size: 12px; padding: 6px 13px; border-radius: 20px;
+    border: 0.5px solid var(--border); background: transparent; color: var(--text2); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cat-btn:hover { background: var(--surface2); }
+  .cat-btn.active { background: var(--surface); border-color: var(--border-strong); color: var(--text); font-weight: 500; }
+
+  /* ── Main columns ── */
+  .columns { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+
+  @media (max-width: 860px) {
+    .columns { grid-template-columns: 1fr; }
+  }
+
+  /* ── News grid ── */
+  .news-col { display: flex; flex-direction: column; gap: 12px; }
+
+  .section-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+  }
+  .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .sec-label { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-red { background: #E24B4A; }
+  .dot-amber { background: #EF9F27; }
+  .dot-blue { background: #378ADD; }
+  .dot-teal { background: #1D9E75; }
+  .sec-title { font-size: 13px; font-weight: 500; }
+  .sec-count { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 8px; border-radius: 10px; }
+
+  .news-item { padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .news-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .news-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+  .news-title-link { font-size: 13px; color: var(--text); text-decoration: none; font-weight: 500; line-height: 1.45; flex: 1; }
+  .news-title-link:hover { color: #378ADD; }
+  .news-src { font-size: 11px; color: var(--text3); white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .news-summary { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 6px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; padding: 3px 8px; border-radius: var(--radius-md);
+    border: 0.5px solid; white-space: nowrap;
+  }
+  .tag.act { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .tag.watch { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+  .tag.info { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue-text); }
+  .tag.ok { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .empty { font-size: 12px; color: var(--text3); padding: 16px 0; text-align: center; }
+
+  /* ── Right column ── */
+  .side-col { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 20px; }
+
+  /* ── Todo Panel ── */
+  .panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 14px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+  .panel-title .icon { font-size: 14px; }
+  .panel-actions { display: flex; gap: 6px; }
+  .btn-sm {
+    font-size: 11px; padding: 4px 10px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border); background: transparent; color: var(--text2); cursor: pointer;
+  }
+  .btn-sm:hover { background: var(--surface2); }
+  .btn-sm.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn-sm.primary:hover { opacity: 0.85; }
+
+  /* Todo add row */
+  .todo-add { padding: 10px 14px; border-bottom: 0.5px solid var(--border); display: flex; gap: 6px; }
+  .todo-add input {
+    flex: 1; font-size: 12px; padding: 6px 10px;
+    border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
+    background: var(--surface2); color: var(--text); outline: none;
+  }
+  .todo-add input:focus { border-color: #378ADD; background: var(--surface); }
+  .todo-add input::placeholder { color: var(--text3); }
+  .priority-select {
+    font-size: 11px; padding: 6px 8px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; outline: none;
+  }
+  .add-btn {
+    font-size: 12px; padding: 6px 12px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border); background: var(--text); color: var(--bg); cursor: pointer; white-space: nowrap;
+  }
+  .add-btn:hover { opacity: 0.85; }
+
+  /* Todo filters */
+  .todo-filters { padding: 8px 14px; border-bottom: 0.5px solid var(--border); display: flex; gap: 5px; }
+  .tf-btn { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid transparent; background: transparent; color: var(--text3); cursor: pointer; }
+  .tf-btn.active { background: var(--surface2); border-color: var(--border); color: var(--text); }
+
+  /* Todo list */
+  .todo-list { max-height: 400px; overflow-y: auto; padding: 6px 0; }
+  .todo-list:empty::after { content: '尚無待辦事項'; display: block; text-align: center; font-size: 12px; color: var(--text3); padding: 24px; }
+  .todo-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 14px; border-bottom: 0.5px solid var(--border); cursor: pointer;
+    transition: background 0.1s;
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-item:hover { background: var(--surface2); }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text3); }
+  .todo-check {
+    width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    transition: all 0.15s; background: transparent;
+  }
+  .todo-item.done .todo-check { background: #1D9E75; border-color: #1D9E75; }
+  .todo-check-inner { width: 8px; height: 8px; }
+  .todo-body { flex: 1; min-width: 0; }
+  .todo-text { font-size: 12px; line-height: 1.45; color: var(--text); word-break: break-all; }
+  .todo-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+  .prio-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 0.5px solid; }
+  .prio-high { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .prio-mid { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+  .prio-low { background: var(--gray-bg); border-color: var(--gray-border); color: var(--gray-text); }
+  .todo-date { font-size: 10px; color: var(--text3); }
+  .todo-del { font-size: 14px; color: var(--text3); cursor: pointer; padding: 0 2px; opacity: 0; transition: opacity 0.1s; flex-shrink: 0; }
+  .todo-item:hover .todo-del { opacity: 1; }
+  .todo-del:hover { color: #E24B4A; }
+
+  /* Stats row inside todo */
+  .todo-stats { display: flex; gap: 10px; padding: 10px 14px; border-top: 0.5px solid var(--border); }
+  .stat-chip { font-size: 11px; color: var(--text3); }
+  .stat-chip span { color: var(--text); font-weight: 500; }
+
+  /* ── Memo Panel ── */
+  .memo-area {
+    width: 100%; font-size: 12px; line-height: 1.7; padding: 12px 14px;
+    border: none; background: transparent; color: var(--text); resize: none; outline: none;
+    font-family: inherit; min-height: 120px;
+  }
+  .memo-area::placeholder { color: var(--text3); }
+  .memo-footer { padding: 8px 14px; border-top: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .memo-saved { font-size: 11px; color: var(--text3); }
+  .memo-clear { font-size: 11px; color: var(--text3); cursor: pointer; border: none; background: none; padding: 0; }
+  .memo-clear:hover { color: #E24B4A; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand">Coupang BM · 鍋具採購情報</div>
+      <div class="main-title">每日採購情資看板</div>
+    </div>
+    <div class="date-badge" id="today-date"></div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="搜尋關鍵字（品牌、原物料、競業…）" oninput="renderNews()" />
+    </div>
+    <div class="cats">
+      <button class="cat-btn active" onclick="setFilter('all',this)">全部</button>
+      <button class="cat-btn" onclick="setFilter('material',this)">原物料</button>
+      <button class="cat-btn" onclick="setFilter('competitor',this)">競業活動</button>
+      <button class="cat-btn" onclick="setFilter('data',this)">數據報告</button>
+      <button class="cat-btn" onclick="setFilter('brand',this)">品牌 &amp; SEO</button>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="columns">
+
+    <!-- News column -->
+    <div class="news-col" id="news-grid"></div>
+
+    <!-- Side column -->
+    <div class="side-col">
+
+      <!-- Todo panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="icon">✓</span> 工作待辦</div>
+          <div class="panel-actions">
+            <button class="btn-sm" onclick="clearDone()">清除已完成</button>
+          </div>
+        </div>
+
+        <div class="todo-add">
+          <input type="text" id="todo-input" placeholder="新增待辦事項…" onkeydown="if(event.key==='Enter')addTodo()" />
+          <select class="priority-select" id="todo-prio">
+            <option value="high">🔴 高</option>
+            <option value="mid" selected>🟡 中</option>
+            <option value="low">⚪ 低</option>
+          </select>
+          <button class="add-btn" onclick="addTodo()">+ 新增</button>
+        </div>
+
+        <div class="todo-filters">
+          <button class="tf-btn active" onclick="setTodoFilter('all',this)">全部</button>
+          <button class="tf-btn" onclick="setTodoFilter('pending',this)">待辦</button>
+          <button class="tf-btn" onclick="setTodoFilter('done',this)">已完成</button>
+          <button class="tf-btn" onclick="setTodoFilter('high',this)">🔴 高優先</button>
+        </div>
+
+        <div class="todo-list" id="todo-list"></div>
+
+        <div class="todo-stats" id="todo-stats"></div>
+      </div>
+
+      <!-- Memo panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="icon">📝</span> 個人備忘</div>
+        </div>
+        <textarea class="memo-area" id="memo-area" placeholder="隨手記錄…&#10;例：下週需與 XX 供應商開會討論 Q3 報價，確認不鏽鋼含鎳量規格。" oninput="saveMemo()"></textarea>
+        <div class="memo-footer">
+          <span class="memo-saved" id="memo-saved">尚未有內容</span>
+          <button class="memo-clear" onclick="clearMemo()">清除</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Date ── */
+const TODAY = new Date();
+document.getElementById('today-date').textContent = TODAY.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+/* ── News data ── */
+const SECTIONS = [
+  {
+    id:'material', title:'影響整體原物料重要新聞', dot:'dot-red',
+    items:[
+      { title:'不鏽鋼304期貨價格本週回升2.3%，鎳礦庫存偏低', src:'SMM 上海有色', url:'https://www.smm.cn',
+        summary:'鎳礦庫存持續偏緊，疊加印尼出口限制政策，帶動不鏽鋼成本端支撐向上，廠商報價陸續上調。',
+        actions:[{type:'act',label:'⚑ 注意採購時機，考慮提前鎖價'}] },
+      { title:'鋁價受美聯儲降息預期影響震盪，LME 周漲1.1%', src:'Bloomberg', url:'https://www.bloomberg.com',
+        summary:'鑄鋁鍋具主要原料成本短期承壓，但需留意美元走弱帶來的進口成本轉換影響。',
+        actions:[{type:'watch',label:'◉ 持續監控，暫無緊急操作'}] },
+      { title:'中國製造業PMI連兩月擴張，鋼材出口量創新高', src:'財新 Caixin', url:'https://www.caixinglobal.com',
+        summary:'中國鍋具代工廠產能利用率回升，但出口報價可能因競爭加劇而有議價空間。',
+        actions:[{type:'ok',label:'✔ 供應鏈穩定，可評估補單機會'}] }
+    ]
+  },
+  {
+    id:'competitor', title:'競業電商平台或百貨活動', dot:'dot-amber',
+    items:[
+      { title:'Momo 618大促預熱開跑，鍋具類滿額折扣最高25%', src:'momo購物', url:'https://www.momoshop.com.tw',
+        summary:'鍋具品類預計在618期間為重點主打，Swiss Diamond、Tefal 已進場。',
+        actions:[{type:'act',label:'⚑ 確認酷澎促銷排程是否對應'}] },
+      { title:'PChome 推出「廚房節」活動，主攻鑄鐵鍋與不沾鍋', src:'PChome 24h', url:'https://24h.pchome.com.tw',
+        summary:'Lodge、Le Creuset 官方店加入活動，主打週末限時下殺，訂單轉換率提升約18%。',
+        actions:[{type:'watch',label:'◉ 比較定價與品項，評估跟進策略'}] },
+      { title:'新光三越美食月，鍋具聯合陳列展售，客單提升顯著', src:'新光三越', url:'https://www.skm.com.tw',
+        summary:'百貨通路結合料理示範活動，強化品牌體驗，帶動高單價品項銷售。',
+        actions:[{type:'info',label:'ℹ 觀察線下通路趨勢，供品牌規劃參考'}] }
+    ]
+  },
+  {
+    id:'data', title:'相關最新數據分析／報告', dot:'dot-blue',
+    items:[
+      { title:'2024 Q1 台灣廚房用品電商市場規模報告（GfK）', src:'GfK 台灣', url:'https://www.gfk.com',
+        summary:'鍋具類電商銷售額年增11%，不沾鍋為最大子品類，但鑄鐵鍋成長率最快（+27% YoY）。',
+        actions:[{type:'info',label:'ℹ 下載完整報告，分析品類佈局'}] },
+      { title:'Google Trends 台灣：「氣炸鍋」搜尋量連三週上升', src:'Google Trends', url:'https://trends.google.com.tw',
+        summary:'氣炸鍋相關搜尋於本週回升至近6個月高點，可連動鍋具週邊配件採購評估。',
+        actions:[{type:'act',label:'⚑ 評估是否擴充氣炸鍋配件品項'}] },
+      { title:'酷澎鍋具品類周報：轉換率較上週提升5.2%', src:'內部數據', url:'#',
+        summary:'不鏽鋼鍋轉換率最高，但退貨率亦偏高，建議確認商品說明是否完整。',
+        actions:[{type:'act',label:'⚑ 協調商品組更新說明頁'},{type:'watch',label:'◉ 留意退貨率趨勢'}] }
+    ]
+  },
+  {
+    id:'brand', title:'品牌經營 · SEO 關鍵字 · 熱門文章', dot:'dot-teal',
+    items:[
+      { title:'「不鏽鋼鍋推薦 2025」搜尋量暴增，部落客大量產出相關文章', src:'Ahrefs / 痞客邦', url:'https://ahrefs.com',
+        summary:'長尾關鍵字「不鏽鋼鍋 幾層好」、「不鏽鋼鍋 推薦品牌」月搜尋量突破8,000，競爭難度中等，是優化入口頁的好機會。',
+        actions:[{type:'act',label:'⚑ 請 SEO 團隊埋入對應關鍵字至品項頁'}] },
+      { title:'日系鍋具品牌 Ballarini 進軍台灣，積極經營 Instagram 內容行銷', src:'Instagram / INSIDE', url:'https://www.inside.com.tw',
+        summary:'品牌以「義大利工藝」為核心訴求，短影音素材轉發率高，粉絲成長速度快，值得關注其在酷澎的上架動態。',
+        actions:[{type:'watch',label:'◉ 追蹤品牌在台動向與酷澎上架計畫'}] },
+      { title:'熱門 YouTube：「鑄鐵鍋 vs 不沾鍋，哪個適合你？」百萬觀看', src:'YouTube 台灣', url:'https://www.youtube.com',
+        summary:'影片帶動「鑄鐵鍋保養」、「不沾鍋 PFOA」等搜尋詞上升，消費者教育內容需求明顯。建議對應補充商品頁 QA 欄位。',
+        actions:[{type:'act',label:'⚑ 補充商品頁常見 Q&A'},{type:'info',label:'ℹ 可評估與 KOL 合作'}] },
+      { title:'Le Creuset 在台推出「限量色鑄鐵鍋」話題操作，引發搶購', src:'ETtoday 生活', url:'https://www.ettoday.net',
+        summary:'限量色策略有效拉升品牌聲量與消費者衝動購買意願，建議觀察是否於酷澎獨家上架。',
+        actions:[{type:'watch',label:'◉ 聯繫 Le Creuset 業務，確認上架規劃'}] }
+    ]
+  }
+];
+
+let activeFilter = 'all';
+
+function setFilter(cat, el) {
+  activeFilter = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderNews();
+}
+
+function renderNews() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const grid = document.getElementById('news-grid');
+  grid.innerHTML = '';
+  SECTIONS.forEach(sec => {
+    if (activeFilter !== 'all' && activeFilter !== sec.id) return;
+    const filtered = sec.items.filter(it =>
+      !q || (it.title + it.summary + it.src).toLowerCase().includes(q)
+    );
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.innerHTML = `
+      <div class="sec-header">
+        <div class="sec-label">
+          <span class="dot ${sec.dot}"></span>
+          <span class="sec-title">${sec.title}</span>
+        </div>
+        <span class="sec-count">${filtered.length} 則</span>
+      </div>
+      ${filtered.length === 0
+        ? '<div class="empty">此分類目前無符合項目</div>'
+        : filtered.map(it => `
+          <div class="news-item">
+            <div class="news-top">
+              <a class="news-title-link" href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
+              <span class="news-src">${it.src}</span>
+            </div>
+            <div class="news-summary">${it.summary}</div>
+            <div class="tags">${it.actions.map(a => `<span class="tag ${a.type}">${a.label}</span>`).join('')}</div>
+          </div>
+        `).join('')}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ── Todo ── */
+let todos = [];
+let todoFilter = 'all';
+let todoId = 0;
+
+function loadTodos() {
+  try { todos = JSON.parse(localStorage.getItem('cp_todos') || '[]'); } catch(e) { todos = []; }
+  todoId = todos.reduce((m, t) => Math.max(m, t.id), 0);
+}
+
+function saveTodos() {
+  localStorage.setItem('cp_todos', JSON.stringify(todos));
+}
+
+function setTodoFilter(f, el) {
+  todoFilter = f;
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTodos();
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-input');
+  const prio = document.getElementById('todo-prio').value;
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  todos.unshift({ id: ++todoId, text, prio, done: false, date: new Date().toLocaleDateString('zh-TW', {month:'2-digit', day:'2-digit'}) });
+  saveTodos();
+  input.value = '';
+  input.focus();
+  renderTodos();
+}
+
+function toggleTodo(id) {
+  const t = todos.find(x => x.id === id);
+  if (t) { t.done = !t.done; saveTodos(); renderTodos(); }
+}
+
+function deleteTodo(id, e) {
+  e.stopPropagation();
+  todos = todos.filter(x => x.id !== id);
+  saveTodos();
+  renderTodos();
+}
+
+function clearDone() {
+  todos = todos.filter(x => !x.done);
+  saveTodos();
+  renderTodos();
+}
+
+const PRIO_LABELS = { high:'高優先', mid:'中優先', low:'一般' };
+const PRIO_CLASSES = { high:'prio-high', mid:'prio-mid', low:'prio-low' };
+
+function renderTodos() {
+  let list = todos;
+  if (todoFilter === 'pending') list = todos.filter(x => !x.done);
+  else if (todoFilter === 'done') list = todos.filter(x => x.done);
+  else if (todoFilter === 'high') list = todos.filter(x => x.prio === 'high' && !x.done);
+
+  const el = document.getElementById('todo-list');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty">暫無項目</div>';
+  } else {
+    el.innerHTML = list.map(t => `
+      <div class="todo-item ${t.done ? 'done' : ''}" onclick="toggleTodo(${t.id})">
+        <div class="todo-check">
+          ${t.done ? '<svg class="todo-check-inner" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+        </div>
+        <div class="todo-body">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">
+            <span class="prio-badge ${PRIO_CLASSES[t.prio]}">${PRIO_LABELS[t.prio]}</span>
+            <span class="todo-date">${t.date}</span>
+          </div>
+        </div>
+        <span class="todo-del" onclick="deleteTodo(${t.id}, event)" title="刪除">✕</span>
+      </div>
+    `).join('');
+  }
+
+  const total = todos.length;
+  const done = todos.filter(x => x.done).length;
+  const high = todos.filter(x => x.prio === 'high' && !x.done).length;
+  document.getElementById('todo-stats').innerHTML = `
+    <span class="stat-chip">待辦 <span>${total - done}</span></span>
+    <span class="stat-chip">已完成 <span>${done}</span></span>
+    ${high > 0 ? `<span class="stat-chip">🔴 高優先 <span>${high}</span></span>` : ''}
+  `;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Memo ── */
+function loadMemo() {
+  const saved = localStorage.getItem('cp_memo') || '';
+  document.getElementById('memo-area').value = saved;
+  updateMemoStatus(saved);
+}
+
+let memoTimer;
+function saveMemo() {
+  clearTimeout(memoTimer);
+  document.getElementById('memo-saved').textContent = '儲存中…';
+  memoTimer = setTimeout(() => {
+    const v = document.getElementById('memo-area').value;
+    localStorage.setItem('cp_memo', v);
+    updateMemoStatus(v);
+  }, 600);
+}
+
+function updateMemoStatus(v) {
+  const chars = v.trim().length;
+  document.getElementById('memo-saved').textContent = chars === 0 ? '尚未有內容' : `已儲存 · ${chars} 字`;
+}
+
+function clearMemo() {
+  if (!confirm('確定要清除備忘內容嗎？')) return;
+  document.getElementById('memo-area').value = '';
+  localStorage.removeItem('cp_memo');
+  updateMemoStatus('');
+}
+
+/* ── Init ── */
+loadTodos();
+renderTodos();
+loadMemo();
+renderNews();
+
+/* Default sample todos */
+if (todos.length === 0) {
+  const samples = [
+    { id:1, text:'確認酷澎618鍋具促銷排程，與競業比較定價', prio:'high', done:false, date:'04/27' },
+    { id:2, text:'聯繫 Le Creuset 業務詢問限量色款上架計畫', prio:'high', done:false, date:'04/27' },
+    { id:3, text:'請 SEO 團隊在不鏽鋼鍋品項頁埋入推薦關鍵字', prio:'mid', done:false, date:'04/27' },
+    { id:4, text:'下載 GfK Q1 廚房用品報告並整理摘要', prio:'mid', done:true, date:'04/26' },
+  ];
+  todos = samples;
+  todoId = 4;
+  saveTodos();
+  renderTodos();
+}
+</script>
+</body>
+</html>
