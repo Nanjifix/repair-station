@@ -637,7 +637,27 @@ body:has(#page-intro.active){background:#fff;}
 #page-intro .iv2-hero img[data-rv].in{transform:none;}
 .iv2-tile{transition:transform .35s cubic-bezier(.2,.65,.2,1), box-shadow .35s;}
 @media(hover:hover){.iv2-tile:hover{transform:translateY(-4px);box-shadow:0 14px 30px -18px rgba(30,60,40,.35);}}
-.iv2-loading{padding:140px 0;text-align:center;color:var(--i-gray2);font-size:13px;letter-spacing:.1em;}
+.iv2-loading{padding:110px 0 120px;text-align:center;color:var(--i-gray2);font-size:13px;letter-spacing:.08em;}
+.iv2-ld-logo{width:132px;height:154px;display:block;margin:0 auto 18px;overflow:visible;}
+.iv2-ld-drv{animation:iv2-screw 1.1s ease-in-out infinite;}
+.iv2-ld-handle{transform-box:fill-box;transform-origin:center;animation:iv2-twist 1.1s ease-in-out infinite;}
+.iv2-ld-shine{animation:iv2-shine 1.1s ease-in-out infinite;}
+.iv2-ld-shadow{transform-box:fill-box;transform-origin:center;animation:iv2-shadow 1.1s ease-in-out infinite;}
+.iv2-ld-spark{opacity:0;transform-box:fill-box;transform-origin:center;animation:iv2-spark 1.1s ease-out infinite;}
+@keyframes iv2-screw{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@keyframes iv2-twist{0%,50%,100%{transform:scaleX(1)}25%,75%{transform:scaleX(.58)}}
+@keyframes iv2-shine{0%{transform:translateX(-7px);opacity:0}30%{opacity:.5}60%{transform:translateX(7px);opacity:0}100%{opacity:0}}
+@keyframes iv2-shadow{0%,100%{transform:scaleX(1);opacity:.18}50%{transform:scaleX(.9);opacity:.26}}
+@keyframes iv2-spark{0%,45%{opacity:0;transform:scale(.4)}55%{opacity:1;transform:scale(1)}80%,100%{opacity:0;transform:scale(1.25)}}
+.iv2-ld-t{font-size:15px;font-weight:700;color:var(--i-ink);letter-spacing:.12em;}
+.iv2-ld-s{margin-top:8px;}
+.iv2-ld-s i{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--i-green);margin:0 2px;vertical-align:middle;animation:iv2-dot 1.2s infinite;}
+.iv2-ld-s i:nth-child(2){animation-delay:.15s}.iv2-ld-s i:nth-child(3){animation-delay:.3s}
+@keyframes iv2-dot{0%,80%,100%{opacity:.2;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.iv2-ld-retry{margin-top:18px;padding:9px 20px;border-radius:999px;border:none;background:var(--i-green);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+.iv2-tile-x{font-size:12px;color:var(--i-gray2);margin-top:4px;line-height:1.5;}
+.iv2-tile-x .iv2-num{color:var(--i-ink);font-weight:700;}
+@media (prefers-reduced-motion: reduce){.iv2-ld-drv,.iv2-ld-handle,.iv2-ld-shine,.iv2-ld-shadow,.iv2-ld-spark,.iv2-ld-s i{animation:none!important;}}
 
 /* 地圖圓點依序出現 */
 .pv-map .iv2-dot{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0;
@@ -1215,8 +1235,8 @@ function switchTab(tab){
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
   if(tab==='stats') renderStats();
   if(tab==='intro'){
-    if(introData.at) renderIntro(true);
-    else document.getElementById('intro-root').innerHTML = '<div class="iv2-loading">載入中…</div>';
+    if(introData.at) renderIntro(true);          // 有資料（或上次的快取）就先顯示
+    else showIntroLoading();
     loadIntroSummary().then(()=>renderIntro());
   }
   if(tab==='interview') renderInterviewLog();
@@ -1267,40 +1287,92 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyDPWXEmtOTpMXXUHm7ss0JCWYs6JtHOm1snSfc525ZMdqOYgvp-G_ALBD-_tJEjiLO/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0zWIqbw_RSFSOu5r5z_cVnfiRizzfwCeV8fR19aZbjQiqf3oO3t5nsOKfpHQJMKrF/exec';
 
-// ══ 資料同步 ══
+// ══ 資料同步（版本號輪詢：表單有變動才下載整份資料）══
+// 每 3 秒只問 Google「資料版本」（很小、很快），版本變了才重新抓整份；
+// 網頁寫入後立刻重抓一次；切回這個分頁時也立刻檢查。
 let _syncTimer = null;
+let _rev = null;              // 目前網頁上資料的版本
+let _revSupported = true;     // 舊版 Apps Script 沒有版本號 → 退回每 10 秒整份抓
+let _fetching = null;
+let _pendingWrites = 0;
+let _failCount = 0;
+let _lastFull = 0;
+let _refreshTimer = null;
+const POLL_MS = 3000, FULL_MS = 60000;
 
-async function fetchData() {
-  if (!GAS_URL) return;
-  setSyncState('syncing', '同步中…');
-  setLBar(true);
-  try {
-    const res  = await fetch(GAS_URL + '?t=' + Date.now());
+async function fetchData(){
+  if(!GAS_URL) return;
+  if(_fetching) return _fetching;            // 不重複發請求
+  if(_pendingWrites > 0){ scheduleRefresh(400); return; }  // 寫入中先不覆蓋畫面
+  _fetching = (async()=>{
+    setSyncState('syncing', '同步中…');
+    setLBar(true);
+    try{
+      const res  = await fetch(GAS_URL + '?t=' + Date.now());
+      const json = await res.json();
+      if(json.error) throw new Error(json.error);
+      if(_pendingWrites > 0){ scheduleRefresh(400); return; }
+      if(json.rev) _rev = String(json.rev); else _revSupported = false;
+      _lastFull = Date.now();
+      _failCount = 0;
+      loadExternalData(json.cards || []);
+    }catch(err){
+      setSyncState('err', '同步失敗');
+      if(++_failCount === 1) showToast('⚠️ 無法連線 Google Sheets，會自動重試');
+    }finally{
+      setLBar(false);
+    }
+  })();
+  try{ await _fetching; } finally { _fetching = null; }
+}
+
+async function pollRev(){
+  if(document.hidden || _fetching || _pendingWrites > 0) return;
+  if(!_revSupported || Date.now()-_lastFull > FULL_MS) return fetchData();
+  try{
+    const res  = await fetch(GAS_URL + '?action=rev&t=' + Date.now());
     const json = await res.json();
-    if (json.error) throw new Error(json.error);
-    loadExternalData(json.cards || []);
-  } catch(err) {
-    setSyncState('err', '同步失敗');
-    showToast('⚠️ 無法連線 Google Sheets');
-  } finally {
-    setLBar(false);
-  }
+    if(!json || !json.rev){ _revSupported = false; return fetchData(); }
+    if(String(json.rev) !== _rev) await fetchData();
+  }catch(e){ /* 下一輪再試 */ }
 }
 
-function startAutoSync() {
+function scheduleRefresh(ms){
+  clearTimeout(_refreshTimer);
+  _refreshTimer = setTimeout(fetchData, ms);
+}
+
+let _tick = 0;
+function startAutoSync(){
   clearInterval(_syncTimer);
-  if (autoSync) _syncTimer = setInterval(fetchData, 10000);
+  if(!autoSync) return;
+  _syncTimer = setInterval(()=>{
+    _tick++;
+    if(_revSupported) pollRev();
+    else if(_tick % 3 === 0) fetchData();     // 舊版：約每 9 秒
+  }, POLL_MS);
 }
+// 切回這個分頁 / 視窗時立刻檢查
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && autoSync) pollRev(); });
+window.addEventListener('focus', ()=>{ if(autoSync) pollRev(); });
+window.addEventListener('online', ()=>{ if(autoSync) fetchData(); });
 
-async function gasPost(body) {
-  const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+async function gasPost(body){
+  _pendingWrites++;
+  try{
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body)
+    });
+    return await res.json();
+  } finally {
+    _pendingWrites--;
+    // 寫入完成後立刻重抓，取得表單端的連動結果（例如 S 欄、時間欄）
+    if(_pendingWrites === 0) scheduleRefresh(250);
+  }
 }
 
 async function gasPostPhoto(body) {
@@ -3065,16 +3137,80 @@ async function fetchSheet(name){
   if(json && Array.isArray(json.values)) return { ok:true, data:json };
   return { ok:false, msg:(json && json.error) || '' };
 }
+// 換算：1 輛垃圾車約 3 公噸（3000 kg）；1 棵樹每年約吸收 22 kg CO2
+const TRUCK_KG = 3000, TREE_KG = 22;
+function eqText(kgText, per, dec, pre, post){
+  const kg = toNum(kgText);
+  if(!kg) return '';
+  const v = kg/per;
+  const txt = v.toLocaleString('en-US',{minimumFractionDigits:dec, maximumFractionDigits:dec});
+  return `<div class="iv2-tile-x">${pre}<span class="iv2-num">${cnt(txt)}</span>${post}</div>`;
+}
+
+let _introLoading = null, _introFreshAt = 0;
 async function loadIntroSummary(force){
-  if(!force && introData.at && Date.now()-introData.at < 60000) return;
-  await Promise.all(['summary','footprint'].map(async k=>{
-    try{
-      const r = await fetchSheet(INTRO_SHEETS[k]);
-      if(r.ok){ introData[k] = r.data; introData.state[k] = 'ok'; introData.msg[k] = ''; }
-      else    { introData[k] = null; introData.state[k] = r.msg ? 'error' : 'missing'; introData.msg[k] = r.msg; }
-    }catch(e){ introData[k] = null; introData.state[k] = 'error'; introData.msg[k] = e.message; }
-  }));
-  introData.at = Date.now();
+  if(!force && _introFreshAt && Date.now()-_introFreshAt < 60000) return;
+  if(_introLoading) return _introLoading;      // 同時只發一次請求
+  _introLoading = (async()=>{
+    await Promise.all(['summary','footprint'].map(async k=>{
+      try{
+        const r = await fetchSheet(INTRO_SHEETS[k]);
+        if(r.ok){ introData[k] = r.data; introData.state[k] = 'ok'; introData.msg[k] = ''; }
+        else if(!introData[k]){ introData.state[k] = r.msg ? 'error' : 'missing'; introData.msg[k] = r.msg; }
+      }catch(e){ if(!introData[k]){ introData.state[k] = 'error'; introData.msg[k] = e.message; } }
+    }));
+    introData.at = _introFreshAt = Date.now();
+    // 存一份在這台裝置，下次打開「簡介」可立即顯示
+    if(introData.summary || introData.footprint){
+      try{ localStorage.setItem('introCache', JSON.stringify({ summary:introData.summary, footprint:introData.footprint, at:introData.at })); }catch(e){}
+    }
+  })();
+  try{ await _introLoading; } finally { _introLoading = null; }
+}
+// 上次的快取（讓簡介頁不用等）
+(function(){
+  try{
+    const c = JSON.parse(localStorage.getItem('introCache')||'null');
+    if(c && (c.summary || c.footprint)){
+      introData.summary = c.summary || null; introData.footprint = c.footprint || null;
+      introData.state = { summary: c.summary ? 'ok' : 'idle', footprint: c.footprint ? 'ok' : 'idle' };
+      introData.at = c.at || 1;
+    }
+  }catch(e){}
+})();
+
+const LOADING_LOGO = `<svg class="iv2-ld-logo" viewBox="0 0 120 140" aria-hidden="true">
+  <ellipse class="iv2-ld-shadow" cx="60" cy="133" rx="38" ry="4" fill="#1f2421"/>
+  <path d="M27 112 C 9 113, 7 126, 21 127 C 40 128, 66 124, 84 120" fill="none" stroke="#1b1b1b" stroke-width="2.4" stroke-linecap="round"/>
+  <rect x="84" y="116" width="11" height="8" rx="2" fill="#9ea3a8"/>
+  <path d="M95 118h5M95 122h5" stroke="#6f7479" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M28 92 L24 126 Q24 129 27 129 L93 129 Q96 129 96 126 L92 92 Z" fill="#2a8a57"/>
+  <ellipse cx="60" cy="92" rx="32" ry="9.5" fill="#2a8a57"/>
+  <ellipse cx="60" cy="92" rx="27" ry="6.8" fill="#f3f4f2"/>
+  <ellipse cx="50" cy="90.5" rx="2.2" ry="1" fill="#5b5f63"/>
+  <ellipse cx="71" cy="93.5" rx="2.2" ry="1" fill="#5b5f63"/>
+  <g class="iv2-ld-spark"><path d="M44 82l-5-4M76 82l5-4M60 78v-5" stroke="#e3a03a" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="iv2-ld-drv">
+    <rect x="58.5" y="48" width="3" height="43" rx="1" fill="#a9adb2"/>
+    <rect x="55.5" y="46" width="9" height="6" rx="1.5" fill="#8c1a20"/>
+    <g class="iv2-ld-handle">
+      <rect x="50" y="8" width="20" height="41" rx="9" fill="#c0262d"/>
+      <rect class="iv2-ld-shine" x="57.5" y="12" width="3" height="32" rx="1.5" fill="#fff"/>
+    </g>
+  </g>
+</svg>`;
+let _introLdTimer = null;
+function showIntroLoading(){
+  const root = document.getElementById('intro-root');
+  if(!root) return;
+  root.innerHTML = `<div class="iv2-loading">${LOADING_LOGO}
+    <div class="iv2-ld-t">小家電維修所</div>
+    <div class="iv2-ld-s" id="iv2-ld-msg">正在整理我們的足跡 <i></i><i></i><i></i></div></div>`;
+  clearTimeout(_introLdTimer);
+  _introLdTimer = setTimeout(()=>{
+    const m = document.getElementById('iv2-ld-msg');
+    if(m) m.innerHTML = '網路較慢，資料還在路上 <i></i><i></i><i></i>';
+  }, 7000);
 }
 
 // ── 儲存格工具 ──
@@ -3436,6 +3572,15 @@ function renderIntro(force){
   if(!root) return;
   const sig = JSON.stringify([introData.summary && introData.summary.display, introData.footprint && introData.footprint.display, introData.state]);
   if(!force && sig===_introSig && root.querySelector('.iv2-sec')) return;
+  clearTimeout(_introLdTimer);
+  if(!introData.summary && !introData.footprint && (introData.state.summary==='error' || introData.state.footprint==='error')){
+    root.innerHTML = `<div class="iv2-loading">${LOADING_LOGO.replace(/class="iv2-ld-(drv|handle|shine|shadow|spark)"/g,'')}
+      <div class="iv2-ld-t">暫時讀不到資料</div>
+      <div class="iv2-ld-s">請確認網路連線，或 Apps Script 已部署新版本</div>
+      <button class="iv2-ld-retry" onclick="showIntroLoading();loadIntroSummary(true).then(()=>renderIntro(true))">重新載入</button></div>`;
+    _introSig = '';
+    return;
+  }
   _introSig = sig;
 
   const logoSrc = (document.querySelector('.topbar-logo-img')||{}).src || '';
@@ -3517,11 +3662,13 @@ function renderIntro(force){
         ${ICONS.waste}
         <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少廢棄物</div>
+        ${eqText(cellText(INTRO_CELLS.wasteKg), TRUCK_KG, 1, '約 ', ' 輛垃圾車進垃圾場')}
       </div>
       <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-green-t);color:var(--i-green);">
         ${ICONS.co2}
         <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少碳排放 CO₂e</div>
+        ${eqText(cellText(INTRO_CELLS.co2Kg), TREE_KG, 0, '約種植了 ', ' 棵樹')}
       </div>
     </div>
   </section>
@@ -3591,6 +3738,7 @@ document.getElementById('sync-pill').style.display = 'flex';
 document.getElementById('q').addEventListener('input',function(){searchQ=this.value.trim();render();});
 // 開啟即拉取真實資料，每 10 秒自動同步
 fetchData().then(()=>startAutoSync());
+setTimeout(()=>loadIntroSummary().then(()=>{ if(currentTab==='intro') renderIntro(); }), 1200);
 // 每分鐘重新渲染看板，讓計時數字更新
 setInterval(()=>{ if(allCards.length) render(); }, 60000);
 </script>
