@@ -154,6 +154,20 @@ body{
 }
 .kcard:hover{box-shadow:0 4px 12px rgba(0,0,0,.11);transform:translateY(-2px);}
 .kcard:active{transform:scale(.97);}
+.kcard.dragging{opacity:.4;transform:scale(.95);}
+.kcard.drag-preview{
+  position:fixed;pointer-events:none;z-index:9999;
+  opacity:.9;transform:scale(1.04) rotate(1.5deg);
+  box-shadow:0 12px 32px rgba(0,0,0,.25);
+  border-radius:10px;background:var(--surface);
+  padding:10px 12px;min-width:160px;
+}
+.col.drag-over .col-body{
+  background:var(--accent-bg);
+  border:2px dashed var(--accent);
+  border-radius:8px;
+  transition:background .2s;
+}
 .kcard-inner{display:flex;align-items:center;gap:10px;}
 .knum-circle{
   width:40px;height:40px;border-radius:50%;
@@ -542,7 +556,7 @@ input:checked+.slider::before{transform:translateX(20px);}
 .lbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
 .lbar.on{transform:scaleX(.75);}
 .lbar.done{transform:scaleX(1);opacity:0;transition:transform .2s,opacity .3s .1s;}
-.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:20px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;}
+.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-wrap;word-break:break-all;max-width:90vw;text-align:left;}
 .toast.show{opacity:1;}
 
 /* ══ PHOTO SECTION ══ */
@@ -725,9 +739,23 @@ input:checked+.slider::before{transform:translateX(20px);}
       <h3 style="margin-bottom:14px;">資料來源</h3>
       <div class="form-row">
         <label>Google Script URL</label>
-        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/…/exec" oninput="saveSettings()">
+        <input class="form-inp" id="gas-url-input" placeholder="https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec" oninput="saveSettings()">
       </div>
-      <div style="font-size:12px;color:var(--text3);margin-top:4px;">修改後重新整理即生效</div>
+      <div class="form-row" style="margin-top:10px;">
+        <label>連動表單</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="form-inp" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/…" oninput="saveSettings()" style="flex:1;">
+          <button onclick="openLink('sheet-url-input')" style="padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;">開啟 ↗</button>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:10px;">
+        <label>照片雲端</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="form-inp" id="photo-folder-input" placeholder="https://drive.google.com/drive/folders/…" oninput="saveSettings()" style="flex:1;">
+          <button onclick="openLink('photo-folder-input')" style="padding:8px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;">開啟 ↗</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:8px;">修改後重新整理即生效</div>
     </div>
 
     <div class="card-box" style="background:var(--surface2);">
@@ -848,13 +876,53 @@ const PALETTE = [
   {sc:'#fff', sbg:'#7c63ec', circleBg:'#d8d0ff', circleColor:'#4a30b0'},
 ];
 
+// ══ 階段 / 維修結果 判斷 ══
+const CANCEL_COL = '取消/轉診/退回';   // 看板欄位名稱
+const QUICK_STAGES = ['未報到','等待維修','維修中','待領取','已領取','取消','轉診/退回']; // 實際寫入 B 欄的值
+function normStage(s){
+  s = String(s||'').trim();
+  if(s==='已報到等待維修') return '等待維修';
+  if(s==='取消轉診退回' || s==='取消/轉診/退回' || s==='轉診或退回不受理') return '轉診/退回';
+  return s;
+}
+// 回傳 '取消' / '轉診/退回' / ''（流程階段優先，其次看維修結果）
+function cancelType(c){
+  const st = normStage(c.stage), r = normStage(c.repairResult);
+  if(st==='取消' || st==='轉診/退回') return st;
+  if(r==='取消'  || r==='轉診/退回')  return r;
+  return '';
+}
+// 卡片在看板上應放在哪一欄
+function boardStage(c){
+  if(cancelType(c)) return CANCEL_COL;
+  const st = normStage(c.stage);
+  return STAGES.some(s=>s.key===st) ? st : '未報到';
+}
+function stageCi(name){
+  const b = boardStage({stage:name, repairResult:''});
+  const i = STAGES.findIndex(s=>s.key===b);
+  return i<0 ? 0 : i;
+}
+// 資料不齊全檢查（維修結果為「取消」則免檢查）
+const REQUIRED_FIELDS = [
+  ['id','掛號號碼'],['rawStage','流程階段'],['bigCat','分類'],['item','品項'],
+  ['brand','品牌'],['faultDesc','故障說明'],['repairResult','維修結果'],['repairResultDesc','結果說明'],
+];
+function missingFields(c){
+  if(normStage(c.repairResult)==='取消') return [];
+  return REQUIRED_FIELDS.filter(([k])=>!String(c[k]||'').trim()).map(([,label])=>label);
+}
+function isIncomplete(c){ return missingFields(c).length>0; }
+let incompleteOnly = false;
+
 // 下拉選單快取（fallback）
 let dropdownCache = {
-  resultOpts: ['OK_成功','NO_失敗','轉診或退回不受理'],
+  resultOpts: ['OK_成功','NO_失敗','取消','轉診/退回'],
   subOpts: {
     'OK_成功':['OK 更換零件','OK 無更換零件: 清潔/重新組裝或固定','OK 非故障/不熟悉或不當操作','OK 沒有解釋說明','OK 物主自行購買更換零件','OK 維修但原有部分功能失效','OK 改裝&升級代替原有零件'],
-    'NO_失敗':['No 沒有零件','No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)','No 沒有解釋說明','No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)','No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)','No 物主放棄維修 (破損疑慮/費用疑慮等)'],
-    '轉診或退回不受理':['考量活動當下時間與資源轉介至專業維修店','保固期內建議送至原廠或經銷中心','配件不齊全無法檢測','No 已更換零件或清潔但無法正常使用','No 功能疑慮 不建議維修 (影響防水或精準)'],
+    'NO_失敗':['No 沒有零件','No 安全疑慮 不建議維修 (多處損壞/火花/漏液鏽蝕或融化燒毀/脆化變形或斷裂)','No 沒有解釋說明','No 無法判別故障原因 (無法拆開/ 過於複雜/ 無對應工具或說明書)','No 無法進一步更換零件或維修 (結構難拆卸或清潔零件/內部過於精密)','No 物主放棄維修 (破損疑慮/費用疑慮等)','No 已更換零件或清潔但無法正常使用','No 功能疑慮 不建議維修 (影響防水或精準)'],
+    '取消':[],
+    '轉診/退回':['考量活動當下時間與資源轉介至專業維修店','保固期內建議送至原廠或經銷中心','配件不齊全無法檢測'],
   },
   catOpts: ['生活家電','照明用具','影視娛樂','美容美體家電','廚房家電','兒童玩具'],
   itemOpts: {
@@ -864,6 +932,13 @@ let dropdownCache = {
     '美容美體家電': ['吹風機','整髮梳/捲髮器','除毛刀/電剪','刮鬍刀','按摩器/熱敷器/電毯','洗牙器/電動牙刷','洗臉機','光療機'],
     '廚房家電': ['廚房家電','加熱鍋具','食物料理機','烤箱/ 食物烘烤機','微波爐','鬆餅機/ 熱壓機','烤土司機','按壓式電熱水瓶','烘碗機/溫奶器','封口機','冰箱','飲水機/ 開飲機'],
     '兒童玩具': ['車類玩具','音樂類玩具','其他'],
+  },
+  // 品項 → 細項（產品細項）
+  subItemOpts: {
+    '電風扇':   ['立扇','箱扇','大廈扇','無葉扇','桌扇','循環扇','壁掛/吊扇/吸頂扇','工業扇','車用/手持扇','冷暖兩用風扇','抽風機/排風扇','USB風扇','水冷扇','其他'],
+    '電暖器':   ['烘被器/烘鞋機','葉片式','煤油式','充電式','鹵素燈','陶瓷式','石英管/電熱絲','其他'],
+    '加熱鍋具': ['電鍋','電子鍋','電水壺/快煮鍋/快煮壺','卡式爐','燒烤盤/燒烤爐','電磁爐','黑晶爐','氣炸鍋','壓力鍋','其他'],
+    '食物料理機':['食物處理機/攪拌機/奶泡機','果汁機/榨汁機','豆漿機','咖啡機','磨豆機','麵包機','發酵機器'],
   }
 };
 
@@ -918,9 +993,19 @@ function getRepairState(c){
 }
 
 // ══ 設定 ══
+const DEFAULT_SHEET_URL  = 'https://docs.google.com/spreadsheets/d/1qSAPHN0_dc3o60blJoyam873vtnIu0QnaY4PYK40M68/edit?gid=0#gid=0';
+const DEFAULT_PHOTO_URL  = 'https://drive.google.com/drive/folders/1SHI--kvSIul84RBgOC8efGtU7fuFmBTl';
+
 function loadSettings(){
   const gs = localStorage.getItem('gasUrl');
   if(gs){ document.getElementById('gas-url-input').value=gs; }
+  // 試算表連結（預設填入）
+  const su = localStorage.getItem('sheetUrl') || DEFAULT_SHEET_URL;
+  document.getElementById('sheet-url-input').value = su;
+  // 照片資料夾連結（預設填入）
+  const pu = localStorage.getItem('photoFolderUrl') || DEFAULT_PHOTO_URL;
+  document.getElementById('photo-folder-input').value = pu;
+
   const ie = localStorage.getItem('interviewEnabled');
   interviewEnabled = ie===null ? true : ie==='true';
   document.getElementById('toggle-interview').checked = interviewEnabled;
@@ -932,12 +1017,21 @@ function loadSettings(){
 function saveSettings(){
   const url = document.getElementById('gas-url-input').value.trim();
   if(url) { localStorage.setItem('gasUrl',url); }
+  const su = document.getElementById('sheet-url-input').value.trim();
+  if(su)  { localStorage.setItem('sheetUrl', su); }
+  const pu = document.getElementById('photo-folder-input').value.trim();
+  if(pu)  { localStorage.setItem('photoFolderUrl', pu); }
   interviewEnabled = document.getElementById('toggle-interview').checked;
   localStorage.setItem('interviewEnabled', interviewEnabled);
   autoSync = document.getElementById('toggle-autosync').checked;
   localStorage.setItem('autoSync', autoSync);
   applyInterviewSetting();
-  startAutoSync(); // 重啟或停止自動同步
+  startAutoSync();
+}
+function openLink(inputId){
+  const url = document.getElementById(inputId).value.trim();
+  if(url) window.open(url, '_blank');
+  else showToast('請先填入連結');
 }
 function applyInterviewSetting(){
   const ivTab = document.getElementById('tab-interview');
@@ -949,7 +1043,7 @@ function applyInterviewSetting(){
 const PAGE_TITLES = {
   repair:    '維修看板',
   interview: '訪問記錄',
-  stats:     '統計',
+  stats:     '維修統計',
   settings:  '設定',
 };
 function switchTab(tab){
@@ -974,18 +1068,20 @@ function mapCard(raw){
   if(!phone3&&phone){ const d=phone.replace(/\D/g,''); phone3=d.length>=3?d.slice(-3):d; }
   const rawId = String(raw.id||raw['編號']||'').trim();
   const rawStage = (raw.stage||raw['流程階段']||raw.status||'').trim();
+  const ns = normStage(rawStage);
   const stage = rawId
-    ? (rawStage || '等待維修')
-    : '未報到';
+    ? (ns || '等待維修')
+    : ((ns==='取消' || ns==='轉診/退回') ? ns : '未報到');
   return{
     rowNum:Number(raw.rowNum)||0,
     id:rawId, endOfProduct:raw.endOfProduct||raw['End of 產品']||raw.item||'',
     phone3, name:raw.name||raw['送修者姓名']||raw['姓名']||'',
     phone, regNum:raw.regNum||rawId||'',
-    stage, noteTag:raw.noteTag||raw['備註標籤']||'',
+    stage, rawStage, noteTag:raw.noteTag||raw['備註標籤']||'',
     bigCat:raw.bigCat||raw['家電大分類']||raw['產品分類']||'',
     item:raw.item||raw['產品品項']||'',
     subItem:raw.subItem||raw['產品細項']||'',
+    prodName:raw.prodName||raw['產品名稱']||'',
     itemNote:raw.itemNote||raw['產品備註']||raw['備註說明']||'',
     brand:raw.brand||raw['品牌']||'',
     model:raw.model||raw['型號']||'',
@@ -1002,13 +1098,15 @@ function mapCard(raw){
     partCost:String(raw.partCost||raw['零件費']||''),
     donationFee:String(raw.donationFee||raw['隨喜費']||''),
     ecoContrib:raw.ecoContrib||raw['減碳貢獻']||'',
+    ecoContribCO2:raw.ecoContribCO2||raw['減碳貢獻CO2e']||'',
     waitStart:raw.waitStart||'',   // AA 欄：等候開始 ISO 時間
     repStart:raw.repStart||'',     // AC 欄：維修開始 ISO 時間
+    photos:raw.photos||'',         // AE 欄：照片 fileId 清單（JSON）
   };
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbywac1vareZCRn0rAIVfTBjYJm5rcekHj6ihLRFGRwrtWuBvUAus9QLfN4PCSAYhvv0/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec';
 
 // ══ 資料同步 ══
 let _syncTimer = null;
@@ -1052,17 +1150,13 @@ async function gasPostPhoto(body) {
     body: JSON.stringify(body)
   });
   const text = await res.text();
-  // 診斷：把回傳前30字顯示在 toast
-  showToast('GAS回傳:' + text.slice(0,60));
   if(text.trim().startsWith('<')){
     throw new Error('GAS 回傳 HTML，請確認部署設定「存取權：任何人」');
   }
   try {
-    const parsed = JSON.parse(text);
-    if(!parsed.error) parsed.success = true;
-    return parsed;
+    return JSON.parse(text);
   } catch(e) {
-    throw new Error('JSON解析失敗:' + text.slice(0, 60));
+    throw new Error('JSON解析失敗:' + text.slice(0, 80));
   }
 }
 
@@ -1090,6 +1184,15 @@ function loadExternalData(cards){
   allCards.forEach(c=>{
     if(!c.rowNum) return;
     const cur = getTs(c.rowNum);
+
+    // 若 Sheets 上是未報到或 AA/AC 都空 → 清除 localStorage 時間戳
+    if(c.stage === '未報到' || (!c.waitStart && !c.repStart)){
+      if(cur.tsReg || cur.tsRepStart || cur.tsRepDone){
+        localStorage.removeItem(tsKey(c.rowNum));
+      }
+      return;
+    }
+
     const patch = {};
     // AA 欄是 HH:MM → 轉成今天的 timestamp
     if(c.waitStart){
@@ -1108,6 +1211,37 @@ function loadExternalData(cards){
     if(Object.keys(patch).length) setTs(c.rowNum, patch);
   });
   buildStageChips();
+  // 把 Sheets AE 欄的照片清單同步到 photoCache（跨裝置共享）
+  allCards.forEach(c=>{
+    if(!c.rowNum || !c.photos) return;
+    try {
+      const list = JSON.parse(c.photos);
+      if(!Array.isArray(list) || !list.length) return;
+      // 依 zone 分組寫入 photoCache（只補不覆蓋本機已有的）
+      const zones = ['外觀','配件','內部'];
+      zones.forEach(zone=>{
+        const key = getPhotoCacheKey(String(c.rowNum), zone);
+        const zonePhotos = list.filter(p=>p.zone===zone);
+        if(!zonePhotos.length) return;
+        if(!photoCache[key]) photoCache[key] = [];
+        zonePhotos.forEach(p=>{
+          const alreadyHave = photoCache[key].some(x=>x.fileId===p.fileId);
+          if(!alreadyHave){
+            photoCache[key].push({
+              dataUrl: '',
+              file: null,
+              status: 'done',
+              fileId: p.fileId,
+              fileUrl: p.fileUrl,
+              name: p.name||''
+            });
+          }
+        });
+        // 同步更新 localStorage
+        savePhotoMeta(String(c.rowNum), zone);
+      });
+    } catch(e){}
+  });
   render();
   updateChipCounts();
   const now = new Date();
@@ -1126,12 +1260,18 @@ function buildStageChips(){
     btn.onclick=function(){toggleStage(s.key,this);};
     fbar.appendChild(btn);
   });
+  // 資料不齊全 快速篩選
+  const ib=document.createElement('button');
+  ib.className='chip';ib.id='chip-incomplete';
+  ib.innerHTML=`⚠️ 資料不齊全 <span class="chip-cnt" style="opacity:.7;font-weight:700;">0</span>`;
+  ib.onclick=function(){toggleIncomplete(this);};
+  fbar.appendChild(ib);
   updateAllChip();
 }
 function updateChipCounts(){
   document.querySelectorAll('#fbar .chip[data-key]').forEach(btn=>{
     const key=btn.dataset.key;
-    const cnt=allCards.filter(c=>c.stage===key).length;
+    const cnt=allCards.filter(c=>boardStage(c)===key).length;
     const span=btn.querySelector('.chip-cnt');
     if(span) span.textContent=cnt;
   });
@@ -1149,6 +1289,15 @@ function updateChipCounts(){
     }
     span.textContent=allCards.length;
   }
+  const incBtn=document.getElementById('chip-incomplete');
+  if(incBtn){ const sp=incBtn.querySelector('.chip-cnt'); if(sp) sp.textContent=allCards.filter(isIncomplete).length; }
+}
+function toggleIncomplete(el){
+  incompleteOnly=!incompleteOnly;
+  el.classList.toggle('on',incompleteOnly);
+  el.style.background=incompleteOnly?'#ff6d48':'';
+  el.style.color=incompleteOnly?'#fff':'';
+  updateAllChip();render();
 }
 function toggleStage(key,el){
   if(activeKeys.has(key)){activeKeys.delete(key);el.classList.remove('on');el.style.background='';el.style.color='';}
@@ -1157,12 +1306,15 @@ function toggleStage(key,el){
 }
 function toggleAll(){
   activeKeys.clear();
+  incompleteOnly=false;
+  const ib=document.getElementById('chip-incomplete');
+  if(ib){ib.classList.remove('on');ib.style.background='';ib.style.color='';}
   document.querySelectorAll('#fbar .chip[data-key]').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
   updateAllChip();render();
 }
 function updateAllChip(){
   const btn=document.getElementById('chip-all');if(!btn)return;
-  if(activeKeys.size===0){btn.classList.add('on');btn.style.background='var(--accent)';btn.style.color='#fff';}
+  if(activeKeys.size===0&&!incompleteOnly){btn.classList.add('on');btn.style.background='var(--accent)';btn.style.color='#fff';}
   else{btn.classList.remove('on');btn.style.background='';btn.style.color='';}
 }
 
@@ -1173,10 +1325,11 @@ function buildCardTimer(c){
   let startMs = null;
   let label = '';
 
-  if(c.stage === '等待維修'){
+  const bs = boardStage(c);
+  if(bs === '等待維修'){
     startMs = ts.tsReg || null;
     label = '等候';
-  } else if(c.stage === '維修中'){
+  } else if(bs === '維修中'){
     startMs = ts.tsRepStart || null;
     label = '維修';
   } else {
@@ -1209,19 +1362,46 @@ function render(){
   const q=searchQ.toLowerCase();
   const showStages=activeKeys.size>0?STAGES.filter(s=>activeKeys.has(s.key)):STAGES;
   const filtered=allCards.filter(c=>{
-    if(activeKeys.size>0&&!activeKeys.has(c.stage))return false;
+    if(activeKeys.size>0&&!activeKeys.has(boardStage(c)))return false;
+    if(incompleteOnly&&!isIncomplete(c))return false;
     if(q&&!c.name.toLowerCase().includes(q)&&!c.phone.includes(q)&&!String(c.id).includes(q)&&!c.endOfProduct.toLowerCase().includes(q))return false;
     return true;
   });
   document.getElementById('board').innerHTML=showStages.map(stage=>{
     const p=PALETTE[stage.ci];
-    const sc=filtered.filter(c=>c.stage===stage.key);
+    const sc=filtered.filter(c=>boardStage(c)===stage.key);
     const idStr=id=>{const d=String(id||'').replace(/\D/g,'');return d?d.slice(-2):'';}
     const cHtml=sc.length?sc.map(c=>{
-      // 第三列：只顯示計時器（等待維修 / 維修中），其他階段顯示 —
+      // 第三列：待領取顯示 noteTag，等待維修/維修中顯示計時器，其他顯示 —
       const timer = buildCardTimer(c);
-      const thirdRow = timer || '<span style="color:var(--border2);font-size:11px;">—</span>';
-      return`<div class="kcard" onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')">
+      let thirdRow;
+      if(incompleteOnly){
+        thirdRow = missingFields(c).map(f=>`<span class="k-tag-chip warn">缺 ${escH(f)}</span>`).join('');
+      } else if(stage.key===CANCEL_COL){
+        const ct = cancelType(c);
+        thirdRow = `<span class="k-tag-chip" style="${ct==='取消'?'background:#eee;border-color:#999;color:#2e2e2e;':'background:#f0eeff;border-color:#7c63ec;color:#4a30b0;'}">${escH(ct)}</span>`;
+      } else if(stage.key==='待領取' && c.noteTag){
+        const TAG_STYLES = {
+          '候補':   'background:#f0eeff;border-color:#7c63ec;color:#4a30b0;',
+          '已通知': 'background:#eaf7ff;border-color:#41bbff;color:#0068a0;',
+          '配件':   'background:#fff8ec;border-color:#ffab2d;color:#a06000;',
+          '特殊商品':'background:#fff0ec;border-color:#ff6d48;color:#c0391a;',
+        };
+        const chips = c.noteTag.split(/[,，、]+/).map(t=>t.trim()).filter(Boolean)
+          .map(t=>`<span class="k-tag-chip" style="${TAG_STYLES[t]||''}">${escH(t)}</span>`).join('');
+        thirdRow = chips || '<span style="color:var(--border2);font-size:11px;">—</span>';
+      } else {
+        thirdRow = timer || '<span style="color:var(--border2);font-size:11px;">—</span>';
+      }
+      return`<div class="kcard"
+        draggable="true"
+        onclick="openModal('${escH(c.id||'')}',${c.rowNum},'${escH(stage.key)}')"
+        ondragstart="dragStart(event,${c.rowNum})"
+        ondragend="dragEnd(event)"
+        oncontextmenu="return false"
+        ontouchstart="touchStart(event,${c.rowNum},this)"
+        ontouchmove="touchMove(event)"
+        ontouchend="touchEnd(event)">
         <div class="kcard-inner">
           <div class="knum-circle" style="background:${p.circleBg};color:${p.circleColor};">${idStr(c.id)}</div>
           <div class="kcard-info">
@@ -1232,11 +1412,178 @@ function render(){
         </div>
       </div>`;
     }).join(''):`<div class="empty-col"> </div>`;
-    return`<div class="col">
+    return`<div class="col" id="col-${escH(stage.key)}"
+      ondragover="dragOver(event)"
+      ondragleave="dragLeave(event)"
+      ondrop="drop(event,'${escH(stage.key)}')">
       <div class="col-hd" style="background:${p.sbg};"><span class="cname" style="color:${p.sc};">${stage.key}</span><span class="ccnt" style="color:${p.sc};">${sc.length}</span></div>
       <div class="col-body">${cHtml}</div>
     </div>`;
   }).join('');
+}
+
+// ══ 拖移換階段 ══
+let _dragRowNum = null;
+let _touchTimer  = null;
+let _touchPreview= null;
+let _touchActive = false;
+let _touchRowNum = null;
+
+// ── 桌面拖移 ──
+function dragStart(e, rowNum){
+  _dragRowNum = rowNum;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragEnd(e){
+  _dragRowNum = null;
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.closest('.col')?.classList.add('drag-over');
+}
+function dragLeave(e){
+  if(!e.currentTarget.contains(e.relatedTarget)){
+    e.currentTarget.closest?.('.col')?.classList.remove('drag-over');
+  }
+}
+async function drop(e, newStage){
+  e.preventDefault();
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(_dragRowNum === null) return;
+  await moveCardToStage(_dragRowNum, newStage);
+}
+
+// ── 手機長按拖移 ──
+function touchStart(e, rowNum, el){
+  _touchRowNum = rowNum;
+  _touchTimer = setTimeout(()=>{
+    _touchActive = true;
+    // 建立浮動預覽
+    const rect = el.getBoundingClientRect();
+    _touchPreview = el.cloneNode(true);
+    _touchPreview.classList.add('drag-preview');
+    _touchPreview.style.width  = rect.width + 'px';
+    _touchPreview.style.left   = rect.left  + 'px';
+    _touchPreview.style.top    = rect.top   + 'px';
+    document.body.appendChild(_touchPreview);
+    el.classList.add('dragging');
+    if(navigator.vibrate) navigator.vibrate(30);
+  }, 500);
+}
+function touchMove(e){
+  if(!_touchActive) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  if(_touchPreview){
+    _touchPreview.style.left = (t.clientX - 80) + 'px';
+    _touchPreview.style.top  = (t.clientY - 40) + 'px';
+  }
+  // 高亮懸停的欄
+  document.querySelectorAll('.col').forEach(col=>{
+    const r = col.getBoundingClientRect();
+    if(t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom){
+      col.classList.add('drag-over');
+    } else {
+      col.classList.remove('drag-over');
+    }
+  });
+}
+async function touchEnd(e){
+  clearTimeout(_touchTimer);
+  if(_touchPreview){ _touchPreview.remove(); _touchPreview=null; }
+  document.querySelectorAll('.kcard.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(!_touchActive){ _touchActive=false; _touchRowNum=null; return; }
+  _touchActive = false;
+  const t = e.changedTouches[0];
+  // 找放下的目標欄
+  let targetStage = null;
+  document.querySelectorAll('.col').forEach(col=>{
+    const r = col.getBoundingClientRect();
+    if(t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom){
+      const id = col.id.replace('col-','');
+      targetStage = decodeURIComponent(id);
+    }
+  });
+  if(targetStage && _touchRowNum !== null){
+    await moveCardToStage(_touchRowNum, targetStage);
+  }
+  _touchRowNum = null;
+}
+
+// ── 共用：執行換階段 ──
+// 拖到「取消/轉診/退回」欄時，選擇要寫入哪一種
+function chooseCancelType(){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');
+    ov.className='moverlay';
+    ov.style.alignItems='center';ov.style.padding='20px';
+    ov.innerHTML=`<div class="modal" style="max-width:320px;padding:22px 20px;border-radius:16px;text-align:center;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:16px;">移至哪一種？</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="save-btn-pill" data-v="取消" style="padding:10px 24px;background:#2e2e2e;box-shadow:none;">取消</button>
+        <button class="save-btn-pill" data-v="轉診/退回" style="padding:10px 24px;background:#7c63ec;box-shadow:none;">轉診/退回</button>
+      </div>
+      <button data-v="" style="margin-top:14px;background:none;border:none;color:var(--text3);cursor:pointer;font-family:inherit;font-size:13px;">返回</button>
+    </div>`;
+    ov.onclick=e=>{
+      const b=e.target.closest('[data-v]');
+      if(b||e.target===ov){ ov.remove(); resolve(b?b.dataset.v:''); }
+    };
+    document.body.appendChild(ov);
+  });
+}
+
+async function moveCardToStage(rowNum, newStage){
+  const c = allCards.find(x=>x.rowNum===rowNum);
+  if(!c) return;
+  if(newStage===CANCEL_COL){
+    if(boardStage(c)===CANCEL_COL) return;
+    newStage = await chooseCancelType();
+    if(!newStage) return;
+  } else if(boardStage(c)===newStage) return;
+  const oldStage = c.stage;
+  const oldResult = c.repairResult;
+  c.stage = newStage;
+  if(newStage==='取消' || newStage==='轉診/退回') c.repairResult = newStage; // GAS 會同步 S 欄
+  render();
+  if(cancelType(c) && boardStage(c)===CANCEL_COL && newStage!=='取消' && newStage!=='轉診/退回'){
+    showToast(`維修結果為「${cancelType(c)}」，卡片仍留在「${CANCEL_COL}」`);
+  } else {
+    showToast(`→ ${newStage}`);
+  }
+  const now = Date.now();
+  const postExtra = {};
+  if(newStage==='未報到'){
+    localStorage.removeItem(tsKey(c.rowNum));
+    postExtra.clearTime = true;
+  }
+  if(newStage==='等待維修' && !getTs(c.rowNum).tsReg){
+    setTs(c.rowNum,{tsReg:now});
+    postExtra.waitStart = new Date(now).toISOString();
+  }
+  if(newStage==='維修中'){
+    const patch={tsRepStart:now};
+    if(!getTs(c.rowNum).tsReg) patch.tsReg=now;
+    setTs(c.rowNum,patch);
+    const ts=getTs(c.rowNum);
+    if(ts.tsReg) postExtra.waitMin=Math.floor((now-ts.tsReg)/60000);
+  }
+  if(newStage==='待領取'){
+    const ts=getTs(c.rowNum);
+    if(ts.tsRepStart) postExtra.repairMin=Math.floor((now-ts.tsRepStart)/60000);
+    setTs(c.rowNum,{tsRepDone:now});
+  }
+  try{
+    await gasPost({action:'updateStage', rowNum:c.rowNum, stage:newStage, ...postExtra});
+  }catch(err){
+    showToast('⚠️ 同步失敗，請手動重整');
+    c.stage = oldStage; c.repairResult = oldResult; render();
+  }
 }
 
 // ══ Modal ══
@@ -1247,7 +1594,7 @@ function openModal(id, rowNum, stageKey){
   const c = allCards.find(x => x.rowNum === rowNum);
   if(!c){ showToast('⚠️ 找不到卡片，請重新整理'); return; }
   if(!c.rowNum){ showToast('⚠️ 此卡片缺少列號，請確認 Google Sheets 資料'); return; }
-  const ci=STAGES.findIndex(s=>s.key===c.stage);
+  const ci=STAGES.findIndex(s=>s.key===boardStage(c));
   const p=PALETTE[ci<0?0:ci];
   const mc=document.getElementById('m-circle');
   const idD=String(c.id||'').replace(/\D/g,'');
@@ -1271,7 +1618,8 @@ function openModal(id, rowNum, stageKey){
   const accBadge = document.getElementById('m-acc-badge');
   if(accBadge) accBadge.style.display = 'none';
   const qs=document.getElementById('m-quick-stage');
-  qs.innerHTML=STAGES.map(s=>`<option value="${s.key}"${c.stage===s.key?' selected':''}>${s.key}</option>`).join('');
+  const curQuick = cancelType(c) || boardStage(c);
+  qs.innerHTML=QUICK_STAGES.map(k=>`<option value="${k}"${curQuick===k?' selected':''}>${k}</option>`).join('');
   qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;
   // sid 用 rowNum 確保唯一，不再依賴 id
   const sid = String(rowNum);
@@ -1334,22 +1682,33 @@ function openModal(id, rowNum, stageKey){
       <div class="trow"><span class="tl">End of 產品</span><span class="tv">${escH(c.endOfProduct||'—')}</span></div>
       <div class="trow">
         <span class="tl">分類</span>
-        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span id="bigcat-text-${escH(sid)}">${escH(c.bigCat||'—')}</span>
-          <button onclick="openCatSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
-          <select class="msel-result" id="mi-bigcat-${escH(sid)}" style="display:none;width:100%;margin-top:4px;"
-            onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
-            ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
-          </select>
-        </span>
+        <select class="msel-result" id="mi-bigcat-${escH(sid)}"
+          onchange="onCatChange('${escH(sid)}');markDirty('${escH(sid)}')">
+          ${['', ...dropdownCache.catOpts].map(o=>`<option value="${escH(o)}"${(c.bigCat||'')===o?' selected':''}>${o||'— 選擇分類 —'}</option>`).join('')}
+        </select>
       </div>
       <div class="trow">
         <span class="tl">品項</span>
-        <span class="tv" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span id="item-text-${escH(sid)}">${escH(c.item||'—')}</span>
-          <button onclick="openItemSel('${escH(sid)}')" style="font-size:11px;padding:1px 7px;border:1px solid var(--border2);border-radius:999px;background:var(--surface);color:var(--accent);cursor:pointer;font-family:inherit;flex-shrink:0;">更正</button>
-          <div id="item-wrap-${escH(sid)}" style="display:none;width:100%;margin-top:4px;">${(()=>{const opts=dropdownCache.itemOpts[c.bigCat||'']||[];if(!opts.length)return`<select class="msel-result" id="mi-item-${escH(sid)}"><option value="">— 請先選分類 —</option></select>`;return`<select class="msel-result" id="mi-item-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;})()}</div>
-        </span>
+        <div id="item-wrap-${escH(sid)}" style="width:100%;">${(()=>{
+          const opts=dropdownCache.itemOpts[c.bigCat||'']||[];
+          if(!opts.length) return `<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')"><option value="">— 請先選分類 —</option></select>`;
+          return `<select class="msel-result" id="mi-item-${escH(sid)}" onchange="onItemChange('${escH(sid)}');markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.item||'')===o?' selected':''}>${o||'— 選擇品項 —'}</option>`).join('')}</select>`;
+        })()}</div>
+      </div>
+      <div class="trow">
+        <span class="tl">細項</span>
+        <div id="subitem-wrap-${escH(sid)}" style="width:100%;">${(()=>{
+          const opts=dropdownCache.subItemOpts[c.item||'']||[];
+          if(!opts.length) return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')"><option value="${escH(c.subItem||'')}">${escH(c.subItem||'— 選擇細項 —')}</option></select>`;
+          return `<select class="msel-result" id="mi-subitem-${escH(sid)}" onchange="markDirty('${escH(sid)}')">${['',...opts].map(o=>`<option value="${escH(o)}"${(c.subItem||'')===o?' selected':''}>${o||'— 選擇細項 —'}</option>`).join('')}</select>`;
+        })()}</div>
+      </div>
+      <div class="trow">
+        <span class="tl">產品名稱</span>
+        <span class="tv-edit" id="ei-prodname-${escH(sid)}"
+          onclick="startEdit(this)" onblur="stopEdit(this,'${escH(sid)}')"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+        >${escH(c.prodName||'')}</span>
       </div>
       <div class="trow"><span class="tl">品牌</span><span class="tv">${escH(c.brand||'—')}</span></div>
       <div class="trow">
@@ -1517,6 +1876,20 @@ function openItemSel(sid){
   if(wrap)wrap.style.display='block';
 }
 
+function onItemChange(sid){
+  const selItem = document.getElementById('mi-item-'+sid);
+  if(!selItem) return;
+  const newItem = selItem.value;
+  const wrap = document.getElementById('subitem-wrap-'+sid);
+  if(!wrap) return;
+  const opts = dropdownCache.subItemOpts[newItem]||[];
+  if(!opts.length){
+    wrap.innerHTML = `<span class="tv" style="color:var(--text3);font-size:13px;">—</span>`;
+  } else {
+    wrap.innerHTML = `<select class="msel-result" id="mi-subitem-${sid}" onchange="markDirty('${sid}')">${['', ...opts].map(o=>`<option value="${escH(o)}">${o||'— 選擇細項 —'}</option>`).join('')}</select>`;
+  }
+  markDirty(sid);
+}
 function onCatChange(sid){
   const selCat=document.getElementById('mi-bigcat-'+sid).value;
   const wrap=document.getElementById('item-wrap-'+sid);
@@ -1536,6 +1909,21 @@ function getSelectedNoteTags(sid){
   if(!wrap) return '';
   return [...wrap.querySelectorAll('.notetag-chip.on')].map(el=>el.dataset.tag).join(',');
 }
+// 把目前 photoCache 的所有照片組成 JSON 寫回 Sheets
+function buildPhotosJson(sid){
+  const zones = ['外觀','配件','內部'];
+  const list = [];
+  zones.forEach(zone=>{
+    const key = getPhotoCacheKey(sid, zone);
+    (photoCache[key]||[]).forEach(p=>{
+      if(p.status==='done' && p.fileId){
+        list.push({ fileId:p.fileId, fileUrl:p.fileUrl||'', zone, name:p.name||'' });
+      }
+    });
+  });
+  return JSON.stringify(list);
+}
+
 async function saveCard(id,sid){
   // sid 現在是 rowNum 字串，用它精準找卡片
   const rowNum = parseInt(sid);
@@ -1563,10 +1951,13 @@ async function saveCard(id,sid){
   const newResDesc = g('mi-resdesc-'+sid)        || c.repairResultDesc;
   const newBigCat  = g('mi-bigcat-'+sid)         || c.bigCat;
   const newItem    = g('mi-item-'+sid)           || c.item;
+  const newSubItem = g('mi-subitem-'+sid)        || c.subItem;
+  const newProdName= getEdit('ei-prodname-'+sid) || c.prodName;
   const newNoteTag = getSelectedNoteTags(sid);
   // 計算新 stage
   let newStage = c.stage;
   if(newId && (!c.stage || c.stage === '未報到')) newStage = '等待維修';
+  if(newResult==='取消' || newResult==='轉診/退回') newStage = newResult;
 
   // 若是第一次填入掛號號碼，記錄等候開始時間
   if(newId && !c.id){
@@ -1590,7 +1981,6 @@ async function saveCard(id,sid){
       fields: {
         id:              newId,
         name:            newName,
-        phone:           newPhone,
         model:           newModel,
         mfgDate:         newMfgDate,
         faultDesc:       newFault,
@@ -1600,20 +1990,23 @@ async function saveCard(id,sid){
         repairResultDesc:newResDesc,
         bigCat:          newBigCat,
         item:            newItem,
+        subItem:         newSubItem,
+        prodName:        newProdName,
         accessories:     newAcc,
         noteTag:         newNoteTag,
         stage:           newStage,
+        photos:          buildPhotosJson(sid),  // 更新 AE 欄照片清單
       }
     });
 
     if(result.error) throw new Error(result.error);
 
     // 更新本機
-    c.id=newId; c.name=newName; c.phone=newPhone; c.model=newModel;
+    c.id=newId; c.name=newName; c.model=newModel;
     c.mfgDate=newMfgDate; c.faultDesc=newFault; c.repairNote=newRepNote;
     c.partCost=newPartCost; c.repairResult=newResult; c.repairResultDesc=newResDesc;
-    c.bigCat=newBigCat; c.item=newItem; c.stage=newStage; c.noteTag=newNoteTag;
-    c.accessories=newAcc;
+    c.bigCat=newBigCat; c.item=newItem; c.subItem=newSubItem; c.prodName=newProdName;
+    c.stage=newStage; c.noteTag=newNoteTag; c.accessories=newAcc;
     c.regNum=newId;
 
     btn.textContent='✓ 已儲存';
@@ -1685,16 +2078,35 @@ async function quickStageChange(newStage){
   const rowNum=parseInt(sid);
   const c=allCards.find(x=>x.rowNum===rowNum);
   if(!c)return;
-  const ci=STAGES.findIndex(s=>s.key===newStage);
-  const p=PALETTE[ci<0?0:ci];
+  const p=PALETTE[stageCi(newStage)];
   const qs=document.getElementById('m-quick-stage');
   if(qs){qs.style.borderColor=p.sbg;qs.style.color=p.circleColor;}
   const oldStage=c.stage;
+  const oldResult=c.repairResult;
   c.stage=newStage;
+  // 取消 / 轉診/退回 → 維修結果同步（GAS 也會同步 S 欄）
+  if(newStage==='取消' || newStage==='轉診/退回'){
+    c.repairResult=newStage;
+    const rs=document.getElementById('mi-result-'+sid);
+    if(rs){ rs.value=newStage; onResultChange(sid); }
+  }
 
   // ── 時間戳記錄 ──
   const now = Date.now();
   const postExtra = {};   // 附帶寫入 GAS 的時間欄位
+
+  // 切換到「未報到」→ 清除所有時間戳
+  if(newStage === '未報到'){
+    localStorage.removeItem(tsKey(c.rowNum));
+    postExtra.clearTime = true;  // 通知 GAS 清除 AA/AB/AC/AD
+  }
+
+  if(newStage === '等待維修'){
+    // 記錄等候開始
+    if(!getTs(c.rowNum).tsReg) setTs(c.rowNum, { tsReg: now });
+    const ts = getTs(c.rowNum);
+    postExtra.waitStart = new Date(ts.tsReg).toISOString();
+  }
 
   if(newStage === '維修中'){
     const patch = { tsRepStart: now };
@@ -1706,7 +2118,7 @@ async function quickStageChange(newStage){
       postExtra.waitMin = Math.floor((now - ts.tsReg) / 60000);
     }
   }
-  if(newStage === '待領取' || newStage === '已領取' || newStage === '取消/轉診/退回'){
+  if(newStage === '待領取' || newStage === '已領取' || newStage === '取消' || newStage === '轉診/退回'){
     const tsCur = getTs(c.rowNum);
     if(newStage === '待領取' && tsCur.tsRepStart && !tsCur.tsRepDone){
       setTs(c.rowNum, { tsRepDone: now });
@@ -1736,6 +2148,7 @@ async function quickStageChange(newStage){
     showToast('✓ 階段已同步');
   } catch(err) {
     c.stage=oldStage;
+    c.repairResult=oldResult;
     showToast('⚠️ 階段更新失敗');
     render();
   }
@@ -1782,7 +2195,7 @@ function ivSearch(){
   ).slice(0,8);
   if(!matches.length){wrap.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0;">找不到符合的送修家電</div>';return;}
   wrap.innerHTML=matches.map(c=>{
-    const stageIdx=STAGES.findIndex(s=>s.key===c.stage);
+    const stageIdx=STAGES.findIndex(s=>s.key===boardStage(c));
     const p=PALETTE[stageIdx<0?0:stageIdx];
     const idD=String(c.id||'').replace(/\D/g,'');
     const isSel=selectedCard&&selectedCard.id===c.id;
@@ -1948,26 +2361,40 @@ function renderStats(){
     return;
   }
   const total=allCards.length;
-  const done=allCards.filter(c=>c.stage==='已領取').length;
-  const referred=allCards.filter(c=>c.stage==='取消/轉診/退回').length;
-  const inProgress=allCards.filter(c=>c.stage==='維修中').length;
-  const waiting=allCards.filter(c=>c.stage==='等待維修').length;
-  const pending=allCards.filter(c=>c.stage==='未報到').length;
-  const readyPickup=allCards.filter(c=>c.stage==='待領取').length;
-  const repaired=done;
-  const failed=referred;
+  // 「取消」計入未報到；「轉診/退回」計入轉診/退回
+  const done=allCards.filter(c=>boardStage(c)==='已領取').length;
+  const referred=allCards.filter(c=>cancelType(c)==='轉診/退回').length;
+  const inProgress=allCards.filter(c=>boardStage(c)==='維修中').length;
+  const waiting=allCards.filter(c=>boardStage(c)==='等待維修').length;
+  const pending=allCards.filter(c=>boardStage(c)==='未報到'||cancelType(c)==='取消').length;
+  const readyPickup=allCards.filter(c=>boardStage(c)==='待領取').length;
+  // 成功維修率：分子=OK_成功，分母=OK_成功+NO_失敗，不論階段
+  const repaired=allCards.filter(c=>c.repairResult==='OK_成功').length;
+  const failed=allCards.filter(c=>c.repairResult==='NO_失敗').length;
   const attempted=repaired+failed;
+  // 整體維修概況：件送修 = OK_成功 + NO_失敗
+  const totalRepaired=attempted;
   const successRate=attempted?Math.round(repaired/attempted*100):0;
   const failRate=attempted?Math.round(failed/attempted*100):0;
+  // 環保貢獻：只計算 OK_成功 的卡片
+  const okCards = allCards.filter(c=>c.repairResult==='OK_成功');
+  const totalEcoKg   = okCards.reduce((s,c)=>s+parseFloat(c.ecoContrib   ||0), 0);
+  const totalCO2Kg   = okCards.reduce((s,c)=>s+parseFloat(c.ecoContribCO2||0), 0);
+  const truckLoad    = 3000; // 1輛垃圾車約 3 公噸 = 3000 kg
+  const treeAbsorb   = 22;   // 1棵樹每年吸收約 22 kg CO2
+  const truckCount   = totalEcoKg > 0 ? (totalEcoKg / truckLoad).toFixed(3) : 0;
+  const treeCount    = totalCO2Kg > 0 ? Math.round(totalCO2Kg / treeAbsorb) : 0;
+  // 送修家電分類、品項分析：只計算 OK_成功 + NO_失敗
+  const repairedCards = allCards.filter(c=>c.repairResult==='OK_成功'||c.repairResult==='NO_失敗');
   const catMap={};
-  allCards.forEach(c=>{const k=c.bigCat||'未分類';catMap[k]=(catMap[k]||0)+1;});
+  repairedCards.forEach(c=>{const k=c.bigCat||'未分類';catMap[k]=(catMap[k]||0)+1;});
   const catList=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
   const maxCat=Math.max(...catList.map(x=>x[1]),1);
   const itemMap={};
-  allCards.forEach(c=>{const k=c.item||c.endOfProduct||'未知';itemMap[k]=(itemMap[k]||0)+1;});
+  repairedCards.forEach(c=>{const k=c.item||c.endOfProduct||'未知';itemMap[k]=(itemMap[k]||0)+1;});
   const itemList=Object.entries(itemMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxItem=Math.max(...itemList.map(x=>x[1]),1);
-  const stageData=STAGES.map(s=>({label:s.key,count:allCards.filter(c=>c.stage===s.key).length,p:PALETTE[s.ci]}));
+  const stageData=STAGES.map(s=>({label:s.key,count:allCards.filter(c=>boardStage(c)===s.key).length,p:PALETTE[s.ci]}));
   const maxStage=Math.max(...stageData.map(x=>x.count),1);
   const ivTotal=interviews.length;
   const ivCards=new Set(interviews.map(r=>r.cardId)).size;
@@ -2016,18 +2443,30 @@ function renderStats(){
   <!-- 第一區塊：整體維修概況 -->
   <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">整體維修概況</div>
-    <div style="display:flex;gap:12px;align-items:stretch;">
-      <!-- 左：送修件數 -->
-      <div style="flex:1;border-right:1px solid var(--border);padding-right:12px;">
-        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${total}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px 40px;">
+      <!-- 件送修 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalRepaired}</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">件送修</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${waiting+inProgress+readyPickup} 件進行中</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">${waiting+inProgress+readyPickup} 件進行中</div>
       </div>
-      <!-- 右：成功維修率 -->
-      <div style="flex:1;padding-left:4px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:52px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
+      <!-- 成功維修率 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${successRate}%</div>
         <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">成功維修率</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">${repaired} 件成功修復</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">${repaired} 件已登記成功</div>
+      </div>
+      <!-- 減少廢棄物 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalEcoKg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少廢棄物</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">約 ${truckCount} 輛垃圾車進垃圾場</div>
+      </div>
+      <!-- 減少碳排放 -->
+      <div style="min-width:0;">
+        <div style="font-size:56px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;">${totalCO2Kg.toFixed(1)}<span style="font-size:20px;font-weight:600;margin-left:2px;">kg</span></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;font-weight:500;">減少碳排放 CO₂e</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">約種植了 ${treeCount} 棵樹</div>
       </div>
     </div>
   </div>
@@ -2036,32 +2475,32 @@ function renderStats(){
   <div class="stat-card" style="margin-bottom:12px;">
     <div class="stat-card-title">各階段分佈</div>
     <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px;">
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ff6d48;">
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ff6d48;font-family:'DM Mono',monospace;line-height:1;">${waiting}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">等待維修</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #ffab2d;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#ffab2d;font-family:'DM Mono',monospace;line-height:1;">${inProgress}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">維修中</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #0dae42;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#0dae42;font-family:'DM Mono',monospace;line-height:1;">${readyPickup}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">待領取</div>
         </div>
       </div>
-      <div style="display:flex;gap:7px;">
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #41bbff;">
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#41bbff;font-family:'DM Mono',monospace;line-height:1;">${done}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">已領取</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #2e2e2e;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#2e2e2e;font-family:'DM Mono',monospace;line-height:1;">${pending}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">未報到</div>
         </div>
-        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;border-left:3px solid #7c63ec;">
+        <div style="flex:1;padding:6px 0;">
           <div style="font-size:22px;font-weight:700;color:#7c63ec;font-family:'DM Mono',monospace;line-height:1;">${referred}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:3px;font-weight:500;">轉診/退回</div>
         </div>
       </div>
     </div>
@@ -2076,14 +2515,12 @@ function renderStats(){
          palette:['#0dae42','#5dca7a','#a8e8be','#c8c8c8']},
         {key:'NO_失敗',      label:'失敗',      accent:'#ff6d48',
          palette:['#ff6d48','#ff9b78','#ffc9b8','#c8c8c8']},
-        {key:'取消轉診退回', label:'轉診/退回', accent:'#7c63ec',
-         palette:['#7c63ec','#a394f5','#cec7fb','#c8c8c8']},
       ];
 
       function buildDonut(descList, cnt, totalAll, g){
         const R=42, cx=52, cy=52;
         const circ=2*Math.PI*R;
-        const pctAll=Math.round(cnt/totalAll*100);
+        const pctAll=totalAll?Math.round(cnt/totalAll*100):0;
         if(!descList.length) return '';
         let paths='', offset=0;
         descList.forEach(([k,v],i)=>{
@@ -2103,7 +2540,7 @@ function renderStats(){
           <text x="${cx}" y="${cy-7}" text-anchor="middle" dominant-baseline="central"
             font-size="18" font-weight="800" fill="${g.accent}" font-family="DM Mono,monospace">${cnt}</text>
           <text x="${cx}" y="${cy+10}" text-anchor="middle" dominant-baseline="central"
-            font-size="10" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
+            font-size="13" font-weight="600" fill="${g.accent}" font-family="DM Mono,monospace">${pctAll}%</text>
         </svg>`;
       }
 
@@ -2121,14 +2558,14 @@ function renderStats(){
           return `<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--border);">
             <div style="width:9px;height:9px;border-radius:2px;background:${color};flex-shrink:0;"></div>
             <div style="flex:1;font-size:12px;color:var(--text2);min-width:0;">${escH(k)}</div>
-            <div style="font-size:12px;font-weight:700;color:${color};font-family:'DM Mono',monospace;flex-shrink:0;white-space:nowrap;">${v} <span style="font-weight:400;color:var(--text3);">(${p2}%)</span></div>
+            <div style="font-size:13px;font-weight:700;color:${color};font-family:'DM Mono',monospace;flex-shrink:0;white-space:nowrap;">${v} <span style="font-weight:400;color:var(--text3);">(${p2}%)</span></div>
           </div>`;
         }).join('');
 
         return `<div style="margin-bottom:18px;padding-bottom:4px;border-bottom:2px solid var(--border);">
           <div style="font-size:13px;font-weight:700;color:${g.accent};margin-bottom:10px;">${g.label}</div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
-            ${buildDonut(descList,cnt,total,g)}
+            ${buildDonut(descList, cnt, attempted, g)}
             <div style="flex:1;min-width:0;">${legend}</div>
           </div>
         </div>`;
@@ -2170,7 +2607,7 @@ function renderStats(){
 const photoCache = {};
 function getPhotoCacheKey(sid, zone){ return sid + '__' + zone; }
 
-// 照片 metadata 持久化（只存 fileUrl/fileId，不存 base64）
+// 照片 metadata 持久化（存 fileId/fileUrl/dataUrl）
 function savePhotoMeta(sid, zone){
   const key = getPhotoCacheKey(sid, zone);
   const photos = (photoCache[key]||[]).map(p=>({
@@ -2178,18 +2615,29 @@ function savePhotoMeta(sid, zone){
     fileId:  p.fileId  || '',
     fileUrl: p.fileUrl || '',
     name:    p.name    || '',
+    dataUrl: p.status === 'done' ? (p.dataUrl || '') : '',
   }));
-  try{ localStorage.setItem('pm_'+key, JSON.stringify(photos)); }catch(e){}
+  try{ localStorage.setItem('pm_'+key, JSON.stringify(photos)); }catch(e){
+    // localStorage 空間不足時，只存 metadata 不存 dataUrl
+    const slim = photos.map(p=>({...p, dataUrl:''}));
+    try{ localStorage.setItem('pm_'+key, JSON.stringify(slim)); }catch(e2){}
+  }
 }
 function loadPhotoMeta(sid, zone){
   const key = getPhotoCacheKey(sid, zone);
   try{
     const saved = JSON.parse(localStorage.getItem('pm_'+key)||'[]');
-    // 還原為只有 metadata 的 entry（無 dataUrl/file，縮圖改用 fileUrl 顯示）
     if(!photoCache[key]) photoCache[key] = [];
     saved.forEach((m,i)=>{
       if(!photoCache[key][i]){
-        photoCache[key][i] = { dataUrl: '', file: null, status: m.status, fileId: m.fileId, fileUrl: m.fileUrl, name: m.name };
+        photoCache[key][i] = {
+          dataUrl: m.dataUrl || '',
+          file: null,
+          status:  m.status,
+          fileId:  m.fileId,
+          fileUrl: m.fileUrl,
+          name:    m.name
+        };
       }
     });
   }catch(e){}
@@ -2201,11 +2649,11 @@ function buildPhotoSection(c, sid, zone, maxCount){
   loadPhotoMeta(sid, zone);
   const photos = photoCache[key];
   const thumbsHtml = photos.map((p, i) => {
-    // 已上傳用 Drive 預覽連結，否則用 base64
-    const imgSrc = (p.status==='done' && p.fileId)
-      ? `https://drive.google.com/thumbnail?id=${p.fileId}&sz=w200`
-      : (p.dataUrl || '');
-    const clickAction = (p.status==='done' && p.fileUrl)
+    // 優先用 dataUrl，沒有才用 Drive thumbnail
+    const imgSrc = p.dataUrl
+      ? p.dataUrl
+      : (p.fileId ? `https://drive.google.com/thumbnail?id=${p.fileId}&sz=w200` : '');
+    const clickAction = p.fileUrl
       ? `window.open('${p.fileUrl}','_blank')`
       : (p.dataUrl ? `openLightbox('${p.dataUrl}')` : '');
     return `<div class="photo-thumb-wrap" id="pt-${escH(sid)}-${zone}-${i}">
@@ -2285,21 +2733,20 @@ function triggerPhotoInput(sid, zone, maxCount){
       entry.status = 'uploading';
       refreshPhotoThumbs(sid, zone, maxCount);
       try {
-        const r = await uploadPhotoToGAS(cardId, zone, idx, file, compressedDataUrl);
-        if(r && (r.success || r.fileId)){
+        const r = await uploadPhotoToGAS(cardId, zone, idx, file, compressedDataUrl, c ? c.rowNum : null);
+        // 顯示完整回傳（診斷用）
+        showToast('回傳:' + JSON.stringify(r).slice(0, 120), 6000);
+        if(r && !r.error){
           entry.status  = 'done';
-          entry.fileId  = r.fileId || '';
+          entry.fileId  = r.fileId  || '';
           entry.fileUrl = r.fileUrl || '';
-          savePhotoMeta(sid, zone); // 持久化到 localStorage
-          showToast('✓ 照片已上傳');
+          savePhotoMeta(sid, zone);
         } else {
           entry.status = 'fail';
-          const errMsg = r && r.error ? r.error : '回傳格式異常';
-          showToast('⚠️ ' + errMsg);
         }
       } catch(e){
         entry.status = 'fail';
-        showToast('catch錯誤:' + e.message.slice(0,80));
+        showToast('CATCH:' + e.message.slice(0, 120), 6000);
       }
       refreshPhotoThumbs(sid, zone, maxCount);
     });
@@ -2320,10 +2767,10 @@ function refreshPhotoThumbs(sid, zone, maxCount){
   const container = document.getElementById('photo-thumbs-'+sid+'-'+zone);
   if(!container) return;
   const thumbs = photos.map((p, i) => {
-    const imgSrc = (p.status==='done' && p.fileId)
-      ? `https://drive.google.com/thumbnail?id=${p.fileId}&sz=w200`
-      : (p.dataUrl || '');
-    const clickAction = (p.status==='done' && p.fileUrl)
+    const imgSrc = p.dataUrl
+      ? p.dataUrl
+      : (p.fileId ? `https://drive.google.com/thumbnail?id=${p.fileId}&sz=w200` : '');
+    const clickAction = p.fileUrl
       ? `window.open('${p.fileUrl}','_blank')`
       : (p.dataUrl ? `openLightbox('${p.dataUrl}')` : '');
     return `<div class="photo-thumb-wrap">
@@ -2346,6 +2793,7 @@ function deletePhoto(sid, zone, idx){
   photoCache[key].splice(idx, 1);
   savePhotoMeta(sid, zone);
   refreshPhotoThumbs(sid, zone, 2);
+  markDirty(sid);  // 讓儲存按鍵變可按
 }
 function openLightbox(dataUrl){
   const lb = document.createElement('div');
@@ -2358,7 +2806,7 @@ function openLightbox(dataUrl){
 // ══ 照片上傳（POST base64 → GAS → Drive）══
 const PHOTO_FOLDER_ID = '1SHI--kvSIul84RBgOC8efGtU7fuFmBTl';
 
-async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
+async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl, rowNum) {
   const ext  = (file.type || 'image/jpeg').split('/')[1] || 'jpg';
   const name = `${cardId}_${zone}_${idx+1}.${ext}`;
   const base64 = dataUrl.split(',')[1];
@@ -2367,7 +2815,9 @@ async function uploadPhotoToGAS(cardId, zone, idx, file, dataUrl) {
     action:   'uploadPhoto',
     fileName: name,
     mimeType: 'image/jpeg',
-    base64:   base64
+    base64:   base64,
+    rowNum:   rowNum,
+    zone:     zone
   });
 }
 
@@ -2416,10 +2866,10 @@ function setLBar(on){
   b.className='lbar'+(on?' on':' done');
   if(!on)setTimeout(()=>b.className='lbar',400);
 }
-function showToast(msg){
+function showToast(msg, duration){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'), duration||3000);
 }
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
