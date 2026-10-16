@@ -607,7 +607,7 @@ body:has(#page-intro.active){background:#fff;}
 /* 地圖 */
 .iv2-map{background:var(--i-soft);border-radius:26px;padding:22px 14px 16px;margin-top:20px;}
 .iv2-map svg.pv-map{display:block;width:100%;height:auto;}
-.pv-map-lbl{font-family:'Noto Sans TC',sans-serif;font-size:7px;fill:var(--i-gray);letter-spacing:.06em;}
+.pv-map-lbl{font-family:'Noto Sans TC',sans-serif;font-size:8.5px;fill:var(--i-gray);letter-spacing:.06em;}
 .iv2-legend{display:flex;justify-content:flex-end;gap:14px;font-size:11px;color:var(--i-gray);padding:4px 4px 0;}
 .iv2-legend span{display:inline-flex;align-items:center;gap:5px;}
 .iv2-mapstats{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:20px;}
@@ -626,6 +626,74 @@ body:has(#page-intro.active){background:#fff;}
 .iv2-lg-i span{flex:1;min-width:0;}
 .iv2-lg-i b{font-weight:600;font-size:13px;color:var(--i-gray);}
 @media(max-width:370px){.iv2-about-t{font-size:15px;}.iv2-tile-n{font-size:36px;}.iv2-big-n{font-size:52px;}.iv2-rate-n{font-size:60px;}}
+
+/* ── 簡介：捲動動態 ── */
+#page-intro [data-rv]{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms), transform .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms);
+}
+#page-intro [data-rv].in{opacity:1;transform:none;}
+#page-intro .iv2-hero img[data-rv]{transform:translateY(14px) scale(.9);}
+#page-intro .iv2-hero img[data-rv].in{transform:none;}
+.iv2-tile{transition:transform .35s cubic-bezier(.2,.65,.2,1), box-shadow .35s;}
+@media(hover:hover){.iv2-tile:hover{transform:translateY(-4px);box-shadow:0 14px 30px -18px rgba(30,60,40,.35);}}
+.iv2-loading{padding:140px 0;text-align:center;color:var(--i-gray2);font-size:13px;letter-spacing:.1em;}
+
+/* 地圖圓點依序出現 */
+.pv-map .iv2-dot{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0;
+  transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--d,0ms), opacity .3s ease var(--d,0ms);}
+.pv-map.in .iv2-dot{transform:scale(1);opacity:1;}
+
+/* 地圖 + 右側三張回憶照片 */
+.iv2-mapwrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:10px;margin-top:20px;}
+.iv2-mapwrap .iv2-map{margin-top:0;padding:16px 8px 12px;border-radius:22px;}
+.iv2-trips{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:10px;min-height:0;}
+.iv2-trip{
+  position:relative;border-radius:18px;overflow:hidden;background:var(--i-soft);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  color:var(--i-gray2);font-size:11px;font-weight:600;text-align:center;min-height:72px;
+  transition:transform .35s cubic-bezier(.2,.65,.2,1);
+}
+.iv2-trip svg{width:20px;height:20px;}
+.iv2-trip img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.65,.2,1);}
+@media(hover:hover){.iv2-trip:hover img{transform:scale(1.05);}}
+.iv2-trip-cap{
+  position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;text-align:left;
+  background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+  color:#fff;font-size:10.5px;font-weight:600;line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.iv2-tv{position:fixed;inset:0;z-index:999;background:rgba(15,20,17,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px;}
+.iv2-tv img{max-width:100%;max-height:68vh;border-radius:14px;object-fit:contain;}
+.iv2-tv-cap{color:#fff;font-size:14px;text-align:center;max-width:520px;line-height:1.6;}
+.iv2-tv-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.iv2-tv-btns button{padding:9px 16px;border-radius:999px;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
+.iv2-tv-btns button.pri{background:#fff;color:#1f2421;}
+
+/* 圓餅：掃描出現 + 互動 */
+.pv-donut .iv2-sweep{transition:stroke-dashoffset 1.4s cubic-bezier(.65,.05,.25,1) .1s;}
+.pv-donut.in .iv2-sweep{stroke-dashoffset:0;}
+.pv-donut .iv2-seg,.pv-donut .iv2-core{cursor:pointer;transition:transform .3s cubic-bezier(.2,.65,.2,1), opacity .3s;}
+.pv-donut text{pointer-events:none;transition:opacity .3s;}
+.pv-donut.hl .iv2-seg,.pv-donut.hl .iv2-core{opacity:.32;}
+.pv-donut.hl .iv2-seg.on,.pv-donut.hl .iv2-core.on{opacity:1;}
+.pv-donut .iv2-seg.on{transform:translate(var(--dx),var(--dy));}
+.iv2-readout{text-align:center;min-height:44px;margin:-8px 0 18px;font-size:13px;color:var(--i-gray2);line-height:1.6;}
+.iv2-readout b{display:block;font-size:15px;color:var(--i-ink);font-weight:700;}
+.iv2-readout .iv2-num{color:var(--i-green);font-weight:700;}
+.iv2-lg-i{cursor:pointer;border-radius:12px;padding:6px 8px;margin:0 -8px;transition:opacity .25s, background .25s;}
+.iv2-lg-i i{transition:transform .25s;}
+.iv2-lg-i span,.iv2-lg-i b{transition:font-size .25s cubic-bezier(.2,.65,.2,1), color .25s;}
+.iv2-lg.hl .iv2-lg-i{opacity:.4;}
+.iv2-lg .iv2-lg-i.on{opacity:1;background:var(--i-soft);}
+.iv2-lg-i.on i{transform:scale(1.35);}
+.iv2-lg-i.on span{font-size:17px;font-weight:700;color:var(--i-ink);}
+.iv2-lg-i.on b{font-size:16px;color:var(--i-ink);}
+
+@media (prefers-reduced-motion: reduce){
+  #page-intro [data-rv], .pv-map .iv2-dot{opacity:1!important;transform:none!important;transition:none!important;}
+  .pv-donut .iv2-sweep{stroke-dashoffset:0!important;transition:none!important;}
+}
 
 /* ══ GLOBAL UTILS ══ */
 .lbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
@@ -1146,7 +1214,11 @@ function switchTab(tab){
   const isRepair = tab === 'repair';
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
   if(tab==='stats') renderStats();
-  if(tab==='intro'){ renderIntro(); loadIntroSummary().then(renderIntro); }
+  if(tab==='intro'){
+    if(introData.at) renderIntro(true);
+    else document.getElementById('intro-root').innerHTML = '<div class="iv2-loading">載入中…</div>';
+    loadIntroSummary().then(()=>renderIntro());
+  }
   if(tab==='interview') renderInterviewLog();
 }
 
@@ -1333,7 +1405,6 @@ function loadExternalData(cards){
   });
   render();
   updateChipCounts();
-  if(currentTab==='intro') renderIntro();
   const now = new Date();
   setSyncState('ok', now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 同步');
 }
@@ -3154,31 +3225,37 @@ function buildRepairDonut(ok, no){
   if(!tot) return '';
   const cx=120, cy=120, R0=74, R1=82, R2=112, gap='#ffffff';
   const okDeg = okSum/tot*360;
-  let svg = `<svg viewBox="0 0 240 240" class="pv-donut" role="img" aria-label="成功與失敗維修分布">`;
-  let a = 0;
-  const seg = (items, shades) => items.forEach(([l,n],i)=>{
+  const C = (2*Math.PI*60).toFixed(1);
+  let svg = `<svg viewBox="0 0 240 240" class="pv-donut" role="img" aria-label="成功與失敗維修分布">
+    <defs><mask id="iv2-sweep" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="240">
+      <circle class="iv2-sweep" cx="120" cy="120" r="60" fill="none" stroke="#fff" stroke-width="122"
+        stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 120 120)"/>
+    </mask></defs><g mask="url(#iv2-sweep)">`;
+  let a = 0, labels = '';
+  const seg = (items, shades, grp) => items.forEach(([l,n],i)=>{
     const d = n/tot*360; if(d<=0) return;
-    svg += `<path d="${arcPath(cx,cy,R1,R2,a,a+d)}" fill="${shade(shades,i)}" stroke="${gap}" stroke-width="1.6"><title>${escH(l)} · ${n}</title></path>`;
+    const [dx,dy] = polar(0,0,6,a+d/2);
+    svg += `<path class="iv2-seg" data-seg="${grp}-${i}" style="--dx:${dx.toFixed(2)}px;--dy:${dy.toFixed(2)}px" d="${arcPath(cx,cy,R1,R2,a,a+d)}" fill="${shade(shades,i)}" stroke="${gap}" stroke-width="1.6"/>`;
     const pct = Math.round(n/tot*100);
     if(pct>=4){
       const [tx,ty] = polar(cx,cy,(R1+R2)/2,a+d/2);
-      svg += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-weight="600" font-size="9.5" fill="${i>=2?'#3a3f3b':'#ffffff'}">${pct}%</text>`;
+      labels += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-weight="600" font-size="9.5" fill="${i>=2?'#3a3f3b':'#ffffff'}">${pct}%</text>`;
     }
     a += d;
   });
-  seg(ok, OK_SHADES); seg(no, NO_SHADES);
-  svg += `<path d="${arcPath(cx,cy,0,R0,0,okDeg)}" fill="${OK_SHADES[0]}" stroke="${gap}" stroke-width="1.6"/>`;
-  if(noSum) svg += `<path d="${arcPath(cx,cy,0,R0,okDeg,360)}" fill="${NO_SHADES[1]}" stroke="${gap}" stroke-width="1.6"/>`;
+  seg(ok, OK_SHADES, 'ok'); seg(no, NO_SHADES, 'no');
+  svg += `<path class="iv2-core" data-grp="ok" d="${arcPath(cx,cy,0,R0,0,okDeg)}" fill="${OK_SHADES[0]}" stroke="${gap}" stroke-width="1.6"/>`;
+  if(noSum) svg += `<path class="iv2-core" data-grp="no" d="${arcPath(cx,cy,0,R0,okDeg,360)}" fill="${NO_SHADES[1]}" stroke="${gap}" stroke-width="1.6"/>`;
   const okPct = Math.round(okSum/tot*100), noPct = 100-okPct;
   const [ox,oy] = noSum ? polar(cx,cy,R0*0.42,okDeg/2) : [cx,cy];
-  svg += `<text x="${ox.toFixed(1)}" y="${(oy-8).toFixed(1)}" text-anchor="middle" font-family="Noto Sans TC,sans-serif" font-size="11" font-weight="600" fill="#ffffff">成功</text>`;
-  svg += `<text x="${ox.toFixed(1)}" y="${(oy+11).toFixed(1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="700" fill="#ffffff">${okPct}%</text>`;
+  labels += `<text x="${ox.toFixed(1)}" y="${(oy-8).toFixed(1)}" text-anchor="middle" font-family="Noto Sans TC,sans-serif" font-size="11" font-weight="600" fill="#ffffff">成功</text>`;
+  labels += `<text x="${ox.toFixed(1)}" y="${(oy+11).toFixed(1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="700" fill="#ffffff">${okPct}%</text>`;
   if(noSum && noPct>=6){
     const [nx,ny] = polar(cx,cy,R0*0.55,okDeg+(360-okDeg)/2);
-    svg += `<text x="${nx.toFixed(1)}" y="${(ny-6).toFixed(1)}" text-anchor="middle" font-family="Noto Sans TC,sans-serif" font-size="10" font-weight="600" fill="#5a3b08">失敗</text>`;
-    svg += `<text x="${nx.toFixed(1)}" y="${(ny+10).toFixed(1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#5a3b08">${noPct}%</text>`;
+    labels += `<text x="${nx.toFixed(1)}" y="${(ny-6).toFixed(1)}" text-anchor="middle" font-family="Noto Sans TC,sans-serif" font-size="10" font-weight="600" fill="#5a3b08">失敗</text>`;
+    labels += `<text x="${nx.toFixed(1)}" y="${(ny+10).toFixed(1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#5a3b08">${noPct}%</text>`;
   }
-  return svg + `</svg>`;
+  return svg + labels + `</g></svg>`;
 }
 
 function buildMapSvg(places){
@@ -3187,17 +3264,21 @@ function buildMapSvg(places){
   const insetName = {matsu:'馬祖', kinmen:'金門'};
   for(const k in M.insets){
     const [x,y,w,h] = M.insets[k];
-    s += `<rect x="${x-5}" y="${y-5}" width="${w+10}" height="${h+19}" rx="6" fill="#ffffff"/>`;
-    s += `<text x="${x-1}" y="${y+h+10}" class="pv-map-lbl">${insetName[k]}</text>`;
+    s += `<rect x="${x-5}" y="${y-5}" width="${w+10}" height="${h+21}" rx="6" fill="#ffffff"/>`;
+    s += `<text x="${x-1}" y="${y+h+12}" class="pv-map-lbl">${insetName[k]}</text>`;
   }
   s += M.paths.map(p=>`<path d="${p.d}" fill="var(--i-land)" stroke="var(--i-soft)" stroke-width="${p.g==='main'?0.6:0}"/>`).join('');
   const lab = (key, txt, dx, dy) => { const xy = M.towns[key] || M.counties[key]; return xy ? `<text x="${(xy[0]+dx).toFixed(1)}" y="${(xy[1]+dy).toFixed(1)}" class="pv-map-lbl">${txt}</text>` : ''; };
-  s += lab('澎湖縣','澎湖',-7,32) + lab('台東縣綠島鄉','綠島',7,2.5) + lab('台東縣蘭嶼鄉','蘭嶼',7,2.5) + lab('屏東縣琉球鄉','小琉球',-26,2.5);
-  // 每去一次 = 一個半透明圓點，重疊越多顏色越深
-  places.forEach(p=>{
+  s += lab('澎湖縣','澎湖',-8,34) + lab('台東縣綠島鄉','綠島',7,3) + lab('台東縣蘭嶼鄉','蘭嶼',7,3) + lab('屏東縣琉球鄉','小琉球',-30,3);
+  // 每去一次 = 一個半透明圓點，重疊越多顏色越深；由北往南依序出現
+  const order = places.map((p,i)=>[i,p.xy[1]]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+  const rank = {}; order.forEach((idx,r)=>rank[idx]=r);
+  places.forEach((p,i)=>{
     const [x,y] = p.xy, n = Math.min(Math.round(p.count), 10);
-    for(let i=0;i<n;i++) s += `<circle cx="${x}" cy="${y}" r="4.4" fill="#1e7a4c" fill-opacity=".28"/>`;
-    s += `<circle cx="${x}" cy="${y}" r="7" fill="transparent"><title>${escH(p.name)} · ${p.count} 次</title></circle>`;
+    const delay = Math.min(rank[i]*55, 1600) + 250;
+    s += `<g class="iv2-dot" style="--d:${delay}ms">`;
+    for(let k=0;k<n;k++) s += `<circle cx="${x}" cy="${y}" r="5" fill="#1e7a4c" fill-opacity=".28"/>`;
+    s += `<circle cx="${x}" cy="${y}" r="8" fill="transparent"><title>${escH(p.name)} · ${p.count} 次</title></circle></g>`;
   });
   return s + `</svg>`;
 }
@@ -3212,17 +3293,157 @@ const ICONS = {
   course:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5"/></svg>',
   waste:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>',
   co2:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-5.5-7-10 3 0 5.5 1 7 3 1.5-2 4-3 7-3 0 4.5-3 8-7 10z"/><path d="M12 14V3"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="3.5"/><path d="M20.5 7H17l-2-3H9L7 7H3.5A1.5 1.5 0 0 0 2 8.5v11A1.5 1.5 0 0 0 3.5 21h17a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 20.5 7z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
 };
 
-function renderIntro(){
+// ── 數字跳動 ──
+function parseCount(t){
+  const m = /^(\D*?)(\d[\d,]*(?:\.\d+)?)(.*)$/.exec(String(t||'').trim());
+  if(!m) return null;
+  const raw = m[2], target = parseFloat(raw.replace(/,/g,''));
+  const dec = (raw.split('.')[1]||'').length, grp = raw.includes(',');
+  return { target, fmt: v => m[1] + v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec,useGrouping:grp}) + m[3] };
+}
+function runCount(el){
+  const f = parseCount(el.dataset.count);
+  if(!f){ el.textContent = el.dataset.count; return; }
+  const t0 = performance.now(), dur = 1600;
+  const step = now => {
+    const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,4);
+    el.textContent = f.fmt(f.target*e);
+    if(k<1) requestAnimationFrame(step); else el.textContent = el.dataset.count;
+  };
+  requestAnimationFrame(step);
+}
+const cnt = t => { const x = escH(t); return parseCount(t) ? `<span data-count="${x}">${x}</span>` : x; };
+
+// ── 捲動出現 ──
+let _introObs = null;
+function initIntroMotion(root){
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(_introObs) _introObs.disconnect();
+  const targets = root.querySelectorAll('[data-rv],[data-count],.pv-map,.pv-donut');
+  if(reduce || !('IntersectionObserver' in window)){ targets.forEach(el=>el.classList.add('in')); return; }
+  root.querySelectorAll('[data-count]').forEach(el=>{ const f = parseCount(el.dataset.count); if(f) el.textContent = f.fmt(0); });
+  _introObs = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(!en.isIntersecting) return;
+      const el = en.target;
+      el.classList.add('in');
+      if(el.dataset.count !== undefined) runCount(el);
+      _introObs.unobserve(el);
+    });
+  }, { threshold:0.18, rootMargin:'0px 0px -6% 0px' });
+  targets.forEach(el=>_introObs.observe(el));
+}
+
+// ── 圓餅與圖例連動 ──
+let INTRO_SEG_INFO = {};
+function introHighlight(key){
+  const root = document.getElementById('intro-root');
+  const donut = root.querySelector('.pv-donut'), lg = root.querySelector('.iv2-lg'), ro = root.querySelector('.iv2-readout');
+  if(!donut || !lg) return;
+  const isGrp = key && key.startsWith('grp:');
+  const g = isGrp ? key.slice(4) : '';
+  root.querySelectorAll('[data-seg]').forEach(el=>{
+    const k = el.dataset.seg;
+    el.classList.toggle('on', !!key && (isGrp ? k.startsWith(g+'-') : k===key));
+  });
+  root.querySelectorAll('.iv2-core').forEach(el=>el.classList.toggle('on', !!key && (isGrp ? el.dataset.grp===g : (key||'').startsWith(el.dataset.grp+'-'))));
+  donut.classList.toggle('hl', !!key);
+  lg.classList.toggle('hl', !!key);
+  const info = key && INTRO_SEG_INFO[key];
+  if(ro) ro.innerHTML = info ? `<b>${escH(info.label)}</b><span class="iv2-num">${info.n.toLocaleString('en-US')}</span> 件・<span class="iv2-num">${info.pct}</span>`
+                             : '將滑鼠移到圓餅上（手機請點選），查看各項細節';
+  if(info && !isGrp){
+    const item = lg.querySelector(`.iv2-lg-i[data-seg="${key}"]`);
+    if(item && window.matchMedia('(hover:none)').matches) item.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }
+}
+function bindDonut(root){
+  const donut = root.querySelector('.pv-donut'), lg = root.querySelector('.iv2-lg');
+  if(!donut || !lg) return;
+  const keyOf = el => {
+    const s = el.closest('[data-seg]'); if(s) return s.dataset.seg;
+    const c = el.closest('.iv2-core'); if(c) return 'grp:'+c.dataset.grp;
+    return null;
+  };
+  let pinned = null;
+  [donut, lg].forEach(box=>{
+    box.addEventListener('pointerover', e=>{ if(e.pointerType==='touch') return; const k = keyOf(e.target); if(k) introHighlight(k); });
+    box.addEventListener('pointerleave', e=>{ if(e.pointerType==='touch') return; introHighlight(pinned); });
+    box.addEventListener('click', e=>{ const k = keyOf(e.target); pinned = (k && k!==pinned) ? k : null; introHighlight(pinned); });
+  });
+}
+
+// ── 照片：團隊照片 + 三張回憶照片（存在這台裝置）──
+function photoInner(photo){
+  return photo ? `<img src="${escH(photo)}" alt="團隊照片"><span class="iv2-photo-chg">更換</span>`
+               : `${ICONS.camera}點此上傳<br>團隊照片`;
+}
+function getTrip(i){ try{ return JSON.parse(localStorage.getItem('introTrip'+i)||'null') || {}; }catch(e){ return {}; } }
+function tripInner(i){
+  const t = getTrip(i);
+  if(t.img) return `<img src="${t.img}" alt="${escH(t.cap||'回憶照片')}">${t.cap ? `<span class="iv2-trip-cap">${escH(t.cap)}</span>` : ''}`;
+  return `${ICONS.plus}<span>回憶照片 ${i+1}</span>`;
+}
+function refreshTrip(i){
+  const el = document.querySelector(`.iv2-trip[data-trip="${i}"]`);
+  if(el) el.innerHTML = tripInner(i);
+}
+function tripClick(i){ getTrip(i).img ? openTripView(i) : pickTripPhoto(i); }
+function pickTripPhoto(i){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(){
+    if(!inp.files || !inp.files[0]) return;
+    compressImage(inp.files[0], function(dataUrl){
+      const old = getTrip(i);
+      const cap = prompt('照片說明（例如：2019 澎湖馬公，可留空）：', old.cap || '');
+      try{ localStorage.setItem('introTrip'+i, JSON.stringify({ img:dataUrl, cap: cap===null ? (old.cap||'') : cap.trim() })); }
+      catch(e){ showToast('⚠️ 照片太大，無法儲存'); return; }
+      refreshTrip(i);
+    });
+  };
+  inp.click();
+}
+function openTripView(i){
+  const t = getTrip(i);
+  const ov = document.createElement('div');
+  ov.className = 'iv2-tv';
+  ov.innerHTML = `<img src="${t.img}" alt="">
+    ${t.cap ? `<div class="iv2-tv-cap">${escH(t.cap)}</div>` : ''}
+    <div class="iv2-tv-btns">
+      <button data-a="change">更換照片</button><button data-a="cap">修改說明</button><button data-a="del">移除</button><button class="pri" data-a="close">關閉</button>
+    </div>`;
+  ov.onclick = e => {
+    const a = e.target.dataset && e.target.dataset.a;
+    if(e.target===ov || a==='close'){ ov.remove(); return; }
+    if(a==='change'){ ov.remove(); pickTripPhoto(i); }
+    if(a==='cap'){
+      const cap = prompt('照片說明：', t.cap||'');
+      if(cap!==null){ try{ localStorage.setItem('introTrip'+i, JSON.stringify({ img:t.img, cap:cap.trim() })); }catch(err){} refreshTrip(i); ov.remove(); }
+    }
+    if(a==='del' && confirm('確定移除這張照片？')){ try{ localStorage.removeItem('introTrip'+i); }catch(err){} refreshTrip(i); ov.remove(); }
+  };
+  document.body.appendChild(ov);
+}
+
+let _introSig = '';
+function renderIntro(force){
   const root = document.getElementById('intro-root');
   if(!root) return;
+  const sig = JSON.stringify([introData.summary && introData.summary.display, introData.footprint && introData.footprint.display, introData.state]);
+  if(!force && sig===_introSig && root.querySelector('.iv2-sec')) return;
+  _introSig = sig;
+
   const logoSrc = (document.querySelector('.topbar-logo-img')||{}).src || '';
   let photo = '';
   try{ photo = localStorage.getItem('introPhoto') || ''; }catch(e){}
   if(!photo && cellText(INTRO_CELLS.photoUrl)) photo = driveThumb(cellText(INTRO_CELLS.photoUrl));
 
-  const val = a1 => escH(cellText(a1) || '—');
+  const val = a1 => cnt(cellText(a1) || '—');
   const fp  = getFootprint();
   const rep = getRepairBreakdown();
   const okSum = rep.ok.reduce((s,x)=>s+x[1],0), noSum = rep.no.reduce((s,x)=>s+x[1],0), tot = okSum+noSum || 1;
@@ -3235,9 +3456,15 @@ function renderIntro(){
   const top = fp.places[0];
   const yearsTxt = fp.yMin ? (fp.yMin===fp.yMax ? `${fp.yMin}` : `${fp.yMin}–${fp.yMax}`) : '';
 
-  const legendGroup = (title, items, shades) => items.length ? `
+  // 圓餅細項資訊（給互動用）
+  const pctTxt = n => (n/tot*100)<1 ? '<1%' : Math.round(n/tot*100)+'%';
+  INTRO_SEG_INFO = { 'grp:ok':{label:'成功', n:okSum, pct:pctTxt(okSum)}, 'grp:no':{label:'失敗', n:noSum, pct:pctTxt(noSum)} };
+  rep.ok.forEach(([l,n],i)=>INTRO_SEG_INFO['ok-'+i] = {label:shortLabel(l), n, pct:pctTxt(n)});
+  rep.no.forEach(([l,n],i)=>INTRO_SEG_INFO['no-'+i] = {label:shortLabel(l), n, pct:pctTxt(n)});
+
+  const legendGroup = (title, items, shades, grp) => items.length ? `
     <div><div class="iv2-lg-h">${title}</div>
-      ${items.map(([l,n],i)=>`<div class="iv2-lg-i"><i style="background:${shade(shades,i)}"></i><span>${escH(shortLabel(l))}</span><b class="iv2-num">${(n/tot*100)<1 ? '&lt;1' : Math.round(n/tot*100)}%</b></div>`).join('')}
+      ${items.map(([l,n],i)=>`<div class="iv2-lg-i" data-seg="${grp}-${i}"><i style="background:${shade(shades,i)}"></i><span>${escH(shortLabel(l))}</span><b class="iv2-num">${escH(pctTxt(n))}</b></div>`).join('')}
     </div>` : '';
 
   const notes = [];
@@ -3248,71 +3475,73 @@ function renderIntro(){
 
   root.innerHTML = `
   <section class="iv2-sec iv2-hero">
-    ${logoSrc ? `<img src="${logoSrc}" alt="小家電維修所">` : ''}
-    <div class="iv2-hero-t">小家電維修所</div>
-    <div class="iv2-hero-s">SINCE 2016</div>
+    ${logoSrc ? `<img src="${logoSrc}" alt="小家電維修所" data-rv>` : ''}
+    <div class="iv2-hero-t" data-rv style="--d:120ms">小家電維修所</div>
+    <div class="iv2-hero-s" data-rv style="--d:220ms">SINCE 2016</div>
   </section>
 
   <section class="iv2-sec">
-    <div class="iv2-eyebrow">01　關於我們</div>
+    <div class="iv2-eyebrow" data-rv>01　關於我們</div>
     <div class="iv2-about">
-      <div class="iv2-about-t">創立於 <b class="iv2-num">2016</b> 年，我們是由一群各自有正職工作，利用假日透過維修回饋社會的「家電醫生」。</div>
-      <div class="iv2-photo" onclick="pickIntroPhoto()">
-        ${photo ? `<img src="${escH(photo)}" alt="團隊照片"><span class="iv2-photo-chg">更換</span>`
-                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="3.5"/><path d="M20.5 7H17l-2-3H9L7 7H3.5A1.5 1.5 0 0 0 2 8.5v11A1.5 1.5 0 0 0 3.5 21h17a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 20.5 7z"/></svg>點此上傳<br>團隊照片`}
-      </div>
+      <div class="iv2-about-t" data-rv style="--d:80ms">創立於 <b class="iv2-num">2016</b> 年，我們是由一群各自有正職工作，利用假日透過維修回饋社會的「家電醫生」。</div>
+      <div class="iv2-photo" data-rv style="--d:200ms" onclick="pickIntroPhoto()">${photoInner(photo)}</div>
     </div>
   </section>
 
   <section class="iv2-sec">
-    <div class="iv2-eyebrow">02　一路走來</div>
-    <div class="iv2-h">走進社區，一場一場累積</div>
+    <div class="iv2-eyebrow" data-rv>02　一路走來</div>
+    <div class="iv2-h" data-rv style="--d:80ms">走進社區，一場一場累積</div>
     <div class="iv2-tiles">
-      <div class="iv2-tile" style="background:var(--i-green-t);color:var(--i-green);">
+      <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-green-t);color:var(--i-green);">
         ${ICONS.clinic}
-        <div class="iv2-tile-n iv2-num" style="color:var(--i-ink);">${val(INTRO_CELLS.clinics)}<span class="iv2-tile-u">場</span></div>
+        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.clinics)}<span class="iv2-tile-u">場</span></div>
         <div class="iv2-tile-l">家電義診</div>
       </div>
-      <div class="iv2-tile" style="background:var(--i-yellow-t);color:#b9781a;">
+      <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-yellow-t);color:#b9781a;">
         ${ICONS.course}
-        <div class="iv2-tile-n iv2-num" style="color:var(--i-ink);">${val(INTRO_CELLS.courses)}<span class="iv2-tile-u">場</span></div>
+        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.courses)}<span class="iv2-tile-u">場</span></div>
         <div class="iv2-tile-l">工作坊／課程</div>
       </div>
     </div>
   </section>
 
   <section class="iv2-sec">
-    <div class="iv2-eyebrow">03　社會效益</div>
-    <div class="iv2-h">每一台修好的家電，都是少一份廢棄物</div>
-    <div class="iv2-big">
+    <div class="iv2-eyebrow" data-rv>03　社會效益</div>
+    <div class="iv2-h" data-rv style="--d:80ms">每一台修好的家電，都是少一份廢棄物</div>
+    <div class="iv2-big" data-rv style="--d:140ms">
       <div><span class="iv2-big-n iv2-num">${val(INTRO_CELLS.repaired)}</span><span class="iv2-big-u">台</span></div>
       <div class="iv2-big-l">總共維修的小家電</div>
     </div>
     <div class="iv2-tiles">
-      <div class="iv2-tile" style="background:var(--i-soft);color:var(--i-gray);">
+      <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-soft);color:var(--i-gray);">
         ${ICONS.waste}
         <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少廢棄物</div>
       </div>
-      <div class="iv2-tile" style="background:var(--i-green-t);color:var(--i-green);">
+      <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-green-t);color:var(--i-green);">
         ${ICONS.co2}
-        <div class="iv2-tile-n iv2-num" style="color:var(--i-ink);">${val(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
+        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少碳排放 CO₂e</div>
       </div>
     </div>
   </section>
 
   <section class="iv2-sec">
-    <div class="iv2-eyebrow">04　足跡</div>
-    <div class="iv2-h">我們去過的地方${fp.sample ? sampleTag : ''}</div>
-    <div class="iv2-p">每一場維修健檢是一個圓點，顏色越深代表去過越多次。</div>
-    <div class="iv2-map">
-      ${buildMapSvg(fp.places)}
-      <div class="iv2-legend"><span>${legendDot(1)}1 次</span><span>${legendDot(3)}3 次</span><span>${legendDot(6)}6 次以上</span></div>
+    <div class="iv2-eyebrow" data-rv>04　足跡</div>
+    <div class="iv2-h" data-rv style="--d:80ms">我們去過的地方${fp.sample ? sampleTag : ''}</div>
+    <div class="iv2-p" data-rv style="--d:140ms">每一場維修健檢是一個圓點，顏色越深代表去過越多次。</div>
+    <div class="iv2-mapwrap">
+      <div class="iv2-map" data-rv style="--d:120ms">
+        ${buildMapSvg(fp.places)}
+        <div class="iv2-legend"><span>${legendDot(1)}1</span><span>${legendDot(3)}3</span><span>${legendDot(6)}6+ 次</span></div>
+      </div>
+      <div class="iv2-trips">
+        ${[0,1,2].map(i=>`<div class="iv2-trip" data-trip="${i}" data-rv style="--d:${260+i*120}ms" onclick="tripClick(${i})">${tripInner(i)}</div>`).join('')}
+      </div>
     </div>
-    <div class="iv2-mapstats">
-      <div><b class="iv2-num">${fp.visits}</b>場維修健檢</div>
-      <div><b class="iv2-num">${fp.places.length}</b>個地點</div>
+    <div class="iv2-mapstats" data-rv style="--d:100ms">
+      <div><b class="iv2-num">${cnt(String(fp.visits))}</b>場維修健檢</div>
+      <div><b class="iv2-num">${cnt(String(fp.places.length))}</b>個地點</div>
       ${yearsTxt ? `<div><b class="iv2-num">${yearsTxt}</b>年份</div>` : ''}
     </div>
     <div class="iv2-note">
@@ -3323,17 +3552,21 @@ function renderIntro(){
   </section>
 
   <section class="iv2-sec">
-    <div class="iv2-eyebrow">05　維修成果</div>
-    <div class="iv2-h">整體維修率${rep.source==='sample' ? sampleTag : ''}</div>
-    <div class="iv2-rate-n iv2-num">${escH(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
-    <div class="iv2-rate-s">成功 <span class="iv2-num">${escH(okTxt)}</span> 件・失敗 <span class="iv2-num">${escH(noTxt)}</span> 件</div>
+    <div class="iv2-eyebrow" data-rv>05　維修成果</div>
+    <div class="iv2-h" data-rv style="--d:80ms">整體維修率${rep.source==='sample' ? sampleTag : ''}</div>
+    <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
+    <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
     ${buildRepairDonut(rep.ok, rep.no)}
-    <div class="iv2-lg">
-      ${legendGroup('成功', rep.ok, OK_SHADES)}
-      ${legendGroup('失敗', rep.no, NO_SHADES)}
+    <div class="iv2-readout">將滑鼠移到圓餅上（手機請點選），查看各項細節</div>
+    <div class="iv2-lg" data-rv>
+      ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
+      ${legendGroup('失敗', rep.no, NO_SHADES, 'no')}
     </div>
     ${notes.length ? `<div class="iv2-note">${notes.join('<br>')}</div>` : ''}
   </section>`;
+
+  bindDonut(root);
+  initIntroMotion(root);
 }
 
 function pickIntroPhoto(){
@@ -3344,7 +3577,8 @@ function pickIntroPhoto(){
     compressImage(inp.files[0], function(dataUrl){
       try{ localStorage.setItem('introPhoto', dataUrl); }
       catch(e){ showToast('⚠️ 照片太大，無法儲存'); return; }
-      renderIntro();
+      const el = document.querySelector('#intro-root .iv2-photo');
+      if(el) el.innerHTML = photoInner(dataUrl);
     });
   };
   inp.click();
