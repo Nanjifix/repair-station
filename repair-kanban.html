@@ -576,95 +576,261 @@ input:checked+.slider::before{transform:translateX(20px);}
 .bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
 
-/* ══ INTRO PAGE（成果展示：白底、簡潔）══ */
+/* ══ INTRO PAGE（成果展示 / 簡報）══════════════════════════════
+   一套字級、一套間距：所有區塊共用，手機到大螢幕依視窗寬度平滑縮放
+   ─────────────────────────────────────────────────────────── */
 #page-intro{
+  /* 色彩 */
   --i-ink:#1f2421; --i-gray:#5f6663; --i-gray2:#9aa19d; --i-soft:#f4f6f3;
   --i-green:#1e7a4c; --i-green-t:#e9f4ed; --i-yellow:#e3a03a; --i-yellow-t:#fcf2df;
   --i-land:#e1e6e0;
+  /* 字級（6 種文字 + 3 種數字）*/
+  --fs-display: clamp(30px, 1.6vw + 22px, 52px);
+  --fs-h:       clamp(23px, 1.2vw + 17px, 40px);
+  --fs-lead:    clamp(16px, .4vw + 14.4px, 21px);
+  --fs-body:    clamp(14.5px, .22vw + 13.6px, 17px);
+  --fs-small:   clamp(12.5px, .1vw + 12.1px, 14px);
+  --fs-eyebrow: clamp(12px, .1vw + 11.6px, 13.5px);
+  --fs-num-xl:  clamp(60px, 5vw + 32px, 120px);
+  --fs-num-l:   clamp(32px, 1.9vw + 24px, 58px);
+  --fs-num-m:   clamp(24px, .9vw + 20px, 36px);
+  /* 行高 */
+  --lh-head:1.32; --lh-text:1.8;
+  /* 間距 */
+  --sp-head:  clamp(24px, 2.2vw + 14px, 44px);   /* 標題 → 內容 */
+  --sp-block: clamp(18px, 1.4vw + 12px, 32px);   /* 內容區塊之間 */
+  --sp-slide: clamp(88px, 6vw + 64px, 140px);    /* 區塊之間（手機 / 平板）*/
+  --r-card:   clamp(20px, 1vw + 16px, 28px);
   background:#fff;color:var(--i-ink);
   min-height:calc(100% - 64px);
 }
 body:has(#page-intro.active){background:#fff;}
-.iv2{max-width:520px;margin:0 auto;padding:40px 22px 88px;}
-.iv2-sec{margin-bottom:76px;}
-.iv2-sec:last-child{margin-bottom:24px;}
-.iv2-eyebrow{font-size:12px;font-weight:600;color:var(--i-green);letter-spacing:.1em;margin-bottom:10px;}
-.iv2-h{font-size:22px;font-weight:700;line-height:1.45;letter-spacing:.01em;}
-.iv2-p{font-size:14px;color:var(--i-gray);line-height:1.8;margin-top:6px;}
+#page-intro, #page-intro button{font-family:'Noto Sans TC',system-ui,sans-serif;}
+
+.iv2{max-width:1160px;margin:0 auto;padding:clamp(40px,4vw,72px) clamp(22px,4vw,64px) clamp(80px,6vw,120px);}
+.iv2-slide{margin-bottom:var(--sp-slide);}
+.iv2-slide:last-child{margin-bottom:0;}
+.iv2-wrap{width:100%;}
+.iv2-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-head);}
+
+/* ── 共用文字 ── */
 .iv2-num{font-family:'Inter','Noto Sans TC',sans-serif;font-feature-settings:'tnum' 1;letter-spacing:-.025em;}
-.iv2-note{font-size:12.5px;color:var(--i-gray2);line-height:1.7;margin-top:14px;}
-.iv2-tag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--i-yellow-t);color:#93600f;font-size:11px;font-weight:600;vertical-align:3px;}
+.iv2-eyebrow{font-size:var(--fs-eyebrow);font-weight:700;color:var(--i-green);letter-spacing:.14em;margin-bottom:12px;}
+.iv2-h{font-size:var(--fs-h);font-weight:700;line-height:var(--lh-head);letter-spacing:.01em;text-wrap:balance;}
+.iv2-p b{color:var(--i-ink);font-weight:700;}
+.iv2-p,.iv2-lead{font-size:var(--fs-lead);line-height:var(--lh-text);color:var(--i-gray);margin-top:14px;max-width:38em;}
+.iv2-lead b{color:var(--i-ink);font-weight:700;}
+.iv2-head{margin-bottom:var(--sp-head);}
+.iv2-sub{font-size:var(--fs-eyebrow);font-weight:700;color:var(--i-gray2);letter-spacing:.14em;margin:0 0 14px;}
+.iv2-note{font-size:var(--fs-small);color:var(--i-gray2);line-height:1.7;margin-top:16px;}
+.iv2-note:empty{display:none;}
+.iv2-tag{display:inline-block;margin-left:10px;padding:2px 9px;border-radius:999px;background:var(--i-yellow-t);color:#93600f;font-size:var(--fs-small);font-weight:600;vertical-align:.25em;letter-spacing:0;}
 
-/* 首屏 */
-.iv2-hero{text-align:center;padding:8px 0 4px;}
-.iv2-hero img{width:128px;height:128px;object-fit:contain;}
-.iv2-hero-t{font-size:24px;font-weight:700;margin-top:18px;letter-spacing:.06em;}
-.iv2-hero-s{font-size:12px;color:var(--i-gray2);letter-spacing:.24em;margin-top:8px;}
-
-/* 關於我們 */
-.iv2-about{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:center;margin-top:16px;}
-.iv2-about-t{font-size:17px;line-height:1.95;font-weight:500;color:var(--i-ink);}
+/* ── 01 封面 + 關於我們 ── */
+.iv2-hero{text-align:center;margin-bottom:clamp(56px,5vw,88px);}
+.iv2-hero img{width:clamp(104px,6vw + 80px,160px);height:auto;aspect-ratio:1/1;object-fit:contain;}
+.iv2-hero-t{font-size:var(--fs-display);font-weight:700;margin-top:18px;letter-spacing:.08em;line-height:1.2;}
+.iv2-hero-s{font-size:var(--fs-small);color:var(--i-gray2);letter-spacing:.32em;margin-top:10px;}
+.iv2-about{display:grid;gap:var(--sp-block);}
+.iv2-about-t{font-size:var(--fs-h);line-height:1.6;font-weight:500;color:var(--i-ink);}
 .iv2-about-t b{color:var(--i-green);font-weight:700;}
 .iv2-photo{
-  position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;cursor:pointer;background:var(--i-soft);
+  position:relative;aspect-ratio:4/3;border-radius:var(--r-card);overflow:hidden;cursor:pointer;background:var(--i-soft);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  color:var(--i-gray2);font-size:12px;text-align:center;line-height:1.5;
+  color:var(--i-gray2);font-size:var(--fs-small);text-align:center;line-height:1.5;
 }
-.iv2-photo svg{width:26px;height:26px;}
-.iv2-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.iv2-photo svg{width:28px;height:28px;}
+.iv2-photo img,.iv2-trip img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--i-soft);}
+.iv2-tags{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:var(--sp-block);}
+.iv2-tagc{padding:.5em 1.1em;border-radius:999px;background:var(--i-green-t);color:var(--i-green);font-size:var(--fs-small);font-weight:600;letter-spacing:.02em;}
+.iv2-tagc:nth-child(2n){background:var(--i-yellow-t);color:#a96c12;}
 .iv2-upl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--i-ink);font-size:11px;font-weight:600;white-space:nowrap;}
 .iv2-upl i{width:11px;height:11px;border-radius:50%;border:2px solid var(--i-green);border-right-color:transparent;animation:spin .8s linear infinite;}
-.iv2-photo img,.iv2-trip img{background:var(--i-soft);}
-.iv2-photo-chg{position:absolute;right:8px;bottom:8px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.9);color:var(--i-ink);font-size:11px;font-weight:600;}
 
-/* 數字方塊 */
-.iv2-tiles{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:20px;}
-.iv2-tile{border-radius:24px;padding:22px 18px 20px;min-width:0;}
-.iv2-tile-ico{width:26px;height:26px;margin-bottom:18px;}
-.iv2-tile-n{font-size:clamp(28px,8.6vw,44px);font-weight:700;line-height:1;color:var(--i-ink);overflow-wrap:anywhere;}
-.iv2-tile-u{font-size:14px;font-weight:600;margin-left:3px;}
-.iv2-tile-l{font-size:13px;color:var(--i-gray);font-weight:600;margin-top:10px;line-height:1.5;}
+/* ── 數字方塊 ── */
+.iv2-tiles{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(10px,1vw + 6px,20px);}
+.iv2-tile{border-radius:var(--r-card);padding:clamp(20px,1.4vw + 14px,34px);min-width:0;transition:transform .35s cubic-bezier(.2,.65,.2,1), box-shadow .35s;}
+@media(hover:hover){.iv2-tile:hover{transform:translateY(-4px);box-shadow:0 14px 30px -18px rgba(30,60,40,.35);}}
+.iv2-tile-ico{width:clamp(24px,.5vw + 21px,30px);height:auto;aspect-ratio:1/1;margin-bottom:clamp(14px,1vw + 8px,24px);}
+.iv2-tile-n{font-size:var(--fs-num-l);font-weight:700;line-height:1;color:var(--i-ink);white-space:nowrap;}
+.iv2-tile-u{font-size:var(--fs-body);font-weight:600;margin-left:4px;letter-spacing:0;}
+.iv2-tile-l{font-size:var(--fs-body);color:var(--i-gray);font-weight:600;margin-top:12px;line-height:1.5;}
+.iv2-tile-x{font-size:var(--fs-small);color:var(--i-gray2);margin-top:4px;line-height:1.5;}
+.iv2-tile-x .iv2-num{color:var(--i-ink);font-weight:700;}
 
-/* 社會效益 */
-.iv2-big{margin-top:18px;}
-.iv2-big-n{font-size:64px;font-weight:700;color:var(--i-green);line-height:1;}
-.iv2-big-u{font-size:18px;font-weight:700;color:var(--i-ink);margin-left:6px;}
-.iv2-big-l{font-size:14px;color:var(--i-gray);margin-top:10px;}
-
-/* 地圖 */
-.iv2-map{background:var(--i-soft);border-radius:26px;padding:22px 14px 16px;margin-top:20px;}
-.iv2-map svg.pv-map{display:block;width:100%;height:auto;}
-.pv-map-lbl{font-family:'Noto Sans TC',sans-serif;font-size:8.5px;fill:var(--i-gray);letter-spacing:.06em;}
-.iv2-legend{display:flex;justify-content:flex-end;gap:14px;font-size:11px;color:var(--i-gray);padding:4px 4px 0;}
-.iv2-legend span{display:inline-flex;align-items:center;gap:5px;}
-.iv2-mapstats{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:20px;}
-.iv2-mapstats div{font-size:12px;color:var(--i-gray);font-weight:600;}
-.iv2-mapstats b{display:block;font-size:26px;color:var(--i-ink);font-weight:700;margin-bottom:4px;}
-
-/* 維修率 */
-.iv2-rate-n{font-size:76px;font-weight:700;color:var(--i-green);line-height:1;margin-top:16px;}
-.iv2-rate-n small{font-size:32px;margin-left:2px;}
-.iv2-rate-s{font-size:13px;color:var(--i-gray);margin-top:10px;}
-.pv-donut{display:block;width:78%;max-width:270px;margin:28px auto 24px;}
-.iv2-lg{display:grid;gap:18px;}
-.iv2-lg-h{font-size:12px;font-weight:700;color:var(--i-gray2);letter-spacing:.08em;margin-bottom:4px;}
-.iv2-lg-i{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13.5px;}
-.iv2-lg-i i{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.iv2-lg-i span{flex:1;min-width:0;}
-.iv2-lg-i b{font-weight:600;font-size:13px;color:var(--i-gray);}
-@media(max-width:370px){.iv2-about-t{font-size:15px;}.iv2-tile-n{font-size:36px;}.iv2-big-n{font-size:52px;}.iv2-rate-n{font-size:60px;}}
-
-/* ── 簡介：捲動動態 ── */
-#page-intro [data-rv]{
-  opacity:0;transform:translateY(22px);
-  transition:opacity .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms), transform .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms);
+/* ── 02 一路走來：合作夥伴 Logo ── */
+.iv2-logos{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.5vw + 4px,10px);max-width:720px;}
+.iv2-logo{
+  position:relative;aspect-ratio:3/2;border-radius:10px;background:var(--i-soft);overflow:hidden;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:#c3c8c4;transition:transform .3s cubic-bezier(.2,.65,.2,1);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
 }
+.iv2-logo svg{width:14px;height:14px;}
+.iv2-logo.has{background:transparent;}
+body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
+.iv2-logo img{width:100%;height:100%;object-fit:contain;padding:8%;pointer-events:none;}
+@media(hover:hover){.iv2-logo:hover{transform:translateY(-2px);}}
+.iv2-logo-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(31,36,33,.7);color:#fff;font-size:13px;line-height:20px;cursor:pointer;display:none;padding:0;}
+@media(hover:hover){.iv2-logo.has:hover .iv2-logo-x{display:block;}}
+.iv2-logo .iv2-upl{font-size:10px;padding:3px 8px;}
+
+/* ── 03 社會效益 ── */
+.iv2-impact{display:grid;gap:var(--sp-block);}
+.iv2-big-row{white-space:nowrap;}
+.iv2-big-n{font-size:var(--fs-num-xl);font-weight:700;color:var(--i-green);line-height:1;}
+.iv2-big-u{font-size:var(--fs-lead);font-weight:700;color:var(--i-ink);margin-left:8px;}
+.iv2-big-l{font-size:var(--fs-body);color:var(--i-gray);margin-top:12px;}
+
+/* ── 04 足跡 ── */
+.iv2-mapwrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:clamp(10px,1vw + 6px,20px);}
+.iv2-map{background:var(--i-soft);border-radius:var(--r-card);padding:16px 8px 12px;display:flex;flex-direction:column;min-height:0;}
+.iv2-map svg.pv-map{display:block;width:100%;height:auto;flex:1;min-height:0;}
+.pv-map-lbl{font-family:'Noto Sans TC',sans-serif;font-size:8.5px;fill:var(--i-gray);letter-spacing:.06em;}
+.iv2-legend{display:flex;justify-content:flex-end;gap:14px;font-size:var(--fs-small);color:var(--i-gray);padding:6px 6px 0;}
+.iv2-legend span{display:inline-flex;align-items:center;gap:5px;}
+.iv2-trips{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(10px,1vw + 6px,20px);min-height:0;}
+.iv2-trip{
+  position:relative;border-radius:calc(var(--r-card) - 4px);overflow:hidden;background:var(--i-soft);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  color:var(--i-gray2);font-size:var(--fs-small);font-weight:600;text-align:center;min-height:72px;
+}
+.iv2-trip svg{width:20px;height:20px;}
+.iv2-trip img{transition:transform .6s cubic-bezier(.2,.65,.2,1);}
+@media(hover:hover){.iv2-trip:hover img{transform:scale(1.05);}}
+.iv2-trip-cap{
+  position:absolute;left:0;right:0;bottom:0;padding:22px 12px 9px;text-align:left;
+  background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+  color:#fff;font-size:var(--fs-small);font-weight:600;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.iv2-mapstats{display:flex;flex-wrap:wrap;gap:12px clamp(28px,3vw,56px);}
+.iv2-mapstats div{font-size:var(--fs-small);color:var(--i-gray);font-weight:600;}
+.iv2-mapstats b{display:block;font-size:var(--fs-num-m);color:var(--i-ink);font-weight:700;margin-bottom:6px;line-height:1.1;}
+.iv2-facts{display:grid;gap:12px;margin-top:var(--sp-block);}
+.iv2-fact{display:flex;align-items:baseline;gap:12px;font-size:var(--fs-body);line-height:1.7;color:var(--i-gray);}
+.iv2-fact::before{content:'';flex-shrink:0;width:7px;height:7px;border-radius:50%;background:var(--i-green);transform:translateY(-2px);}
+.iv2-fact b{color:var(--i-ink);font-weight:700;}
+.iv2-fact b.g{color:var(--i-green);}
+.iv2-geo-info{margin-top:var(--sp-block);}
+
+/* ── 05 維修成果 ── */
+.iv2-rate-n{font-size:var(--fs-num-xl);font-weight:700;color:var(--i-green);line-height:1;}
+.iv2-rate-n small{font-size:.42em;margin-left:4px;}
+.iv2-rate-s{font-size:var(--fs-body);color:var(--i-gray);margin-top:12px;}
+.pv-donut{display:block;width:min(78%,300px);margin:var(--sp-head) auto var(--sp-block);}
+.iv2-readout{text-align:center;min-height:3.4em;font-size:var(--fs-small);color:var(--i-gray2);line-height:1.6;}
+.iv2-readout b{display:block;font-size:var(--fs-body);color:var(--i-ink);font-weight:700;}
+.iv2-readout .iv2-num{color:var(--i-green);font-weight:700;}
+.iv2-lg{display:grid;gap:clamp(16px,1.2vw + 10px,26px);margin-top:var(--sp-block);}
+.iv2-lg-h{font-size:var(--fs-eyebrow);font-weight:700;color:var(--i-gray2);letter-spacing:.14em;margin-bottom:4px;}
+.iv2-lg-i{display:flex;align-items:center;gap:12px;font-size:var(--fs-body);cursor:pointer;border-radius:12px;padding:6px 10px;margin:0 -10px;transition:opacity .25s, background .25s;}
+.iv2-lg-i i{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:transform .25s;}
+.iv2-lg-i span{flex:1;min-width:0;transition:font-size .25s cubic-bezier(.2,.65,.2,1);}
+.iv2-lg-i b{font-weight:600;font-size:var(--fs-body);color:var(--i-gray);transition:color .25s;}
+.iv2-lg.hl .iv2-lg-i{opacity:.4;}
+.iv2-lg .iv2-lg-i.on{opacity:1;background:var(--i-soft);}
+.iv2-lg-i.on i{transform:scale(1.35);}
+.iv2-lg-i.on span{font-size:calc(var(--fs-body) * 1.15);font-weight:700;color:var(--i-ink);}
+.iv2-lg-i.on b{color:var(--i-ink);}
+
+/* ── 06 最常維修 Top 10 ── */
+.iv2-rank{display:grid;gap:clamp(8px,1.5vh,18px);}
+.iv2-rk{display:grid;grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"i n v" "i b b";column-gap:12px;row-gap:6px;align-items:center;transition:opacity .2s;}
+.iv2-rk-i{grid-area:i;align-self:start;font-size:var(--fs-small);font-weight:700;color:var(--i-gray2);text-align:right;line-height:1.7;}
+.iv2-rk-n{grid-area:n;font-size:var(--fs-body);font-weight:600;color:var(--i-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.iv2-rk-v{grid-area:v;font-size:var(--fs-small);color:var(--i-gray);white-space:nowrap;}
+.iv2-rk-v b{font-size:var(--fs-body);color:var(--i-ink);font-weight:700;margin-right:6px;}
+.iv2-rk-bar{grid-area:b;height:clamp(12px,.5vw + 9px,20px);border-radius:999px;background:var(--i-soft);overflow:hidden;}
+.iv2-rk-fill{display:block;height:100%;width:var(--w);border-radius:999px;background:#8fc4a1;transform-origin:left;transform:scaleX(0);transition:transform 1.1s cubic-bezier(.2,.65,.2,1) var(--d,0ms);}
+.iv2-rank.in .iv2-rk-fill{transform:scaleX(1);}
+.iv2-rk:nth-child(-n+3) .iv2-rk-fill{background:#3d9466;}
+.iv2-rk:first-child .iv2-rk-fill{background:var(--i-green);}
+.iv2-rk:first-child .iv2-rk-i{color:var(--i-green);}
+.iv2-rank.hl .iv2-rk{opacity:.4;}
+.iv2-rank.hl .iv2-rk.on{opacity:1;}
+
+/* ── 平板 ── */
+@media (min-width:640px){
+  .iv2-photo{aspect-ratio:16/9;}
+  .iv2-rk{grid-template-columns:28px minmax(0,9em) minmax(0,1fr) 9.5em;grid-template-areas:"i n b v";row-gap:0;}
+  .iv2-rk-i{align-self:center;}
+  .iv2-rk-v{text-align:right;}
+}
+
+/* ── 電腦：一個畫面 = 一個區塊（簡報模式）── */
+@media (min-width:1000px){
+  .iv2{padding-top:0;padding-bottom:0;}
+  .iv2-slide{
+    min-height:var(--slide-h, calc(100vh - 128px));margin:0;
+    display:flex;align-items:center;padding:clamp(20px,5vh,72px) 0;
+    scroll-snap-align:start;
+  }
+  .iv2-slide + .iv2-slide{border-top:1px solid #f0f2ef;}
+  .iv2-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(48px,5vw,88px);align-items:center;}
+
+  /* 01：左 封面＋介紹，右 團隊照片 */
+  .iv2-s1 .iv2-hero{text-align:left;margin-bottom:clamp(32px,5vh,56px);display:flex;align-items:center;gap:24px;}
+  .iv2-s1 .iv2-hero img{width:clamp(84px,6vw,120px);}
+  .iv2-s1 .iv2-hero-t{margin-top:0;}
+  .iv2-s1 .iv2-photo{aspect-ratio:4/5;max-height:calc(var(--slide-h, 100vh) - 120px);width:100%;}
+
+  /* 02：左 文案＋數字，右 合作夥伴 */
+  .iv2-s2 .iv2-logos{max-width:none;}
+
+  /* 03：大數字在左、兩個方塊在右 */
+  .iv2-impact{grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr);gap:clamp(40px,4vw,72px);align-items:center;}
+  .iv2-big-n{font-size:clamp(72px,6.4vw,120px);}
+
+  /* 04：左 文字重點，右 地圖＋照片（高度配合螢幕）*/
+  .iv2-s4 .iv2-cols{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);}
+  .iv2-mapwrap{height:min(calc(var(--slide-h, 100vh) - 120px), 680px);grid-template-columns:minmax(0,1.3fr) minmax(0,.8fr);}
+  .iv2-map{padding:22px 14px 14px;}
+  .iv2-map svg.pv-map{height:100%;}
+
+  /* 05：左 維修率＋圓餅，右 圖例 */
+  .iv2-rate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(48px,5vw,88px);align-items:center;}
+  .iv2-s5 .iv2-head{margin-bottom:var(--sp-block);}
+  .pv-donut{width:min(80%, calc(var(--slide-h, 100vh) - 470px), 360px);min-width:220px;margin:var(--sp-block) auto 8px;}
+  .iv2-lg-i{padding:clamp(2px,.45vh,6px) 10px;}
+  .iv2-lg{gap:clamp(10px,2vh,26px);}
+  .iv2-lg{margin-top:0;}
+
+  /* 06 */
+  .iv2-rk{grid-template-columns:32px minmax(0,11em) minmax(0,1fr) 10.5em;column-gap:18px;}
+}
+/* 筆電等較矮的螢幕：圖例與排行稍微緊湊 */
+@media (min-width:1000px) and (max-height:780px){
+  .iv2-lg-i, .iv2-lg-i b{font-size:var(--fs-small);}
+  .iv2-rate-n{font-size:clamp(60px,5.5vw,96px);}
+}
+/* 螢幕不夠高時，取消一頁一區塊，避免內容被擠壓 */
+@media (min-width:1000px) and (max-height:620px){
+  .iv2-slide{min-height:0;padding:64px 0;}
+  .iv2-mapwrap{height:520px;}
+}
+#app-scroll.iv2-snap{scroll-snap-type:y proximity;scroll-padding-top:64px;}
+
+/* ── 自動輪播進度條 ── */
+.iv2-autobar{position:fixed;left:0;right:0;top:64px;height:3px;z-index:60;pointer-events:none;display:none;}
+.iv2-autobar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);}
+body.iv2-autoplay .iv2-autobar{display:block;}
+
+/* ── 捲動動態 ── */
+#page-intro [data-rv]{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms), transform .8s cubic-bezier(.2,.65,.2,1) var(--d,0ms);}
 #page-intro [data-rv].in{opacity:1;transform:none;}
 #page-intro .iv2-hero img[data-rv]{transform:translateY(14px) scale(.9);}
 #page-intro .iv2-hero img[data-rv].in{transform:none;}
-.iv2-tile{transition:transform .35s cubic-bezier(.2,.65,.2,1), box-shadow .35s;}
-@media(hover:hover){.iv2-tile:hover{transform:translateY(-4px);box-shadow:0 14px 30px -18px rgba(30,60,40,.35);}}
-.iv2-loading{padding:110px 0 120px;text-align:center;color:var(--i-gray2);font-size:13px;letter-spacing:.08em;}
+.pv-map .iv2-dot{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0;transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--d,0ms), opacity .3s ease var(--d,0ms);}
+.pv-map.in .iv2-dot{transform:scale(1);opacity:1;}
+.pv-donut .iv2-sweep{transition:stroke-dashoffset 1.4s cubic-bezier(.65,.05,.25,1) .1s;}
+.pv-donut.in .iv2-sweep{stroke-dashoffset:0;}
+.pv-donut .iv2-seg,.pv-donut .iv2-core{cursor:pointer;transition:transform .3s cubic-bezier(.2,.65,.2,1), opacity .3s;}
+.pv-donut text{pointer-events:none;transition:opacity .3s;}
+.pv-donut.hl .iv2-seg,.pv-donut.hl .iv2-core{opacity:.32;}
+.pv-donut.hl .iv2-seg.on,.pv-donut.hl .iv2-core.on{opacity:1;}
+.pv-donut .iv2-seg.on{transform:translate(var(--dx),var(--dy));}
+
+/* ── 載入中（動態 Logo）── */
+.iv2-loading{padding:110px 0 120px;text-align:center;color:var(--i-gray2);font-size:var(--fs-small);letter-spacing:.08em;}
 .iv2-ld-logo{width:132px;height:154px;display:block;margin:0 auto 18px;overflow:visible;}
 .iv2-ld-drv{animation:iv2-screw 1.1s ease-in-out infinite;}
 .iv2-ld-handle{transform-box:fill-box;transform-origin:center;animation:iv2-twist 1.1s ease-in-out infinite;}
@@ -682,244 +848,16 @@ body:has(#page-intro.active){background:#fff;}
 .iv2-ld-s i:nth-child(2){animation-delay:.15s}.iv2-ld-s i:nth-child(3){animation-delay:.3s}
 @keyframes iv2-dot{0%,80%,100%{opacity:.2;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 .iv2-ld-retry{margin-top:18px;padding:9px 20px;border-radius:999px;border:none;background:var(--i-green);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
-.iv2-tile-x{font-size:12px;color:var(--i-gray2);margin-top:4px;line-height:1.5;}
-.iv2-tile-x .iv2-num{color:var(--i-ink);font-weight:700;}
-@media (prefers-reduced-motion: reduce){.iv2-ld-drv,.iv2-ld-handle,.iv2-ld-shine,.iv2-ld-shadow,.iv2-ld-spark,.iv2-ld-s i{animation:none!important;}}
 
-/* 地圖圓點依序出現 */
-.pv-map .iv2-dot{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0;
-  transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--d,0ms), opacity .3s ease var(--d,0ms);}
-.pv-map.in .iv2-dot{transform:scale(1);opacity:1;}
-
-/* 地圖 + 右側三張回憶照片 */
-.iv2-mapwrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:10px;margin-top:20px;}
-.iv2-mapwrap .iv2-map{margin-top:0;padding:16px 8px 12px;border-radius:22px;}
-.iv2-trips{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:10px;min-height:0;}
-.iv2-trip{
-  position:relative;border-radius:18px;overflow:hidden;background:var(--i-soft);cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  color:var(--i-gray2);font-size:11px;font-weight:600;text-align:center;min-height:72px;
-  transition:transform .35s cubic-bezier(.2,.65,.2,1);
-}
-.iv2-trip svg{width:20px;height:20px;}
-.iv2-trip img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.65,.2,1);}
-@media(hover:hover){.iv2-trip:hover img{transform:scale(1.05);}}
-.iv2-trip-cap{
-  position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;text-align:left;
-  background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
-  color:#fff;font-size:10.5px;font-weight:600;line-height:1.35;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+/* ── 照片檢視 ── */
 .iv2-tv{position:fixed;inset:0;z-index:999;background:rgba(15,20,17,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px;}
 .iv2-tv img{max-width:100%;max-height:68vh;border-radius:14px;object-fit:contain;}
-.iv2-tv-cap{color:#fff;font-size:14px;text-align:center;max-width:520px;line-height:1.6;}
-.iv2-tv-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-.iv2-tv-btns button{padding:9px 16px;border-radius:999px;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;}
-.iv2-tv-btns button.pri{background:#fff;color:#1f2421;}
-
-/* 圓餅：掃描出現 + 互動 */
-.pv-donut .iv2-sweep{transition:stroke-dashoffset 1.4s cubic-bezier(.65,.05,.25,1) .1s;}
-.pv-donut.in .iv2-sweep{stroke-dashoffset:0;}
-.pv-donut .iv2-seg,.pv-donut .iv2-core{cursor:pointer;transition:transform .3s cubic-bezier(.2,.65,.2,1), opacity .3s;}
-.pv-donut text{pointer-events:none;transition:opacity .3s;}
-.pv-donut.hl .iv2-seg,.pv-donut.hl .iv2-core{opacity:.32;}
-.pv-donut.hl .iv2-seg.on,.pv-donut.hl .iv2-core.on{opacity:1;}
-.pv-donut .iv2-seg.on{transform:translate(var(--dx),var(--dy));}
-.iv2-readout{text-align:center;min-height:44px;margin:-8px 0 18px;font-size:13px;color:var(--i-gray2);line-height:1.6;}
-.iv2-readout b{display:block;font-size:15px;color:var(--i-ink);font-weight:700;}
-.iv2-readout .iv2-num{color:var(--i-green);font-weight:700;}
-.iv2-lg-i{cursor:pointer;border-radius:12px;padding:6px 8px;margin:0 -8px;transition:opacity .25s, background .25s;}
-.iv2-lg-i i{transition:transform .25s;}
-.iv2-lg-i span,.iv2-lg-i b{transition:font-size .25s cubic-bezier(.2,.65,.2,1), color .25s;}
-.iv2-lg.hl .iv2-lg-i{opacity:.4;}
-.iv2-lg .iv2-lg-i.on{opacity:1;background:var(--i-soft);}
-.iv2-lg-i.on i{transform:scale(1.35);}
-.iv2-lg-i.on span{font-size:17px;font-weight:700;color:var(--i-ink);}
-.iv2-lg-i.on b{font-size:16px;color:var(--i-ink);}
-
-
-/* hashtag */
-.iv2-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;}
-.iv2-tagc{padding:8px 14px;border-radius:999px;background:var(--i-green-t);color:var(--i-green);font-size:13.5px;font-weight:600;letter-spacing:.02em;}
-.iv2-tagc:nth-child(2n){background:var(--i-yellow-t);color:#a96c12;}
-/* 02 文案 */
-.iv2-lead{font-size:15.5px;line-height:1.95;color:var(--i-gray);margin-top:14px;}
-.iv2-lead b{color:var(--i-ink);font-weight:700;}
-/* 合作夥伴 Logo 牆 */
-.iv2-sub{font-size:13px;font-weight:700;color:var(--i-gray2);letter-spacing:.1em;margin:44px 0 14px;}
-.iv2-logos{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;max-width:720px;}
-.iv2-logo{
-  position:relative;aspect-ratio:3/2;border-radius:10px;background:var(--i-soft);overflow:hidden;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;color:#c3c8c4;
-  transition:transform .3s cubic-bezier(.2,.65,.2,1), box-shadow .3s;
-  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
-}
-.iv2-logo svg{width:14px;height:14px;}
-.iv2-logo.has{background:transparent;}
-body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
-.iv2-logo img{width:100%;height:100%;object-fit:contain;padding:8%;pointer-events:none;}
-@media(hover:hover){.iv2-logo:hover{transform:translateY(-2px);}}
-.iv2-logo-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(31,36,33,.7);color:#fff;font-size:13px;line-height:22px;cursor:pointer;display:none;padding:0;}
-@media(hover:hover){.iv2-logo.has:hover .iv2-logo-x{display:block;}}
-.iv2-logo .iv2-upl{font-size:10px;padding:3px 8px;}
-/* 足跡重點 */
-.iv2-facts{display:grid;gap:10px;margin-top:22px;}
-.iv2-fact{display:flex;align-items:baseline;gap:10px;font-size:15px;line-height:1.7;color:var(--i-gray);}
-.iv2-fact::before{content:'';flex-shrink:0;width:7px;height:7px;border-radius:50%;background:var(--i-green);transform:translateY(-2px);}
-.iv2-fact b{color:var(--i-ink);font-weight:700;}
-.iv2-fact b.g{color:var(--i-green);}
-@media (min-width:640px){
-  .iv2-tagc{font-size:14.5px;padding:9px 16px;}
-  .iv2-lead{font-size:17px;}
-  .iv2-logos{gap:8px;}
-  .iv2-fact{font-size:16px;}
-}
-@media (min-width:1000px){
-  .iv2-tags{gap:10px;margin-top:36px;}
-  .iv2-tagc{font-size:16px;padding:10px 20px;}
-  .iv2-lead{font-size:19px;max-width:820px;margin-top:18px;}
-  .iv2-sub{font-size:14px;margin:64px 0 18px;}
-  .iv2-logos{gap:10px;max-width:780px;}
-  .iv2-logo{border-radius:12px;}
-  .iv2-facts{gap:12px;margin-top:30px;}
-  .iv2-fact{font-size:18px;}
-}
-
-/* 最常維修 Top 10（橫條圖）*/
-.iv2-h2{margin-top:72px;}
-.iv2-rank{display:grid;gap:14px;margin-top:22px;}
-.iv2-rk{
-  display:grid;grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"i n v" "i b b";
-  column-gap:10px;row-gap:6px;align-items:center;cursor:default;border-radius:12px;padding:4px 0;transition:background .2s;
-}
-.iv2-rk-i{grid-area:i;align-self:start;padding-top:2px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--i-gray2);text-align:right;}
-.iv2-rk-n{grid-area:n;font-size:14.5px;font-weight:600;color:var(--i-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.iv2-rk-v{grid-area:v;font-size:13px;color:var(--i-gray);white-space:nowrap;}
-.iv2-rk-v b{font-family:'Inter',sans-serif;font-size:15px;color:var(--i-ink);font-weight:700;margin-right:6px;}
-.iv2-rk-bar{grid-area:b;height:12px;border-radius:6px;background:var(--i-soft);overflow:hidden;}
-.iv2-rk-fill{display:block;height:100%;width:var(--w);border-radius:6px;background:#8fc4a1;transform-origin:left;transform:scaleX(0);
-  transition:transform 1.1s cubic-bezier(.2,.65,.2,1) var(--d,0ms);}
-.iv2-rank.in .iv2-rk-fill{transform:scaleX(1);}
-.iv2-rk:nth-child(-n+3) .iv2-rk-fill{background:#3d9466;}
-.iv2-rk:first-child .iv2-rk-fill{background:var(--i-green);}
-.iv2-rk:first-child .iv2-rk-i{color:var(--i-green);}
-.iv2-rank.hl .iv2-rk{opacity:.4;}
-.iv2-rank.hl .iv2-rk.on{opacity:1;}
-.iv2-rk{transition:opacity .2s;}
-@media (min-width:640px){
-  .iv2-rk{grid-template-columns:28px minmax(0,9em) minmax(0,1fr) 9.5em;grid-template-areas:"i n b v";row-gap:0;}
-  .iv2-rk-i{padding-top:0;align-self:center;font-size:14px;}
-  .iv2-rk-n{font-size:15.5px;}
-  .iv2-rk-v{text-align:right;}
-  .iv2-rk-bar{height:16px;border-radius:8px;}
-  .iv2-rk-fill{border-radius:8px;}
-}
-@media (min-width:1000px){
-  .iv2-h2{margin-top:96px;}
-  .iv2-rank{gap:18px;margin-top:32px;}
-  .iv2-rk{grid-template-columns:32px minmax(0,11em) minmax(0,1fr) 10.5em;column-gap:16px;}
-  .iv2-rk-n{font-size:18px;}
-  .iv2-rk-i{font-size:16px;}
-  .iv2-rk-v{font-size:14.5px;}
-  .iv2-rk-v b{font-size:18px;}
-  .iv2-rk-bar{height:20px;border-radius:10px;}
-  .iv2-rk-fill{border-radius:10px;}
-}
-@media (prefers-reduced-motion: reduce){.iv2-rk-fill{transform:none!important;transition:none!important;}}
-
-/* ── 簡介：平板 / 電腦版面 ── */
-@media (min-width:640px){
-  .iv2{max-width:760px;padding:56px 40px 110px;}
-  .iv2-sec{margin-bottom:96px;}
-  .iv2-eyebrow{font-size:13px;}
-  .iv2-h{font-size:28px;}
-  .iv2-p{font-size:15.5px;}
-  .iv2-hero img{width:150px;height:150px;}
-  .iv2-hero-t{font-size:32px;}
-  .iv2-about{gap:32px;}
-  .iv2-about-t{font-size:21px;}
-  .iv2-tiles{gap:16px;}
-  .iv2-tile{padding:28px 24px 24px;border-radius:28px;}
-  .iv2-tile-n{font-size:clamp(36px,6vw,52px);white-space:nowrap;overflow-wrap:normal;}
-  .iv2-tile-l{font-size:14.5px;}
-  .iv2-tile-x{font-size:13px;}
-  .iv2-big-n{font-size:84px;}
-  .iv2-big-u{font-size:22px;}
-  .iv2-big-l{font-size:15.5px;}
-  .iv2-mapwrap{gap:16px;}
-  .iv2-trip{font-size:12.5px;}
-  .iv2-trip-cap{font-size:12.5px;padding:22px 12px 9px;}
-  .iv2-mapstats b{font-size:32px;}
-  .iv2-mapstats div{font-size:13px;}
-  .iv2-note{font-size:13.5px;}
-  .iv2-rate-n{font-size:96px;}
-  .iv2-rate-n small{font-size:40px;}
-  .iv2-rate-s{font-size:15px;}
-  .pv-donut{max-width:320px;}
-  .iv2-lg-i{font-size:14.5px;}
-}
-@media (min-width:1000px){
-  .iv2{max-width:1120px;padding:80px 64px 140px;}
-  .iv2-sec{margin-bottom:132px;}
-  .iv2-eyebrow{font-size:14px;margin-bottom:14px;}
-  .iv2-h{font-size:36px;}
-  .iv2-p{font-size:17px;}
-  .iv2-hero{padding-top:24px;}
-  .iv2-hero img{width:184px;height:184px;}
-  .iv2-hero-t{font-size:44px;margin-top:24px;}
-  .iv2-hero-s{font-size:14px;}
-  .iv2-about{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:64px;margin-top:24px;}
-  .iv2-about-t{font-size:28px;line-height:1.9;}
-  .iv2-photo{aspect-ratio:4/3.6;border-radius:28px;}
-  .iv2-tiles{gap:20px;margin-top:28px;}
-  .iv2-tile{padding:34px 30px 30px;}
-  .iv2-tile-ico{width:30px;height:30px;margin-bottom:22px;}
-  .iv2-tile-n{font-size:clamp(40px,4vw,62px);white-space:nowrap;overflow-wrap:normal;}
-  .iv2-tile-u{font-size:18px;}
-  .iv2-tile-l{font-size:16px;}
-  .iv2-tile-x{font-size:14px;}
-  /* 社會效益：大數字在左、兩個方塊在右 */
-  .iv2-impact{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.6fr);gap:40px;align-items:center;margin-top:32px;}
-  .iv2-impact .iv2-big,.iv2-impact .iv2-tiles{margin-top:0;}
-  .iv2-big > div:first-child{white-space:nowrap;}
-  .iv2-big-n{font-size:clamp(64px,6vw,104px);}
-  .iv2-big-u{font-size:28px;}
-  .iv2-big-l{font-size:17px;margin-top:14px;}
-  /* 足跡：地圖與照片各半 */
-  .iv2-mapwrap{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;margin-top:28px;}
-  .iv2-mapwrap .iv2-map{padding:28px 20px 18px;border-radius:30px;}
-  .iv2-trips{gap:20px;}
-  .iv2-trip{border-radius:24px;font-size:14px;}
-  .iv2-trip svg{width:26px;height:26px;}
-  .iv2-trip-cap{font-size:14px;padding:30px 16px 12px;}
-  .iv2-mapstats{gap:16px 56px;margin-top:28px;}
-  .iv2-mapstats b{font-size:40px;}
-  .iv2-mapstats div{font-size:14px;}
-  .iv2-note{font-size:14.5px;}
-  /* 維修成果：左邊數字與圓餅、右邊圖例 */
-  .iv2-rate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center;}
-  .iv2-rate-n{font-size:120px;}
-  .iv2-rate-n small{font-size:48px;}
-  .iv2-rate-s{font-size:16px;}
-  .pv-donut{width:86%;max-width:400px;margin:36px auto 24px;}
-  .iv2-readout{font-size:14px;}
-  .iv2-readout b{font-size:17px;}
-  .iv2-lg{gap:26px;}
-  .iv2-lg-h{font-size:13px;}
-  .iv2-lg-i{font-size:15.5px;padding:8px 12px;margin:0 -12px;}
-  .iv2-lg-i b{font-size:15px;}
-  .iv2-lg-i.on span{font-size:20px;}
-  .iv2-lg-i.on b{font-size:19px;}
-}
-@media (min-width:1600px){
-  .iv2{max-width:1280px;}
-  .iv2-about-t{font-size:32px;}
-  .iv2-h{font-size:40px;}
-}
 
 @media (prefers-reduced-motion: reduce){
   #page-intro [data-rv], .pv-map .iv2-dot{opacity:1!important;transform:none!important;transition:none!important;}
   .pv-donut .iv2-sweep{stroke-dashoffset:0!important;transition:none!important;}
+  .iv2-rk-fill{transform:none!important;transition:none!important;}
+  .iv2-ld-drv,.iv2-ld-handle,.iv2-ld-shine,.iv2-ld-shadow,.iv2-ld-spark,.iv2-ld-s i{animation:none!important;}
 }
 
 /* ══ GLOBAL UTILS ══ */
@@ -1117,6 +1055,23 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
         </div>
         <label class="toggle">
           <input type="checkbox" id="toggle-tabbar" onchange="saveSettings()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-row" style="border:none;padding:14px 0 0;margin-top:14px;border-top:1px solid var(--border) !important;">
+        <div class="sr-left">
+          <div class="sr-label">簡介自動輪播</div>
+          <div class="sr-desc">適合展覽會場。開啟後切換到「簡介」，依序自動播放每個區塊，播完回到開頭重新播放；有人捲動或點擊時會暫停 15 秒</div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);">
+            每個區塊停留
+            <select id="autoplay-sec" onchange="saveSettings()" style="padding:6px 10px;border:1px solid var(--border2);border-radius:8px;background:var(--surface);font-family:inherit;font-size:13px;color:var(--text);">
+              <option value="6">6 秒</option><option value="10" selected>10 秒</option><option value="15">15 秒</option><option value="20">20 秒</option><option value="30">30 秒</option>
+            </select>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-autoplay" onchange="saveSettings()">
           <span class="slider"></span>
         </label>
       </div>
@@ -1411,6 +1366,10 @@ function loadSettings(){
   document.getElementById('toggle-autosync').checked = autoSync;
   tabbarHidden = localStorage.getItem('tabbarHidden') === 'true';
   document.getElementById('toggle-tabbar').checked = tabbarHidden;
+  introAutoplay = localStorage.getItem('introAutoplay') === 'true';
+  introDwell = parseInt(localStorage.getItem('introDwell')||'10', 10) || 10;
+  document.getElementById('toggle-autoplay').checked = introAutoplay;
+  document.getElementById('autoplay-sec').value = String(introDwell);
   applyInterviewSetting();
   applyTabbarSetting();
 }
@@ -1432,14 +1391,127 @@ function saveSettings(){
     applyTabbarSetting();
     if(tabbarHidden) showToast('已隱藏選單，點右上角 Logo 或最下方小橫條可叫出');
   }
+  const ap = document.getElementById('toggle-autoplay').checked;
+  const dw = parseInt(document.getElementById('autoplay-sec').value, 10) || 10;
+  const dwChanged = dw !== introDwell;
+  introDwell = dw; localStorage.setItem('introDwell', dw);
+  if(ap !== introAutoplay){
+    introAutoplay = ap;
+    localStorage.setItem('introAutoplay', ap);
+    if(ap){ switchTab('intro'); showToast('已開始自動輪播簡介'); }
+    else { stopIntroAutoplay(); showToast('已關閉自動輪播'); }
+  } else if(dwChanged && introAutoplay) restartIntroAutoplay();
   applyInterviewSetting();
   startAutoSync();
 }
+
+// ══ 簡介：一個畫面一個區塊（簡報）、鍵盤翻頁、自動輪播 ══
+let introAutoplay = false, introDwell = 10;
+let _apTimer = null, _apPauseUntil = 0;
+const AP_PAUSE_MS = 15000;
+function updateSlideH(){
+  const sc = document.getElementById('app-scroll'), tb = document.querySelector('.topbar');
+  if(!sc || !tb) return;
+  document.documentElement.style.setProperty('--slide-h', Math.max(0, sc.clientHeight - tb.offsetHeight) + 'px');
+}
+function introSlides(){ return [...document.querySelectorAll('#intro-root .iv2-slide')]; }
+function slideTop(el){
+  const sc = document.getElementById('app-scroll'), tb = document.querySelector('.topbar');
+  return el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - (tb ? tb.offsetHeight : 0);
+}
+function currentSlide(){
+  const sc = document.getElementById('app-scroll'); const sl = introSlides();
+  let best = 0, bd = Infinity;
+  sl.forEach((el,i)=>{ const d = Math.abs(slideTop(el) - sc.scrollTop); if(d < bd){ bd = d; best = i; } });
+  return best;
+}
+function goSlide(i, instant){
+  const sl = introSlides(); if(!sl.length) return;
+  i = Math.max(0, Math.min(sl.length-1, i));
+  document.getElementById('app-scroll').scrollTo({ top: slideTop(sl[i]) + 1, behavior: instant ? 'auto' : 'smooth' });
+}
+// 鍵盤翻頁（演講用）：↓ / PageDown / 空白鍵 下一頁，↑ / PageUp 上一頁，Home / End
+document.addEventListener('keydown', e=>{
+  if(currentTab !== 'intro') return;
+  const tag = (e.target && e.target.tagName) || '';
+  if(/INPUT|TEXTAREA|SELECT/.test(tag) || e.target.isContentEditable) return;
+  if(document.getElementById('mov') && document.getElementById('mov').style.display === 'flex') return;
+  const k = e.key; let to = null;
+  if(k==='ArrowDown' || k==='PageDown' || (k===' ' && !e.shiftKey) || k==='ArrowRight') to = currentSlide()+1;
+  else if(k==='ArrowUp' || k==='PageUp' || (k===' ' && e.shiftKey) || k==='ArrowLeft') to = currentSlide()-1;
+  else if(k==='Home') to = 0;
+  else if(k==='End') to = introSlides().length-1;
+  if(to===null) return;
+  e.preventDefault();
+  goSlide(to);
+  pauseIntroAutoplay();
+});
+
+function setAutoBar(ms){
+  const bar = document.querySelector('.iv2-autobar i'); if(!bar) return;
+  bar.style.transition = 'none'; bar.style.transform = 'scaleX(0)';
+  void bar.offsetWidth;
+  if(ms > 0){ bar.style.transition = `transform ${ms}ms linear`; bar.style.transform = 'scaleX(1)'; }
+}
+function scheduleIntroStep(ms){
+  clearTimeout(_apTimer);
+  if(!introAutoplay || currentTab !== 'intro'){ document.body.classList.remove('iv2-autoplay'); return; }
+  document.body.classList.add('iv2-autoplay');
+  setAutoBar(ms);
+  _apTimer = setTimeout(introStep, ms);
+}
+function introStep(){
+  if(!introAutoplay || currentTab !== 'intro') return stopIntroAutoplay(true);
+  const left = _apPauseUntil - Date.now();
+  if(left > 0) return scheduleIntroStep(left);
+  const sl = introSlides();
+  if(!sl.length) return scheduleIntroStep(2000);
+  const next = currentSlide() + 1;
+  if(next >= sl.length){
+    // 播完一輪：回到開頭並重播動畫
+    renderIntro(true);
+    goSlide(0, true);
+  } else {
+    goSlide(next);
+  }
+  scheduleIntroStep(introDwell*1000);
+}
+function startIntroAutoplay(){
+  if(!introAutoplay) return;
+  _apPauseUntil = 0;
+  scheduleIntroStep(introDwell*1000);
+}
+function restartIntroAutoplay(){ if(introAutoplay && currentTab==='intro') startIntroAutoplay(); }
+function stopIntroAutoplay(keepSetting){
+  clearTimeout(_apTimer); _apTimer = null;
+  document.body.classList.remove('iv2-autoplay');
+  setAutoBar(0);
+}
+function pauseIntroAutoplay(){
+  if(!introAutoplay || currentTab !== 'intro') return;
+  _apPauseUntil = Date.now() + AP_PAUSE_MS;
+  scheduleIntroStep(AP_PAUSE_MS);
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  const sc = document.getElementById('app-scroll');
+  if(sc){
+    updateSlideH();
+    if('ResizeObserver' in window) new ResizeObserver(updateSlideH).observe(sc);
+    window.addEventListener('resize', updateSlideH);
+    // 有人操作就暫停輪播
+    ['wheel','touchstart','pointerdown'].forEach(t=>sc.addEventListener(t, ()=>{ if(currentTab==='intro') pauseIntroAutoplay(); }, {passive:true}));
+  }
+  const bar = document.createElement('div');
+  bar.className = 'iv2-autobar'; bar.innerHTML = '<i></i>';
+  document.body.appendChild(bar);
+});
+
 // ── 下方選單 隱藏 / 暫時叫出 ──
 let tabbarHidden = false;
 function applyTabbarSetting(){
   document.body.classList.toggle('tb-hidden', tabbarHidden);
   document.body.classList.remove('tb-peek');
+  setTimeout(updateSlideH, 350);
 }
 function peekTabbar(on){
   if(!tabbarHidden) return;
@@ -1481,6 +1553,9 @@ function switchTab(tab){
   document.getElementById('topbar-title').textContent = PAGE_TITLES[tab] || '';
   const _sc = document.getElementById('app-scroll'); if(_sc) _sc.scrollTop = 0;   // 換分頁回到最上方
   if(tabbarHidden) document.body.classList.remove('tb-peek');                    // 選完分頁就再收起
+  if(_sc) _sc.classList.toggle('iv2-snap', tab === 'intro');
+  updateSlideH();
+  if(tab === 'intro') startIntroAutoplay(); else stopIntroAutoplay();
   // sync-pill 只在維修頁顯示
   const isRepair = tab === 'repair';
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
@@ -3983,7 +4058,7 @@ function renderIntro(force){
   const root = document.getElementById('intro-root');
   if(!root) return;
   const sig = JSON.stringify([introData.summary && introData.summary.display, introData.footprint && introData.footprint.display, introData.state, introData.photos||null]);
-  if(!force && sig===_introSig && root.querySelector('.iv2-sec')) return;
+  if(!force && sig===_introSig && root.querySelector('.iv2-slide')) return;
   clearTimeout(_introLdTimer);
   if(!introData.summary && !introData.footprint && (introData.state.summary==='error' || introData.state.footprint==='error')){
     root.innerHTML = `<div class="iv2-loading">${LOADING_LOGO.replace(/class="iv2-ld-(drv|handle|shine|shadow|spark)"/g,'')}
@@ -4031,75 +4106,95 @@ function renderIntro(force){
   if(st.summary==='error')   notes.push('讀取「overall_summary」失敗' + (introData.msg.summary ? '：'+escH(introData.msg.summary) : ''));
   if(st.footprint==='error') notes.push('讀取「SUMMARY_MAP」失敗' + (introData.msg.footprint ? '：'+escH(introData.msg.footprint) : ''));
 
+  const head = (no, title, p, extra) => `
+      <div class="iv2-head">
+        <div class="iv2-eyebrow" data-rv>${no}</div>
+        <div class="iv2-h" data-rv style="--d:80ms">${title}${extra||''}</div>
+        ${p ? `<div class="iv2-p" data-rv style="--d:140ms">${p}</div>` : ''}
+      </div>`;
+
   root.innerHTML = `
-  <section class="iv2-sec iv2-hero">
-    ${logoSrc ? `<img src="${logoSrc}" alt="小家電維修所" data-rv>` : ''}
-    <div class="iv2-hero-t" data-rv style="--d:120ms">小家電維修所</div>
-    <div class="iv2-hero-s" data-rv style="--d:220ms">SINCE 2016</div>
-  </section>
-
-  <section class="iv2-sec">
-    <div class="iv2-eyebrow" data-rv>01　關於我們</div>
-    <div class="iv2-about">
+  <section class="iv2-slide iv2-s1" data-slide="0"><div class="iv2-wrap iv2-cols">
+    <div>
+      <div class="iv2-hero">
+        ${logoSrc ? `<img src="${logoSrc}" alt="小家電維修所" data-rv>` : ''}
+        <div>
+          <div class="iv2-hero-t" data-rv style="--d:120ms">小家電維修所</div>
+          <div class="iv2-hero-s" data-rv style="--d:220ms">SINCE 2016</div>
+        </div>
+      </div>
+      <div class="iv2-eyebrow" data-rv>01　關於我們</div>
       <div class="iv2-about-t" data-rv style="--d:80ms">創立於 <b class="iv2-num">2016</b> 年，我們是由一群各自有正職工作，利用假日透過維修回饋社會的「家電醫生」。</div>
-      <div class="iv2-photo" data-rv style="--d:200ms" onclick="pickIntroPhoto()">${photoInner()}</div>
-    </div>
-    <div class="iv2-tags">
-      ${INTRO_TAGS.map((t,i)=>`<span class="iv2-tagc" data-rv style="--d:${120+i*70}ms">#${escH(t)}</span>`).join('')}
-    </div>
-  </section>
-
-  <section class="iv2-sec">
-    <div class="iv2-eyebrow" data-rv>02　一路走來</div>
-    <div class="iv2-h" data-rv style="--d:80ms">一卡維修工具出發！用維修串起每一個角落</div>
-    <div class="iv2-lead" data-rv style="--d:140ms">維修不必待在固定據點。我們拉著一卡工具主動出擊，每一次跨界合作，都讓維修變得更日常、更有溫度，也讓更多人願意把壞掉的東西帶來，再給它一次機會。</div>
-    <div class="iv2-tiles">
-      <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-green-t);color:var(--i-green);">
-        ${ICONS.clinic}
-        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.clinics)}<span class="iv2-tile-u">場</span></div>
-        <div class="iv2-tile-l">家電義診</div>
-      </div>
-      <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-yellow-t);color:#b9781a;">
-        ${ICONS.course}
-        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.courses)}<span class="iv2-tile-u">場</span></div>
-        <div class="iv2-tile-l">工作坊／課程</div>
+      <div class="iv2-tags">
+        ${INTRO_TAGS.map((t,i)=>`<span class="iv2-tagc" data-rv style="--d:${120+i*70}ms">#${escH(t)}</span>`).join('')}
       </div>
     </div>
-    <div class="iv2-sub" data-rv>曾經合作與參與的夥伴</div>
-    <div class="iv2-logos">
-      ${Array.from({length:LOGO_COUNT},(_,i)=>`<div class="iv2-logo" data-logo="${i}" data-rv style="--d:${Math.min(i*35,500)}ms">${logoInner(i)}</div>`).join('')}
-    </div>
-  </section>
+    <div class="iv2-photo" data-rv style="--d:200ms" onclick="pickIntroPhoto()">${photoInner()}</div>
+  </div></section>
 
-  <section class="iv2-sec">
-    <div class="iv2-eyebrow" data-rv>03　社會效益</div>
-    <div class="iv2-h" data-rv style="--d:80ms">每一台修好的家電，都是少一份廢棄物</div>
+  <section class="iv2-slide iv2-s2" data-slide="1"><div class="iv2-wrap iv2-cols">
+    <div>
+      ${head('02　一路走來', '一卡維修工具出發！<br>用維修串起每一個角落', '維修不必待在固定據點。我們拉著一卡工具主動出擊，每一次跨界合作，都讓維修變得更日常、更有溫度，也讓更多人願意把壞掉的東西帶來，再給它一次機會。')}
+      <div class="iv2-tiles">
+        <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-green-t);color:var(--i-green);">
+          ${ICONS.clinic}
+          <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.clinics)}<span class="iv2-tile-u">場</span></div>
+          <div class="iv2-tile-l">家電義診</div>
+        </div>
+        <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-yellow-t);color:#b9781a;">
+          ${ICONS.course}
+          <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.courses)}<span class="iv2-tile-u">場</span></div>
+          <div class="iv2-tile-l">工作坊／課程</div>
+        </div>
+      </div>
+    </div>
+    <div class="iv2-partners">
+      <div class="iv2-sub" data-rv>曾經合作與參與的夥伴</div>
+      <div class="iv2-logos">
+        ${Array.from({length:LOGO_COUNT},(_,i)=>`<div class="iv2-logo" data-logo="${i}" data-rv style="--d:${Math.min(i*35,500)}ms">${logoInner(i)}</div>`).join('')}
+      </div>
+    </div>
+  </div></section>
+
+  <section class="iv2-slide iv2-s3" data-slide="2"><div class="iv2-wrap">
+    ${head('03　社會效益', '每一台修好的家電，都是少一份廢棄物')}
     <div class="iv2-impact">
-    <div class="iv2-big" data-rv style="--d:140ms">
-      <div><span class="iv2-big-n iv2-num">${val(INTRO_CELLS.repaired)}</span><span class="iv2-big-u">台</span></div>
-      <div class="iv2-big-l">總共維修的小家電</div>
-    </div>
-    <div class="iv2-tiles">
-      <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-soft);color:var(--i-gray);">
-        ${ICONS.waste}
-        <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
-        <div class="iv2-tile-l">減少廢棄物</div>
-        ${eqText(cellText(INTRO_CELLS.wasteKg), TRUCK_KG, 0, '約 ', ' 輛垃圾車進垃圾場')}
+      <div class="iv2-big" data-rv style="--d:140ms">
+        <div class="iv2-big-row"><span class="iv2-big-n iv2-num">${val(INTRO_CELLS.repaired)}</span><span class="iv2-big-u">台</span></div>
+        <div class="iv2-big-l">總共維修的小家電</div>
       </div>
-      <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-green-t);color:var(--i-green);">
-        ${ICONS.co2}
-        <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
-        <div class="iv2-tile-l">減少碳排放 CO₂e</div>
-        ${eqText(cellText(INTRO_CELLS.co2Kg), TREE_KG, 0, '約種植了 ', ' 棵樹')}
+      <div class="iv2-tiles">
+        <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-soft);color:var(--i-gray);">
+          ${ICONS.waste}
+          <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
+          <div class="iv2-tile-l">減少廢棄物</div>
+          ${eqText(cellText(INTRO_CELLS.wasteKg), TRUCK_KG, 0, '約 ', ' 輛垃圾車進垃圾場')}
+        </div>
+        <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-green-t);color:var(--i-green);">
+          ${ICONS.co2}
+          <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
+          <div class="iv2-tile-l">減少碳排放 CO₂e</div>
+          ${eqText(cellText(INTRO_CELLS.co2Kg), TREE_KG, 0, '約種植了 ', ' 棵樹')}
+        </div>
       </div>
     </div>
-    </div>
-  </section>
+  </div></section>
 
-  <section class="iv2-sec">
-    <div class="iv2-eyebrow" data-rv>04　足跡</div>
-    <div class="iv2-h" data-rv style="--d:80ms">我們去過的地方${fp.sample ? sampleTag : ''}</div>
-    <div class="iv2-p" data-rv style="--d:140ms">每一場維修健檢是一個圓點，顏色越深代表去過越多次。</div>
+  <section class="iv2-slide iv2-s4" data-slide="3"><div class="iv2-wrap iv2-cols">
+    <div>
+      ${head('04　足跡', '我們去過的地方', '每一場維修健檢是一個圓點，顏色越深代表去過越多次。', fp.sample ? sampleTag : '')}
+      <div class="iv2-mapstats" data-rv style="--d:100ms">
+        <div><b class="iv2-num">${cnt(String(fp.visits))}</b>場維修健檢</div>
+        <div><b class="iv2-num">${cnt(String(fp.places.length))}</b>個地點</div>
+        ${yearsTxt ? `<div><b class="iv2-num">${yearsTxt}</b>年份</div>` : ''}
+      </div>
+      <div class="iv2-facts">
+        ${top ? `<div class="iv2-fact" data-rv style="--d:80ms"><span><b class="g">${escH(placeShort(top.key))}・<span class="iv2-num">${top.count}</span> 次</b>，是最常去的地方</span></div>` : '<div class="iv2-fact">尚無地點資料</div>'}
+        ${cityCount ? `<div class="iv2-fact" data-rv style="--d:160ms"><span>台灣已經去過 <b class="iv2-num">${cnt(String(cityCount))}</b> 個城市</span></div>` : ''}
+        ${far ? `<div class="iv2-fact" data-rv style="--d:240ms"><span>以台北為起點，去過最遠的地方是距離 <b class="iv2-num">約 ${cnt(far.km.toLocaleString('en-US'))} 公里</b> 的 <b class="g">${escH(placeShort(far.key))}</b></span></div>` : ''}
+      </div>
+      <div class="iv2-note">${fp.unmatched.length ? `有 ${fp.unmatched.length} 筆地址無法對應到地圖：${escH(fp.unmatched.slice(0,3).join('、'))}${fp.unmatched.length>3?'…':''}` : ''}${fp.noAddr ? `${fp.unmatched.length ? '<br>' : ''}有 ${fp.noAddr} 場維修健檢沒有填地址` : ''}</div>
+    </div>
     <div class="iv2-mapwrap">
       <div class="iv2-map" data-rv style="--d:120ms">
         ${buildMapSvg(fp.places)}
@@ -4109,43 +4204,29 @@ function renderIntro(force){
         ${[0,1,2].map(i=>`<div class="iv2-trip" data-trip="${i}" data-rv style="--d:${260+i*120}ms" onclick="tripClick(${i})">${tripInner(i)}</div>`).join('')}
       </div>
     </div>
-    <div class="iv2-mapstats" data-rv style="--d:100ms">
-      <div><b class="iv2-num">${cnt(String(fp.visits))}</b>場維修健檢</div>
-      <div><b class="iv2-num">${cnt(String(fp.places.length))}</b>個地點</div>
-      ${yearsTxt ? `<div><b class="iv2-num">${yearsTxt}</b>年份</div>` : ''}
-    </div>
-    <div class="iv2-facts">
-      ${top ? `<div class="iv2-fact" data-rv style="--d:80ms"><span><b class="g">${escH(placeShort(top.key))}・<span class="iv2-num">${top.count}</span> 次</b>，是最常去的地方</span></div>` : '<div class="iv2-fact">尚無地點資料</div>'}
-      ${cityCount ? `<div class="iv2-fact" data-rv style="--d:160ms"><span>台灣已經去過 <b class="iv2-num">${cnt(String(cityCount))}</b> 個城市</span></div>` : ''}
-      ${far ? `<div class="iv2-fact" data-rv style="--d:240ms"><span>以台北為起點，去過最遠的地方是距離 <b class="iv2-num">約 ${cnt(far.km.toLocaleString('en-US'))} 公里</b> 的 <b class="g">${escH(placeShort(far.key))}</b></span></div>` : ''}
-    </div>
-    <div class="iv2-note">
-      ${fp.unmatched.length ? `有 ${fp.unmatched.length} 筆地址無法對應到地圖：${escH(fp.unmatched.slice(0,3).join('、'))}${fp.unmatched.length>3?'…':''}` : ''}
-      ${fp.noAddr ? `${fp.unmatched.length ? '<br>' : ''}有 ${fp.noAddr} 場維修健檢沒有填地址` : ''}
-    </div>
-  </section>
+  </div></section>
 
-  <section class="iv2-sec">
-    <div class="iv2-eyebrow" data-rv>05　維修成果</div>
-    <div class="iv2-h" data-rv style="--d:80ms">整體維修率${rep.source==='sample' ? sampleTag : ''}</div>
+  <section class="iv2-slide iv2-s5" data-slide="4"><div class="iv2-wrap">
     <div class="iv2-rate-grid">
-    <div class="iv2-rate-l">
-    <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
-    <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
-    ${buildRepairDonut(rep.ok, rep.no)}
-    <div class="iv2-readout">將滑鼠移到圓餅上查看各項</div>
+      <div class="iv2-rate-l">
+        ${head('05　維修成果', '整體維修率', '', rep.source==='sample' ? sampleTag : '')}
+        <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
+        <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
+        ${buildRepairDonut(rep.ok, rep.no)}
+        <div class="iv2-readout">將滑鼠移到圓餅上查看各項</div>
+      </div>
+      <div class="iv2-lg" data-rv>
+        ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
+        ${legendGroup('失敗', rep.no, NO_SHADES, 'no')}
+      </div>
     </div>
-    <div class="iv2-lg" data-rv>
-      ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
-      ${legendGroup('失敗', rep.no, NO_SHADES, 'no')}
-    </div>
-    </div>
+  </div></section>
 
-    <div class="iv2-h iv2-h2" data-rv>最常維修的家電 Top 10${topItems.sample ? sampleTag : ''}</div>
-    <div class="iv2-p" data-rv style="--d:80ms">依送修件數排序，看看大家最常把哪些小家電帶來給家電醫生。</div>
+  <section class="iv2-slide iv2-s6" data-slide="5"><div class="iv2-wrap">
+    ${head('06　熱門品項', '最常維修的家電 Top 10', '依送修件數排序，看看大家最常把哪些小家電帶來給家電醫生。', topItems.sample ? sampleTag : '')}
     ${buildTopItems(topItems.top)}
     ${notes.length ? `<div class="iv2-note">${notes.join('<br>')}</div>` : ''}
-  </section>`;
+  </div></section>`;
 
   bindDonut(root);
   bindLogos(root);
@@ -4161,6 +4242,7 @@ document.getElementById('sync-pill').style.display = 'flex';
 document.getElementById('q').addEventListener('input',function(){searchQ=this.value.trim();render();});
 // 開啟即拉取真實資料，每 10 秒自動同步
 fetchData().then(()=>startAutoSync());
+if(introAutoplay) switchTab('intro');
 setTimeout(()=>loadIntroSummary().then(()=>{ if(currentTab==='intro') renderIntro(); }), 1200);
 // 每分鐘重新渲染看板，讓計時數字更新
 setInterval(()=>{ if(allCards.length) render(); }, 60000);
