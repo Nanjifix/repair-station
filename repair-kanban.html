@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>小家電維修所</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;900&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,10 +29,17 @@ body{
   font-family:'Noto Sans TC',system-ui,sans-serif;
   font-size:16px;
   color:var(--text);
-  min-height:100vh;
-  padding-bottom:var(--tab-h);
   -webkit-tap-highlight-color:transparent;
   overscroll-behavior:none;
+}
+/* 整個網頁不捲動，只捲動中間內容區 → 底部選單永遠固定在最下方（修正 iPhone 網址列伸縮、回彈時選單被帶著跑） */
+html,body{height:100%;overflow:hidden;}
+#app-scroll{
+  position:fixed;top:0;left:0;right:0;
+  bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
 }
 
 /* ══ TOP BAR ══ */
@@ -81,7 +88,7 @@ body{
 /* ══ BOTTOM TAB BAR ══ */
 .tabbar{
   position:fixed;bottom:0;left:0;right:0;
-  height:var(--tab-h);
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom));
   background:var(--surface);
   border-top:1px solid var(--border);
   display:flex;align-items:stretch;
@@ -558,7 +565,7 @@ input:checked+.slider::before{transform:translateX(20px);}
   --i-green:#1e7a4c; --i-green-t:#e9f4ed; --i-yellow:#e3a03a; --i-yellow-t:#fcf2df;
   --i-land:#e1e6e0;
   background:#fff;color:var(--i-ink);
-  min-height:calc(100vh - 64px - var(--tab-h));
+  min-height:calc(100% - 64px);
 }
 body:has(#page-intro.active){background:#fff;}
 .iv2{max-width:520px;margin:0 auto;padding:40px 22px 88px;}
@@ -588,6 +595,9 @@ body:has(#page-intro.active){background:#fff;}
 }
 .iv2-photo svg{width:26px;height:26px;}
 .iv2-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.iv2-upl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--i-ink);font-size:11px;font-weight:600;white-space:nowrap;}
+.iv2-upl i{width:11px;height:11px;border-radius:50%;border:2px solid var(--i-green);border-right-color:transparent;animation:spin .8s linear infinite;}
+.iv2-photo img,.iv2-trip img{background:var(--i-soft);}
 .iv2-photo-chg{position:absolute;right:8px;bottom:8px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.9);color:var(--i-ink);font-size:11px;font-weight:600;}
 
 /* 數字方塊 */
@@ -719,7 +729,7 @@ body:has(#page-intro.active){background:#fff;}
 .lbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
 .lbar.on{transform:scaleX(.75);}
 .lbar.done{transform:scaleX(1);opacity:0;transition:transform .2s,opacity .3s .1s;}
-.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-wrap;word-break:break-all;max-width:90vw;text-align:left;}
+.toast{position:fixed;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-wrap;word-break:break-all;max-width:90vw;text-align:left;}
 .toast.show{opacity:1;}
 
 /* ══ PHOTO SECTION ══ */
@@ -765,6 +775,7 @@ body:has(#page-intro.active){background:#fff;}
 <div class="lbar" id="lbar"></div>
 <div class="toast" id="toast"></div>
 
+<div id="app-scroll">
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-left">
@@ -945,6 +956,8 @@ body:has(#page-intro.active){background:#fff;}
 </div>
 
 <!-- MODAL (repair card detail) -->
+ </div><!-- /app-scroll -->
+
 <div class="moverlay" id="mov" style="display:none" onclick="closeBg(event)">
   <div class="modal">
     <div class="m-handle"></div>
@@ -1230,6 +1243,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   // 更新 topbar 標題
   document.getElementById('topbar-title').textContent = PAGE_TITLES[tab] || '';
+  const _sc = document.getElementById('app-scroll'); if(_sc) _sc.scrollTop = 0;   // 換分頁回到最上方
   // sync-pill 只在維修頁顯示
   const isRepair = tab === 'repair';
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
@@ -1287,7 +1301,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0zWIqbw_RSFSOu5r5z_cVnfiRizzfwCeV8fR19aZbjQiqf3oO3t5nsOKfpHQJMKrF/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyrsHDIanJ5cwrjnzPvAGjiXBkC7Q9V4wNWFau2-F4vsI41GM9YEV5-qP_zcxN5O98Q/exec';
 
 // ══ 資料同步（版本號輪詢：表單有變動才下載整份資料）══
 // 每 3 秒只問 Google「資料版本」（很小、很快），版本變了才重新抓整份；
@@ -2909,8 +2923,8 @@ function buildPhotoSection(c, sid, zone, maxCount){
   </div>`;
 }
 // 壓縮圖片到最長邊 1200px，JPEG 品質 0.82
-function compressImage(file, callback){
-  const MAX = 780, Q = 0.82;
+function compressImage(file, callback, maxSize){
+  const MAX = maxSize || 780, Q = 0.82;
   const reader = new FileReader();
   reader.onload = function(e){
     const img = new Image();
@@ -3152,20 +3166,29 @@ async function loadIntroSummary(force){
   if(!force && _introFreshAt && Date.now()-_introFreshAt < 60000) return;
   if(_introLoading) return _introLoading;      // 同時只發一次請求
   _introLoading = (async()=>{
-    await Promise.all(['summary','footprint'].map(async k=>{
+    const photoJob = (async()=>{
+      try{
+        const res = await fetch(GAS_URL + '?action=introPhotos&t=' + Date.now());
+        const j = await res.json();
+        if(j && j.photos) introData.photos = j.photos;
+      }catch(e){}
+    })();
+    await Promise.all([photoJob, ...['summary','footprint'].map(async k=>{
       try{
         const r = await fetchSheet(INTRO_SHEETS[k]);
         if(r.ok){ introData[k] = r.data; introData.state[k] = 'ok'; introData.msg[k] = ''; }
         else if(!introData[k]){ introData.state[k] = r.msg ? 'error' : 'missing'; introData.msg[k] = r.msg; }
       }catch(e){ if(!introData[k]){ introData.state[k] = 'error'; introData.msg[k] = e.message; } }
-    }));
+    })]);
     introData.at = _introFreshAt = Date.now();
-    // 存一份在這台裝置，下次打開「簡介」可立即顯示
-    if(introData.summary || introData.footprint){
-      try{ localStorage.setItem('introCache', JSON.stringify({ summary:introData.summary, footprint:introData.footprint, at:introData.at })); }catch(e){}
-    }
+    saveIntroCache();
   })();
   try{ await _introLoading; } finally { _introLoading = null; }
+}
+// 存一份在這台裝置，下次打開「簡介」可立即顯示
+function saveIntroCache(){
+  if(!(introData.summary || introData.footprint)) return;
+  try{ localStorage.setItem('introCache', JSON.stringify({ summary:introData.summary, footprint:introData.footprint, photos:introData.photos||null, at:introData.at })); }catch(e){}
 }
 // 上次的快取（讓簡介頁不用等）
 (function(){
@@ -3174,6 +3197,7 @@ async function loadIntroSummary(force){
     if(c && (c.summary || c.footprint)){
       introData.summary = c.summary || null; introData.footprint = c.footprint || null;
       introData.state = { summary: c.summary ? 'ok' : 'idle', footprint: c.footprint ? 'ok' : 'idle' };
+      introData.photos = c.photos || null;
       introData.at = c.at || 1;
     }
   }catch(e){}
@@ -3513,64 +3537,82 @@ function bindDonut(root){
   });
 }
 
-// ── 照片：團隊照片 + 三張回憶照片（存在這台裝置）──
-function photoInner(photo){
-  return photo ? `<img src="${escH(photo)}" alt="團隊照片"><span class="iv2-photo-chg">更換</span>`
-               : `${ICONS.camera}點此上傳<br>團隊照片`;
+// ── 照片：團隊照片 + 三張回憶照片（上傳到 Google Drive，所有裝置共用；點圖片即可更換）──
+const UPLOAD_BADGE = '<span class="iv2-upl"><i></i>上傳中</span>';
+const _introUploading = {};   // slot → 上傳中的本機預覽
+function slotPhoto(slot){
+  const cloud = introData.photos && introData.photos[slot];
+  if(_introUploading[slot]) return { src:_introUploading[slot], cap:(cloud && cloud.cap) || '', uploading:true };
+  if(cloud && cloud.id) return { src:`https://drive.google.com/thumbnail?id=${encodeURIComponent(cloud.id)}&sz=w1200`, cap:cloud.cap || '' };
+  // 舊版存在本機、尚未上傳的照片
+  try{
+    if(slot==='team'){ const l = localStorage.getItem('introPhoto'); if(l) return { src:l, cap:'', local:true }; }
+    else { const t = JSON.parse(localStorage.getItem('introTrip'+slot.slice(4))||'null'); if(t && t.img) return { src:t.img, cap:t.cap||'', local:true }; }
+  }catch(e){}
+  if(slot==='team' && cellText(INTRO_CELLS.photoUrl)) return { src:driveThumb(cellText(INTRO_CELLS.photoUrl)), cap:'' };
+  return null;
 }
-function getTrip(i){ try{ return JSON.parse(localStorage.getItem('introTrip'+i)||'null') || {}; }catch(e){ return {}; } }
+function photoInner(){
+  const p = slotPhoto('team');
+  return p ? `<img src="${escH(p.src)}" alt="團隊照片" referrerpolicy="no-referrer">${p.uploading ? UPLOAD_BADGE : ''}`
+           : `${ICONS.camera}點此上傳<br>團隊照片`;
+}
 function tripInner(i){
-  const t = getTrip(i);
-  if(t.img) return `<img src="${t.img}" alt="${escH(t.cap||'回憶照片')}">${t.cap ? `<span class="iv2-trip-cap">${escH(t.cap)}</span>` : ''}`;
+  const p = slotPhoto('trip'+i);
+  if(p) return `<img src="${escH(p.src)}" alt="${escH(p.cap||'回憶照片')}" referrerpolicy="no-referrer">${p.cap ? `<span class="iv2-trip-cap">${escH(p.cap)}</span>` : ''}${p.uploading ? UPLOAD_BADGE : ''}`;
   return `${ICONS.plus}<span>回憶照片 ${i+1}</span>`;
 }
-function refreshTrip(i){
-  const el = document.querySelector(`.iv2-trip[data-trip="${i}"]`);
-  if(el) el.innerHTML = tripInner(i);
+function refreshIntroSlot(slot){
+  const el = slot==='team' ? document.querySelector('#intro-root .iv2-photo')
+                           : document.querySelector(`.iv2-trip[data-trip="${slot.slice(4)}"]`);
+  if(el) el.innerHTML = slot==='team' ? photoInner() : tripInner(Number(slot.slice(4)));
 }
-function tripClick(i){ getTrip(i).img ? openTripView(i) : pickTripPhoto(i); }
-function pickTripPhoto(i){
+function pickIntroPhoto(){ pickSlotPhoto('team'); }
+function tripClick(i){ pickSlotPhoto('trip'+i); }
+function pickSlotPhoto(slot){
+  if(_introUploading[slot]) return;
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'image/*';
   inp.onchange = function(){
     if(!inp.files || !inp.files[0]) return;
-    compressImage(inp.files[0], function(dataUrl){
-      const old = getTrip(i);
-      const cap = prompt('照片說明（例如：2019 澎湖馬公，可留空）：', old.cap || '');
-      try{ localStorage.setItem('introTrip'+i, JSON.stringify({ img:dataUrl, cap: cap===null ? (old.cap||'') : cap.trim() })); }
-      catch(e){ showToast('⚠️ 照片太大，無法儲存'); return; }
-      refreshTrip(i);
-    });
+    compressImage(inp.files[0], async function(dataUrl){
+      let caption;
+      if(slot !== 'team'){
+        const old = slotPhoto(slot);
+        const c = prompt('照片說明（例如：2019 澎湖馬公，可留空）：', (old && old.cap) || '');
+        caption = c===null ? ((old && old.cap) || '') : c.trim();
+      }
+      _introUploading[slot] = dataUrl;
+      refreshIntroSlot(slot);
+      try{
+        const r = await gasPostPhoto({ action:'uploadIntroPhoto', slot, mimeType:'image/jpeg', base64:dataUrl.split(',')[1], caption });
+        if(!r || r.error) throw new Error((r && r.error) || '上傳失敗');
+        introData.photos = r.photos || introData.photos;
+        // 雲端已有，清掉舊版本機照片
+        try{ slot==='team' ? localStorage.removeItem('introPhoto') : localStorage.removeItem('introTrip'+slot.slice(4)); }catch(e){}
+        saveIntroCache();
+        // 等雲端縮圖載好再換，避免閃一下空白
+        const cloud = slotPhoto(slot) && introData.photos[slot];
+        if(cloud && cloud.id){
+          await new Promise(res=>{ const im = new Image(); im.referrerPolicy='no-referrer'; im.onload = im.onerror = res; im.src = `https://drive.google.com/thumbnail?id=${encodeURIComponent(cloud.id)}&sz=w1200`; setTimeout(res, 8000); });
+        }
+        showToast('✓ 照片已儲存到雲端');
+      }catch(e){
+        showToast('⚠️ 照片上傳失敗：' + e.message, 5000);
+      }finally{
+        delete _introUploading[slot];
+        refreshIntroSlot(slot);
+      }
+    }, 1400);
   };
   inp.click();
-}
-function openTripView(i){
-  const t = getTrip(i);
-  const ov = document.createElement('div');
-  ov.className = 'iv2-tv';
-  ov.innerHTML = `<img src="${t.img}" alt="">
-    ${t.cap ? `<div class="iv2-tv-cap">${escH(t.cap)}</div>` : ''}
-    <div class="iv2-tv-btns">
-      <button data-a="change">更換照片</button><button data-a="cap">修改說明</button><button data-a="del">移除</button><button class="pri" data-a="close">關閉</button>
-    </div>`;
-  ov.onclick = e => {
-    const a = e.target.dataset && e.target.dataset.a;
-    if(e.target===ov || a==='close'){ ov.remove(); return; }
-    if(a==='change'){ ov.remove(); pickTripPhoto(i); }
-    if(a==='cap'){
-      const cap = prompt('照片說明：', t.cap||'');
-      if(cap!==null){ try{ localStorage.setItem('introTrip'+i, JSON.stringify({ img:t.img, cap:cap.trim() })); }catch(err){} refreshTrip(i); ov.remove(); }
-    }
-    if(a==='del' && confirm('確定移除這張照片？')){ try{ localStorage.removeItem('introTrip'+i); }catch(err){} refreshTrip(i); ov.remove(); }
-  };
-  document.body.appendChild(ov);
 }
 
 let _introSig = '';
 function renderIntro(force){
   const root = document.getElementById('intro-root');
   if(!root) return;
-  const sig = JSON.stringify([introData.summary && introData.summary.display, introData.footprint && introData.footprint.display, introData.state]);
+  const sig = JSON.stringify([introData.summary && introData.summary.display, introData.footprint && introData.footprint.display, introData.state, introData.photos||null]);
   if(!force && sig===_introSig && root.querySelector('.iv2-sec')) return;
   clearTimeout(_introLdTimer);
   if(!introData.summary && !introData.footprint && (introData.state.summary==='error' || introData.state.footprint==='error')){
@@ -3584,11 +3626,9 @@ function renderIntro(force){
   _introSig = sig;
 
   const logoSrc = (document.querySelector('.topbar-logo-img')||{}).src || '';
-  let photo = '';
-  try{ photo = localStorage.getItem('introPhoto') || ''; }catch(e){}
-  if(!photo && cellText(INTRO_CELLS.photoUrl)) photo = driveThumb(cellText(INTRO_CELLS.photoUrl));
 
   const val = a1 => cnt(cellText(a1) || '—');
+  const intVal = a1 => { const t = cellText(a1); if(!t || !/\d/.test(t)) return cnt(t || '—'); return cnt(Math.round(toNum(t)).toLocaleString('en-US')); };
   const fp  = getFootprint();
   const rep = getRepairBreakdown();
   const okSum = rep.ok.reduce((s,x)=>s+x[1],0), noSum = rep.no.reduce((s,x)=>s+x[1],0), tot = okSum+noSum || 1;
@@ -3599,6 +3639,7 @@ function renderIntro(force){
   const rateNum = rateTxt.replace(/%$/,''), hasPct = /%$/.test(rateTxt);
   const sampleTag = '<span class="iv2-tag">示意資料</span>';
   const top = fp.places[0];
+  const cityCount = new Set(fp.places.map(p=>String(p.key).slice(0,3))).size;   // 依縣市計算：新北市、台北市各算一個
   const yearsTxt = fp.yMin ? (fp.yMin===fp.yMax ? `${fp.yMin}` : `${fp.yMin}–${fp.yMax}`) : '';
 
   // 圓餅細項資訊（給互動用）
@@ -3629,7 +3670,7 @@ function renderIntro(force){
     <div class="iv2-eyebrow" data-rv>01　關於我們</div>
     <div class="iv2-about">
       <div class="iv2-about-t" data-rv style="--d:80ms">創立於 <b class="iv2-num">2016</b> 年，我們是由一群各自有正職工作，利用假日透過維修回饋社會的「家電醫生」。</div>
-      <div class="iv2-photo" data-rv style="--d:200ms" onclick="pickIntroPhoto()">${photoInner(photo)}</div>
+      <div class="iv2-photo" data-rv style="--d:200ms" onclick="pickIntroPhoto()">${photoInner()}</div>
     </div>
   </section>
 
@@ -3660,13 +3701,13 @@ function renderIntro(force){
     <div class="iv2-tiles">
       <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-soft);color:var(--i-gray);">
         ${ICONS.waste}
-        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
+        <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.wasteKg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少廢棄物</div>
-        ${eqText(cellText(INTRO_CELLS.wasteKg), TRUCK_KG, 1, '約 ', ' 輛垃圾車進垃圾場')}
+        ${eqText(cellText(INTRO_CELLS.wasteKg), TRUCK_KG, 0, '約 ', ' 輛垃圾車進垃圾場')}
       </div>
       <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-green-t);color:var(--i-green);">
         ${ICONS.co2}
-        <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
+        <div class="iv2-tile-n iv2-num">${intVal(INTRO_CELLS.co2Kg)}<span class="iv2-tile-u">kg</span></div>
         <div class="iv2-tile-l">減少碳排放 CO₂e</div>
         ${eqText(cellText(INTRO_CELLS.co2Kg), TREE_KG, 0, '約種植了 ', ' 棵樹')}
       </div>
@@ -3693,6 +3734,7 @@ function renderIntro(force){
     </div>
     <div class="iv2-note">
       ${top ? `最常前往：${escH(top.name)}・${top.count} 次` : '尚無地點資料'}
+      ${cityCount ? `<br>去過 <b class="iv2-num" style="color:var(--i-ink);">${cityCount}</b> 個城市` : ''}
       ${fp.unmatched.length ? `<br>有 ${fp.unmatched.length} 筆地址無法對應到地圖：${escH(fp.unmatched.slice(0,3).join('、'))}${fp.unmatched.length>3?'…':''}` : ''}
       ${fp.noAddr ? `<br>有 ${fp.noAddr} 場維修健檢沒有填地址` : ''}
     </div>
@@ -3716,20 +3758,6 @@ function renderIntro(force){
   initIntroMotion(root);
 }
 
-function pickIntroPhoto(){
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = function(){
-    if(!inp.files || !inp.files[0]) return;
-    compressImage(inp.files[0], function(dataUrl){
-      try{ localStorage.setItem('introPhoto', dataUrl); }
-      catch(e){ showToast('⚠️ 照片太大，無法儲存'); return; }
-      const el = document.querySelector('#intro-root .iv2-photo');
-      if(el) el.innerHTML = photoInner(dataUrl);
-    });
-  };
-  inp.click();
-}
 
 
 loadSettings();
