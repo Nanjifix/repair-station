@@ -54,7 +54,7 @@ html,body{height:100%;overflow:hidden;}
 }
 .topbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
 .topbar-title{
-  font-size:22px;font-weight:900;color:var(--text);
+  font-size:clamp(17px,5.4vw,22px);font-weight:900;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-family:'Noto Sans TC',sans-serif;line-height:1.2;
 }
@@ -80,6 +80,23 @@ html,body{height:100%;overflow:hidden;}
   flex-shrink:0;
 }
 .tbtn:active{transform:scale(.93);}
+
+
+/* ── 隱藏下方選單（設定可切換；演示時畫面更乾淨）── */
+.tabbar{transition:transform .32s cubic-bezier(.2,.65,.2,1);}
+body.tb-hidden .tabbar{transform:translateY(calc(100% + 2px));box-shadow:none;}
+body.tb-hidden.tb-peek .tabbar{transform:none;box-shadow:0 -2px 12px rgba(28,35,80,.07);}
+body.tb-hidden #app-scroll{bottom:0;}
+body.tb-hidden .toast{bottom:calc(28px + env(safe-area-inset-bottom));}
+.tb-handle{
+  display:none;position:fixed;left:50%;bottom:env(safe-area-inset-bottom);transform:translateX(-50%);
+  width:88px;height:26px;z-index:9998;border:none;background:transparent;cursor:pointer;padding:0;
+}
+.tb-handle::before{content:'';display:block;width:44px;height:5px;border-radius:3px;background:rgba(30,36,33,.16);margin:12px auto 0;transition:background .2s,width .2s;}
+@media(hover:hover){.tb-handle:hover::before{background:rgba(30,36,33,.35);width:56px;}}
+body.tb-hidden .tb-handle{display:block;}
+body.tb-hidden.tb-peek .tb-handle{display:none;}
+body.tb-hidden .topbar-logo-img{cursor:pointer;}
 
 /* ══ PAGES ══ */
 .page{display:none;}
@@ -720,6 +737,97 @@ body:has(#page-intro.active){background:#fff;}
 .iv2-lg-i.on span{font-size:17px;font-weight:700;color:var(--i-ink);}
 .iv2-lg-i.on b{font-size:16px;color:var(--i-ink);}
 
+
+/* ── 簡介：平板 / 電腦版面 ── */
+@media (min-width:640px){
+  .iv2{max-width:760px;padding:56px 40px 110px;}
+  .iv2-sec{margin-bottom:96px;}
+  .iv2-eyebrow{font-size:13px;}
+  .iv2-h{font-size:28px;}
+  .iv2-p{font-size:15.5px;}
+  .iv2-hero img{width:150px;height:150px;}
+  .iv2-hero-t{font-size:32px;}
+  .iv2-about{gap:32px;}
+  .iv2-about-t{font-size:21px;}
+  .iv2-tiles{gap:16px;}
+  .iv2-tile{padding:28px 24px 24px;border-radius:28px;}
+  .iv2-tile-n{font-size:clamp(36px,6vw,52px);white-space:nowrap;overflow-wrap:normal;}
+  .iv2-tile-l{font-size:14.5px;}
+  .iv2-tile-x{font-size:13px;}
+  .iv2-big-n{font-size:84px;}
+  .iv2-big-u{font-size:22px;}
+  .iv2-big-l{font-size:15.5px;}
+  .iv2-mapwrap{gap:16px;}
+  .iv2-trip{font-size:12.5px;}
+  .iv2-trip-cap{font-size:12.5px;padding:22px 12px 9px;}
+  .iv2-mapstats b{font-size:32px;}
+  .iv2-mapstats div{font-size:13px;}
+  .iv2-note{font-size:13.5px;}
+  .iv2-rate-n{font-size:96px;}
+  .iv2-rate-n small{font-size:40px;}
+  .iv2-rate-s{font-size:15px;}
+  .pv-donut{max-width:320px;}
+  .iv2-lg-i{font-size:14.5px;}
+}
+@media (min-width:1000px){
+  .iv2{max-width:1120px;padding:80px 64px 140px;}
+  .iv2-sec{margin-bottom:132px;}
+  .iv2-eyebrow{font-size:14px;margin-bottom:14px;}
+  .iv2-h{font-size:36px;}
+  .iv2-p{font-size:17px;}
+  .iv2-hero{padding-top:24px;}
+  .iv2-hero img{width:184px;height:184px;}
+  .iv2-hero-t{font-size:44px;margin-top:24px;}
+  .iv2-hero-s{font-size:14px;}
+  .iv2-about{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:64px;margin-top:24px;}
+  .iv2-about-t{font-size:28px;line-height:1.9;}
+  .iv2-photo{aspect-ratio:4/3.6;border-radius:28px;}
+  .iv2-tiles{gap:20px;margin-top:28px;}
+  .iv2-tile{padding:34px 30px 30px;}
+  .iv2-tile-ico{width:30px;height:30px;margin-bottom:22px;}
+  .iv2-tile-n{font-size:clamp(40px,4vw,62px);white-space:nowrap;overflow-wrap:normal;}
+  .iv2-tile-u{font-size:18px;}
+  .iv2-tile-l{font-size:16px;}
+  .iv2-tile-x{font-size:14px;}
+  /* 社會效益：大數字在左、兩個方塊在右 */
+  .iv2-impact{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.6fr);gap:40px;align-items:center;margin-top:32px;}
+  .iv2-impact .iv2-big,.iv2-impact .iv2-tiles{margin-top:0;}
+  .iv2-big > div:first-child{white-space:nowrap;}
+  .iv2-big-n{font-size:clamp(64px,6vw,104px);}
+  .iv2-big-u{font-size:28px;}
+  .iv2-big-l{font-size:17px;margin-top:14px;}
+  /* 足跡：地圖與照片各半 */
+  .iv2-mapwrap{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;margin-top:28px;}
+  .iv2-mapwrap .iv2-map{padding:28px 20px 18px;border-radius:30px;}
+  .iv2-trips{gap:20px;}
+  .iv2-trip{border-radius:24px;font-size:14px;}
+  .iv2-trip svg{width:26px;height:26px;}
+  .iv2-trip-cap{font-size:14px;padding:30px 16px 12px;}
+  .iv2-mapstats{gap:16px 56px;margin-top:28px;}
+  .iv2-mapstats b{font-size:40px;}
+  .iv2-mapstats div{font-size:14px;}
+  .iv2-note{font-size:14.5px;}
+  /* 維修成果：左邊數字與圓餅、右邊圖例 */
+  .iv2-rate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center;}
+  .iv2-rate-n{font-size:120px;}
+  .iv2-rate-n small{font-size:48px;}
+  .iv2-rate-s{font-size:16px;}
+  .pv-donut{width:86%;max-width:400px;margin:36px auto 24px;}
+  .iv2-readout{font-size:14px;}
+  .iv2-readout b{font-size:17px;}
+  .iv2-lg{gap:26px;}
+  .iv2-lg-h{font-size:13px;}
+  .iv2-lg-i{font-size:15.5px;padding:8px 12px;margin:0 -12px;}
+  .iv2-lg-i b{font-size:15px;}
+  .iv2-lg-i.on span{font-size:20px;}
+  .iv2-lg-i.on b{font-size:19px;}
+}
+@media (min-width:1600px){
+  .iv2{max-width:1280px;}
+  .iv2-about-t{font-size:32px;}
+  .iv2-h{font-size:40px;}
+}
+
 @media (prefers-reduced-motion: reduce){
   #page-intro [data-rv], .pv-map .iv2-dot{opacity:1!important;transform:none!important;transition:none!important;}
   .pv-donut .iv2-sweep{stroke-dashoffset:0!important;transition:none!important;}
@@ -902,13 +1010,24 @@ body:has(#page-intro.active){background:#fff;}
         </label>
       </div>
 
-      <div class="settings-row" style="border:none;padding:0;">
+      <div class="settings-row" style="border:none;padding:0 0 14px;margin-bottom:14px;">
         <div class="sr-left">
           <div class="sr-label">自動同步</div>
-          <div class="sr-desc">每 30 秒自動從 Google Sheets 更新資料</div>
+          <div class="sr-desc">Google 表單有變動時，約 3 秒內自動更新</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="toggle-autosync" checked onchange="saveSettings()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-row" style="border:none;padding:0;">
+        <div class="sr-left">
+          <div class="sr-label">隱藏下方選單</div>
+          <div class="sr-desc">適合簡報演示，畫面更乾淨。隱藏後點右上角 Logo，或畫面最下方的小橫條，可暫時叫出選單</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-tabbar" onchange="saveSettings()">
           <span class="slider"></span>
         </label>
       </div>
@@ -982,6 +1101,7 @@ body:has(#page-intro.active){background:#fff;}
 </div>
 
 <!-- BOTTOM TAB BAR -->
+<button class="tb-handle" id="tb-handle" aria-label="顯示下方選單" onclick="peekTabbar(true)"></button>
 <nav class="tabbar">
   <button class="tab" id="tab-intro" onclick="switchTab('intro')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1200,7 +1320,10 @@ function loadSettings(){
   const as = localStorage.getItem('autoSync');
   autoSync = as===null ? true : as==='true';
   document.getElementById('toggle-autosync').checked = autoSync;
+  tabbarHidden = localStorage.getItem('tabbarHidden') === 'true';
+  document.getElementById('toggle-tabbar').checked = tabbarHidden;
   applyInterviewSetting();
+  applyTabbarSetting();
 }
 function saveSettings(){
   const url = document.getElementById('gas-url-input').value.trim();
@@ -1213,9 +1336,33 @@ function saveSettings(){
   localStorage.setItem('interviewEnabled', interviewEnabled);
   autoSync = document.getElementById('toggle-autosync').checked;
   localStorage.setItem('autoSync', autoSync);
+  const th = document.getElementById('toggle-tabbar').checked;
+  if(th !== tabbarHidden){
+    tabbarHidden = th;
+    localStorage.setItem('tabbarHidden', tabbarHidden);
+    applyTabbarSetting();
+    if(tabbarHidden) showToast('已隱藏選單，點右上角 Logo 或最下方小橫條可叫出');
+  }
   applyInterviewSetting();
   startAutoSync();
 }
+// ── 下方選單 隱藏 / 暫時叫出 ──
+let tabbarHidden = false;
+function applyTabbarSetting(){
+  document.body.classList.toggle('tb-hidden', tabbarHidden);
+  document.body.classList.remove('tb-peek');
+}
+function peekTabbar(on){
+  if(!tabbarHidden) return;
+  const want = (on === undefined) ? !document.body.classList.contains('tb-peek') : on;
+  document.body.classList.toggle('tb-peek', want);
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  const logo = document.querySelector('.topbar-logo-img');
+  if(logo) logo.addEventListener('click', e=>{ if(tabbarHidden){ e.stopPropagation(); peekTabbar(); } });
+  const sc = document.getElementById('app-scroll');
+  if(sc) sc.addEventListener('click', ()=>peekTabbar(false));   // 點畫面其他地方收起
+});
 function openLink(inputId){
   const url = document.getElementById(inputId).value.trim();
   if(url) window.open(url, '_blank');
@@ -1229,7 +1376,7 @@ function applyInterviewSetting(){
 
 // ══ 分頁切換 ══
 const PAGE_TITLES = {
-  intro:     '團隊簡介',
+  intro:     'Hi 我們是小家電維修所',
   repair:    '維修看板',
   interview: '訪問記錄',
   stats:     '維修統計',
@@ -1244,6 +1391,7 @@ function switchTab(tab){
   // 更新 topbar 標題
   document.getElementById('topbar-title').textContent = PAGE_TITLES[tab] || '';
   const _sc = document.getElementById('app-scroll'); if(_sc) _sc.scrollTop = 0;   // 換分頁回到最上方
+  if(tabbarHidden) document.body.classList.remove('tb-peek');                    // 選完分頁就再收起
   // sync-pill 只在維修頁顯示
   const isRepair = tab === 'repair';
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
@@ -3694,6 +3842,7 @@ function renderIntro(force){
   <section class="iv2-sec">
     <div class="iv2-eyebrow" data-rv>03　社會效益</div>
     <div class="iv2-h" data-rv style="--d:80ms">每一台修好的家電，都是少一份廢棄物</div>
+    <div class="iv2-impact">
     <div class="iv2-big" data-rv style="--d:140ms">
       <div><span class="iv2-big-n iv2-num">${val(INTRO_CELLS.repaired)}</span><span class="iv2-big-u">台</span></div>
       <div class="iv2-big-l">總共維修的小家電</div>
@@ -3711,6 +3860,7 @@ function renderIntro(force){
         <div class="iv2-tile-l">減少碳排放 CO₂e</div>
         ${eqText(cellText(INTRO_CELLS.co2Kg), TREE_KG, 0, '約種植了 ', ' 棵樹')}
       </div>
+    </div>
     </div>
   </section>
 
@@ -3743,13 +3893,17 @@ function renderIntro(force){
   <section class="iv2-sec">
     <div class="iv2-eyebrow" data-rv>05　維修成果</div>
     <div class="iv2-h" data-rv style="--d:80ms">整體維修率${rep.source==='sample' ? sampleTag : ''}</div>
+    <div class="iv2-rate-grid">
+    <div class="iv2-rate-l">
     <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
     <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
     ${buildRepairDonut(rep.ok, rep.no)}
-    <div class="iv2-readout">將滑鼠移到圓餅上（手機請點選），查看各項細節</div>
+    <div class="iv2-readout">將滑鼠移到圓餅上查看各項</div>
+    </div>
     <div class="iv2-lg" data-rv>
       ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
       ${legendGroup('失敗', rep.no, NO_SHADES, 'no')}
+    </div>
     </div>
     ${notes.length ? `<div class="iv2-note">${notes.join('<br>')}</div>` : ''}
   </section>`;
