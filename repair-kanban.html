@@ -756,6 +756,56 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
   .iv2-rk-v{text-align:right;}
 }
 
+/* ── 07 我們能做什麼（能力 × 合作方向）── */
+.iv2-view{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-bottom:var(--sp-block);}
+.iv2-view-l{font-size:var(--fs-small);font-weight:600;color:var(--i-gray2);letter-spacing:.06em;}
+.iv2-segc{display:inline-flex;background:var(--i-soft);border-radius:999px;padding:4px;gap:2px;}
+.iv2-segc button{border:none;background:transparent;padding:.55em 1.25em;border-radius:999px;font-size:var(--fs-body);font-weight:600;color:var(--i-gray);cursor:pointer;transition:background .25s,color .25s,box-shadow .25s;}
+.iv2-segc button.on{background:#fff;color:var(--i-ink);box-shadow:0 1px 3px rgba(30,40,35,.12);}
+.iv2-segc button[data-v="biz"].on{color:#a96c12;}
+.iv2-segc button[data-v="com"].on{color:var(--i-green);}
+.iv2-cap{display:grid;}
+.iv2-cap-hd{display:none;}
+.iv2-cap-row{display:grid;gap:12px;padding:clamp(18px,2.2vh,26px) 0;border-top:1px solid #edf0ec;}
+.iv2-cap-row:last-child{border-bottom:1px solid #edf0ec;}
+.iv2-cap-k{display:flex;align-items:center;gap:12px;}
+.iv2-cap-ico{flex-shrink:0;width:clamp(38px,1.2vw + 32px,48px);aspect-ratio:1/1;border-radius:14px;background:var(--i-green-t);color:var(--i-green);display:flex;align-items:center;justify-content:center;}
+.iv2-cap-ico svg{width:52%;height:52%;}
+.iv2-cap-name{font-size:var(--fs-lead);font-weight:700;color:var(--i-ink);line-height:1.35;}
+.iv2-cap-proof{font-size:var(--fs-small);color:var(--i-green);font-weight:600;margin-top:3px;}
+.iv2-cap-proof:empty{display:none;}
+.iv2-cap-mine{font-size:var(--fs-body);color:var(--i-gray);line-height:1.75;}
+.iv2-cap-mine b,.iv2-cap-co b{color:var(--i-ink);font-weight:700;}
+/* 兩種角度的文字疊在同一格（高度取較高者），切換時淡入淡出 */
+.iv2-cap-co{display:grid;border-radius:16px;padding:14px 16px;font-size:var(--fs-body);line-height:1.75;color:var(--i-ink);background:var(--i-green-t);transition:background .35s;}
+.iv2-cap[data-view="biz"] .iv2-cap-co{background:var(--i-yellow-t);}
+.iv2-cap-co [data-v]{grid-area:1/1;display:block;transition:opacity .35s, transform .35s;}
+.iv2-cap-co [data-v="biz"]{opacity:0;transform:translateY(6px);pointer-events:none;}
+.iv2-cap[data-view="biz"] .iv2-cap-co [data-v="com"]{opacity:0;transform:translateY(-6px);pointer-events:none;}
+.iv2-cap[data-view="biz"] .iv2-cap-co [data-v="biz"]{opacity:1;transform:none;pointer-events:auto;}
+.iv2-cap-lbl{display:block;font-size:var(--fs-eyebrow);font-weight:700;color:var(--i-gray2);letter-spacing:.12em;margin-bottom:6px;}
+.iv2-cap-co .iv2-cap-lbl{color:var(--i-green);}
+.iv2-cap[data-view="biz"] .iv2-cap-co .iv2-cap-lbl{color:#a96c12;}
+.iv2-nw{display:inline-block;}
+@media (min-width:1000px){
+  .iv2-s7-top{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:var(--sp-head);}
+  .iv2-s7-top .iv2-head,.iv2-s7-top .iv2-view{margin-bottom:0;}
+  .iv2-s7-top .iv2-view{flex-shrink:0;}
+}
+@media (min-width:1000px) and (max-height:780px){
+  .iv2-s7 .iv2-p{display:none;}
+  .iv2-cap-row{padding:12px 0;}
+  .iv2-cap-co{padding:10px 14px;}
+  .iv2-cap-mine,.iv2-cap-co{line-height:1.6;}
+}
+@media (min-width:760px){
+  .iv2-cap-hd,.iv2-cap-row{grid-template-columns:minmax(0,.95fr) minmax(0,1.1fr) minmax(0,1.35fr);gap:clamp(20px,2.4vw,40px);align-items:center;}
+  .iv2-cap-hd{display:grid;padding:0 0 12px;font-size:var(--fs-eyebrow);font-weight:700;color:var(--i-gray2);letter-spacing:.12em;}
+  .iv2-cap-hd span:last-child{transition:color .35s;color:var(--i-green);}
+  .iv2-cap[data-view="biz"] .iv2-cap-hd span:last-child{color:#a96c12;}
+  .iv2-cap-row .iv2-cap-lbl{display:none;}
+}
+
 /* ── 電腦：一個畫面 = 一個區塊（簡報模式）── */
 @media (min-width:1000px){
   .iv2{padding-top:0;padding-bottom:0;}
@@ -1407,7 +1457,7 @@ function saveSettings(){
 
 // ══ 簡介：一個畫面一個區塊（簡報）、鍵盤翻頁、自動輪播 ══
 let introAutoplay = false, introDwell = 10;
-let _apTimer = null, _apPauseUntil = 0;
+let _apTimer = null, _apPauseUntil = 0, _apViewTimer = null;
 const AP_PAUSE_MS = 15000;
 function updateSlideH(){
   const sc = document.getElementById('app-scroll'), tb = document.querySelector('.topbar');
@@ -1474,6 +1524,12 @@ function introStep(){
   } else {
     goSlide(next);
   }
+  clearTimeout(_apViewTimer);
+  const target = next >= sl.length ? sl[0] : sl[next];
+  if(target && target.classList.contains('iv2-s7')){
+    setIntroView('com');
+    _apViewTimer = setTimeout(()=>{ if(introAutoplay && currentTab==='intro' && Date.now() >= _apPauseUntil) setIntroView('biz'); }, introDwell*500);
+  }
   scheduleIntroStep(introDwell*1000);
 }
 function startIntroAutoplay(){
@@ -1483,13 +1539,14 @@ function startIntroAutoplay(){
 }
 function restartIntroAutoplay(){ if(introAutoplay && currentTab==='intro') startIntroAutoplay(); }
 function stopIntroAutoplay(keepSetting){
-  clearTimeout(_apTimer); _apTimer = null;
+  clearTimeout(_apTimer); _apTimer = null; clearTimeout(_apViewTimer);
   document.body.classList.remove('iv2-autoplay');
   setAutoBar(0);
 }
 function pauseIntroAutoplay(){
   if(!introAutoplay || currentTab !== 'intro') return;
   _apPauseUntil = Date.now() + AP_PAUSE_MS;
+  clearTimeout(_apViewTimer);
   scheduleIntroStep(AP_PAUSE_MS);
 }
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -3767,6 +3824,7 @@ const ICONS = {
   clinic:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>',
   course:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5"/></svg>',
   waste:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>',
+  data:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V12"/></svg>',
   co2:'<svg class="iv2-tile-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-5.5-7-10 3 0 5.5 1 7 3 1.5-2 4-3 7-3 0 4.5-3 8-7 10z"/><path d="M12 14V3"/></svg>',
   camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="3.5"/><path d="M20.5 7H17l-2-3H9L7 7H3.5A1.5 1.5 0 0 0 2 8.5v11A1.5 1.5 0 0 0 3.5 21h17a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 20.5 7z"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -4053,6 +4111,35 @@ function bindTopItems(root){
   box.addEventListener('pointerleave', ()=>{ box.classList.remove('hl'); box.querySelectorAll('.iv2-rk.on').forEach(x=>x.classList.remove('on')); });
 }
 
+// ── 07 我們能做什麼：能力 × 合作方向 ──
+let introView = 'com';      // com = 維修社群、biz = 企業
+const CAPS = [
+  { icon:'clinic', name:'維修活動',
+    proof:()=>{ const v = cellText(INTRO_CELLS.clinics); return v ? `${escH(v)} 場義診實戰經驗` : ''; },
+    mine:'一手包辦<b>流程設計</b>、<b>場域規劃</b>與<b>現場管理</b>',
+    com:'分享<b>活動 SOP</b>、場地安全檢核與維修動線，讓你也能順利辦好一場維修活動',
+    biz:'<b>企業維修志工日</b>：從規劃到執行全程協助，並陪伴成立內部維修社團' },
+  { icon:'data', name:'維修工具與數據',
+    proof:()=>{ const v = cellText(INTRO_CELLS.repaired); return v ? `${escH(v)} 件維修紀錄` : ''; },
+    mine:'標準化<b>工具配置</b>，累積完整<b>維修紀錄</b>與<b>故障案例庫</b>',
+    com:'提供<b>工具箱配置清單</b>，交流故障案例，一起共建維修資料庫',
+    biz:'<b>產品易維修性改善</b>：以真實維修數據找出痛點，提出易拆解、易維護的設計建議' },
+  { icon:'course', name:'維修教育與體驗',
+    proof:()=>{ const v = cellText(INTRO_CELLS.courses); return v ? `${escH(v)} 場工作坊／課程` : ''; },
+    mine:'<b>客製化課程</b>與<b>遊戲化體驗</b>設計，讓維修好學又好玩',
+    com:'交流教學方法，共享<b>遊戲化教案</b>與<b>線上教材</b>',
+    biz:'<b>ESG 維修工作坊</b>：員工動手修，並走進社區為獨居長者做居家用電安全檢測' },
+];
+function setIntroView(v, byUser){
+  introView = v === 'biz' ? 'biz' : 'com';
+  const box = document.querySelector('#intro-root .iv2-cap');
+  if(box) box.dataset.view = introView;
+  document.querySelectorAll('#intro-root .iv2-segc button').forEach(b=>b.classList.toggle('on', b.dataset.v === introView));
+  const hd = document.getElementById('iv2-cap-co-hd');
+  if(hd) hd.textContent = introView === 'biz' ? '和企業一起做' : '和維修社群一起做';
+  if(byUser) pauseIntroAutoplay();
+}
+
 let _introSig = '';
 function renderIntro(force){
   const root = document.getElementById('intro-root');
@@ -4139,7 +4226,7 @@ function renderIntro(force){
         <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-green-t);color:var(--i-green);">
           ${ICONS.clinic}
           <div class="iv2-tile-n iv2-num">${val(INTRO_CELLS.clinics)}<span class="iv2-tile-u">場</span></div>
-          <div class="iv2-tile-l">家電義診</div>
+          <div class="iv2-tile-l">維修家電義診</div>
         </div>
         <div class="iv2-tile" data-rv style="--d:240ms;background:var(--i-yellow-t);color:#b9781a;">
           ${ICONS.course}
@@ -4191,7 +4278,7 @@ function renderIntro(force){
       <div class="iv2-facts">
         ${top ? `<div class="iv2-fact" data-rv style="--d:80ms"><span><b class="g">${escH(placeShort(top.key))}・<span class="iv2-num">${top.count}</span> 次</b>，是最常去的地方</span></div>` : '<div class="iv2-fact">尚無地點資料</div>'}
         ${cityCount ? `<div class="iv2-fact" data-rv style="--d:160ms"><span>台灣已經去過 <b class="iv2-num">${cnt(String(cityCount))}</b> 個城市</span></div>` : ''}
-        ${far ? `<div class="iv2-fact" data-rv style="--d:240ms"><span>以台北為起點，去過最遠的地方是距離 <b class="iv2-num">約 ${cnt(far.km.toLocaleString('en-US'))} 公里</b> 的 <b class="g">${escH(placeShort(far.key))}</b></span></div>` : ''}
+        ${far ? `<div class="iv2-fact" data-rv style="--d:240ms"><span>以台北為起點，去過最遠的地方是距離約 ${cnt(far.km.toLocaleString('en-US'))} 公里的 <b class="g">${escH(placeShort(far.key))}</b></span></div>` : ''}
       </div>
       <div class="iv2-note">${fp.unmatched.length ? `有 ${fp.unmatched.length} 筆地址無法對應到地圖：${escH(fp.unmatched.slice(0,3).join('、'))}${fp.unmatched.length>3?'…':''}` : ''}${fp.noAddr ? `${fp.unmatched.length ? '<br>' : ''}有 ${fp.noAddr} 場維修健檢沒有填地址` : ''}</div>
     </div>
@@ -4213,7 +4300,7 @@ function renderIntro(force){
         <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
         <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
         ${buildRepairDonut(rep.ok, rep.no)}
-        <div class="iv2-readout">將滑鼠移到圓餅上查看各項</div>
+        <div class="iv2-readout">滑鼠移到圓餅上查看各項細節</div>
       </div>
       <div class="iv2-lg" data-rv>
         ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
@@ -4226,6 +4313,34 @@ function renderIntro(force){
     ${head('06　熱門品項', '最常維修的家電 Top 10', '依送修件數排序，看看大家最常把哪些小家電帶來給家電醫生。', topItems.sample ? sampleTag : '')}
     ${buildTopItems(topItems.top)}
     ${notes.length ? `<div class="iv2-note">${notes.join('<br>')}</div>` : ''}
+  </div></section>
+
+  <section class="iv2-slide iv2-s7" data-slide="6"><div class="iv2-wrap">
+    <div class="iv2-s7-top">
+    ${head('07　我們能做什麼？', '<span class="iv2-nw">三種核心能力，</span><span class="iv2-nw">一起把維修做得更遠</span>', '從一場活動到長期合作，我們都能和你一起完成。選擇你的角度，看看可以怎麼合作。')}
+    <div class="iv2-view" data-rv style="--d:120ms">
+      <span class="iv2-view-l">我是</span>
+      <div class="iv2-segc" role="tablist" aria-label="選擇閱讀角度">
+        <button type="button" data-v="com" role="tab" class="${introView==='com'?'on':''}" onclick="setIntroView('com',true)">維修社群</button>
+        <button type="button" data-v="biz" role="tab" class="${introView==='biz'?'on':''}" onclick="setIntroView('biz',true)">企業</button>
+      </div>
+    </div>
+    </div>
+    <div class="iv2-cap" data-view="${introView}">
+      <div class="iv2-cap-hd"><span>核心能力</span><span>我們的專長</span><span id="iv2-cap-co-hd">${introView==='biz'?'和企業一起做':'和維修社群一起做'}</span></div>
+      ${CAPS.map((c,i)=>`
+      <div class="iv2-cap-row" data-rv style="--d:${160+i*120}ms">
+        <div class="iv2-cap-k">
+          <span class="iv2-cap-ico">${ICONS[c.icon]}</span>
+          <div><div class="iv2-cap-name">${c.name}</div><div class="iv2-cap-proof">${c.proof()}</div></div>
+        </div>
+        <div class="iv2-cap-mine"><span class="iv2-cap-lbl">我們的專長</span>${c.mine}</div>
+        <div class="iv2-cap-co">
+          <span data-v="com"><span class="iv2-cap-lbl">和維修社群一起做</span>${c.com}</span>
+          <span data-v="biz"><span class="iv2-cap-lbl">和企業一起做</span>${c.biz}</span>
+        </div>
+      </div>`).join('')}
+    </div>
   </div></section>`;
 
   bindDonut(root);
