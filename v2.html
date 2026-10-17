@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>小家電維修所</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;900&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -29,10 +29,17 @@ body{
   font-family:'Noto Sans TC',system-ui,sans-serif;
   font-size:16px;
   color:var(--text);
-  min-height:100vh;
-  padding-bottom:var(--tab-h);
   -webkit-tap-highlight-color:transparent;
   overscroll-behavior:none;
+}
+/* 整個網頁不捲動，只捲動中間內容區 → 底部選單永遠固定在最下方（修正 iPhone 網址列伸縮、回彈時選單被帶著跑） */
+html,body{height:100%;overflow:hidden;}
+#app-scroll{
+  position:fixed;top:0;left:0;right:0;
+  bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
 }
 
 /* ══ TOP BAR ══ */
@@ -81,7 +88,7 @@ body{
 /* ══ BOTTOM TAB BAR ══ */
 .tabbar{
   position:fixed;bottom:0;left:0;right:0;
-  height:var(--tab-h);
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom));
   background:var(--surface);
   border-top:1px solid var(--border);
   display:flex;align-items:stretch;
@@ -558,7 +565,7 @@ input:checked+.slider::before{transform:translateX(20px);}
   --i-green:#1e7a4c; --i-green-t:#e9f4ed; --i-yellow:#e3a03a; --i-yellow-t:#fcf2df;
   --i-land:#e1e6e0;
   background:#fff;color:var(--i-ink);
-  min-height:calc(100vh - 64px - var(--tab-h));
+  min-height:calc(100% - 64px);
 }
 body:has(#page-intro.active){background:#fff;}
 .iv2{max-width:520px;margin:0 auto;padding:40px 22px 88px;}
@@ -722,7 +729,7 @@ body:has(#page-intro.active){background:#fff;}
 .lbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
 .lbar.on{transform:scaleX(.75);}
 .lbar.done{transform:scaleX(1);opacity:0;transition:transform .2s,opacity .3s .1s;}
-.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-wrap;word-break:break-all;max-width:90vw;text-align:left;}
+.toast{position:fixed;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%);background:#1c1e2e;color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-wrap;word-break:break-all;max-width:90vw;text-align:left;}
 .toast.show{opacity:1;}
 
 /* ══ PHOTO SECTION ══ */
@@ -768,6 +775,7 @@ body:has(#page-intro.active){background:#fff;}
 <div class="lbar" id="lbar"></div>
 <div class="toast" id="toast"></div>
 
+<div id="app-scroll">
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-left">
@@ -948,6 +956,8 @@ body:has(#page-intro.active){background:#fff;}
 </div>
 
 <!-- MODAL (repair card detail) -->
+ </div><!-- /app-scroll -->
+
 <div class="moverlay" id="mov" style="display:none" onclick="closeBg(event)">
   <div class="modal">
     <div class="m-handle"></div>
@@ -1233,6 +1243,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   // 更新 topbar 標題
   document.getElementById('topbar-title').textContent = PAGE_TITLES[tab] || '';
+  const _sc = document.getElementById('app-scroll'); if(_sc) _sc.scrollTop = 0;   // 換分頁回到最上方
   // sync-pill 只在維修頁顯示
   const isRepair = tab === 'repair';
   document.getElementById('sync-pill').style.display = isRepair ? 'flex' : 'none';
