@@ -747,19 +747,19 @@ body:has(#page-intro.active){background:#fff;}
 .iv2-lead b{color:var(--i-ink);font-weight:700;}
 /* 合作夥伴 Logo 牆 */
 .iv2-sub{font-size:13px;font-weight:700;color:var(--i-gray2);letter-spacing:.1em;margin:44px 0 14px;}
-.iv2-logos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.iv2-logos{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;max-width:720px;}
 .iv2-logo{
-  position:relative;aspect-ratio:3/2;border-radius:14px;background:var(--i-soft);overflow:hidden;cursor:pointer;
+  position:relative;aspect-ratio:3/2;border-radius:10px;background:var(--i-soft);overflow:hidden;cursor:pointer;
   display:flex;align-items:center;justify-content:center;color:#c3c8c4;
   transition:transform .3s cubic-bezier(.2,.65,.2,1), box-shadow .3s;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
 }
-.iv2-logo svg{width:18px;height:18px;}
-.iv2-logo.has{background:#fff;box-shadow:inset 0 0 0 1px #edf0ec;}
-.iv2-logo img{width:100%;height:100%;object-fit:contain;padding:12%;pointer-events:none;}
-@media(hover:hover){.iv2-logo:hover{transform:translateY(-3px);box-shadow:0 10px 24px -16px rgba(30,60,40,.4);}
-  .iv2-logo.has:hover{box-shadow:inset 0 0 0 1px #edf0ec, 0 10px 24px -16px rgba(30,60,40,.4);}}
-.iv2-logo-x{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(31,36,33,.7);color:#fff;font-size:13px;line-height:22px;cursor:pointer;display:none;padding:0;}
+.iv2-logo svg{width:14px;height:14px;}
+.iv2-logo.has{background:transparent;}
+body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
+.iv2-logo img{width:100%;height:100%;object-fit:contain;padding:8%;pointer-events:none;}
+@media(hover:hover){.iv2-logo:hover{transform:translateY(-2px);}}
+.iv2-logo-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(31,36,33,.7);color:#fff;font-size:13px;line-height:22px;cursor:pointer;display:none;padding:0;}
 @media(hover:hover){.iv2-logo.has:hover .iv2-logo-x{display:block;}}
 .iv2-logo .iv2-upl{font-size:10px;padding:3px 8px;}
 /* 足跡重點 */
@@ -771,7 +771,7 @@ body:has(#page-intro.active){background:#fff;}
 @media (min-width:640px){
   .iv2-tagc{font-size:14.5px;padding:9px 16px;}
   .iv2-lead{font-size:17px;}
-  .iv2-logos{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+  .iv2-logos{gap:8px;}
   .iv2-fact{font-size:16px;}
 }
 @media (min-width:1000px){
@@ -779,11 +779,53 @@ body:has(#page-intro.active){background:#fff;}
   .iv2-tagc{font-size:16px;padding:10px 20px;}
   .iv2-lead{font-size:19px;max-width:820px;margin-top:18px;}
   .iv2-sub{font-size:14px;margin:64px 0 18px;}
-  .iv2-logos{gap:16px;}
-  .iv2-logo{border-radius:18px;}
+  .iv2-logos{gap:10px;max-width:780px;}
+  .iv2-logo{border-radius:12px;}
   .iv2-facts{gap:12px;margin-top:30px;}
   .iv2-fact{font-size:18px;}
 }
+
+/* 最常維修 Top 10（橫條圖）*/
+.iv2-h2{margin-top:72px;}
+.iv2-rank{display:grid;gap:14px;margin-top:22px;}
+.iv2-rk{
+  display:grid;grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"i n v" "i b b";
+  column-gap:10px;row-gap:6px;align-items:center;cursor:default;border-radius:12px;padding:4px 0;transition:background .2s;
+}
+.iv2-rk-i{grid-area:i;align-self:start;padding-top:2px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--i-gray2);text-align:right;}
+.iv2-rk-n{grid-area:n;font-size:14.5px;font-weight:600;color:var(--i-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.iv2-rk-v{grid-area:v;font-size:13px;color:var(--i-gray);white-space:nowrap;}
+.iv2-rk-v b{font-family:'Inter',sans-serif;font-size:15px;color:var(--i-ink);font-weight:700;margin-right:6px;}
+.iv2-rk-bar{grid-area:b;height:12px;border-radius:6px;background:var(--i-soft);overflow:hidden;}
+.iv2-rk-fill{display:block;height:100%;width:var(--w);border-radius:6px;background:#8fc4a1;transform-origin:left;transform:scaleX(0);
+  transition:transform 1.1s cubic-bezier(.2,.65,.2,1) var(--d,0ms);}
+.iv2-rank.in .iv2-rk-fill{transform:scaleX(1);}
+.iv2-rk:nth-child(-n+3) .iv2-rk-fill{background:#3d9466;}
+.iv2-rk:first-child .iv2-rk-fill{background:var(--i-green);}
+.iv2-rk:first-child .iv2-rk-i{color:var(--i-green);}
+.iv2-rank.hl .iv2-rk{opacity:.4;}
+.iv2-rank.hl .iv2-rk.on{opacity:1;}
+.iv2-rk{transition:opacity .2s;}
+@media (min-width:640px){
+  .iv2-rk{grid-template-columns:28px minmax(0,9em) minmax(0,1fr) 9.5em;grid-template-areas:"i n b v";row-gap:0;}
+  .iv2-rk-i{padding-top:0;align-self:center;font-size:14px;}
+  .iv2-rk-n{font-size:15.5px;}
+  .iv2-rk-v{text-align:right;}
+  .iv2-rk-bar{height:16px;border-radius:8px;}
+  .iv2-rk-fill{border-radius:8px;}
+}
+@media (min-width:1000px){
+  .iv2-h2{margin-top:96px;}
+  .iv2-rank{gap:18px;margin-top:32px;}
+  .iv2-rk{grid-template-columns:32px minmax(0,11em) minmax(0,1fr) 10.5em;column-gap:16px;}
+  .iv2-rk-n{font-size:18px;}
+  .iv2-rk-i{font-size:16px;}
+  .iv2-rk-v{font-size:14.5px;}
+  .iv2-rk-v b{font-size:18px;}
+  .iv2-rk-bar{height:20px;border-radius:10px;}
+  .iv2-rk-fill{border-radius:10px;}
+}
+@media (prefers-reduced-motion: reduce){.iv2-rk-fill{transform:none!important;transition:none!important;}}
 
 /* ── 簡介：平板 / 電腦版面 ── */
 @media (min-width:640px){
@@ -3336,6 +3378,7 @@ const INTRO_CELLS = {
   noCount:     'B9',   // 維修成果：失敗件數
   repairRate:  'C8',   // 維修成果：整體維修率（OK_成功 的比例）
   breakdown:   'L2:Q16', // 維修成果：圓餅圖細項（L=結果分類、O=細項、P=件數）
+  topItems:    'S:U',    // 維修成果：最常維修的家電品項（S=品項、T=數量、U=佔比），自動取前 10 名
 };
 // SUMMARY_MAP 分頁的欄位（足跡地圖）
 const FOOTPRINT = { year:'A', date:'B', category:'D', address:'H', match:'維修健檢' };
@@ -3841,7 +3884,7 @@ function farthestFromTaipei(places){
 }
 
 // ── 02 合作夥伴 Logo 牆（20 格，存到 Google Drive，所有裝置共用）──
-const LOGO_COUNT = 20;
+const LOGO_COUNT = 18;
 function logoInner(i){
   const p = slotPhoto('logo'+i);
   if(!p) return ICONS.plus;
@@ -3880,6 +3923,61 @@ async function removeIntroLogo(i){
   }catch(e){ showToast('⚠️ ' + e.message, 4000); }
 }
 
+// ── 05 最常維修的家電品項 Top 10（overall_summary：S 品項、T 數量、U 佔比）──
+const SAMPLE_TOP_ITEMS = [['電風扇',412],['電鍋',356],['吹風機',248],['檯燈',190],['收音機',151],['果汁機',122],['除濕機',98],['電暖器',87],['烤麵包機',64],['咖啡機',52]];
+function getTopItems(){
+  const sh = introData.summary;
+  const cS = colIdx('S'), cT = colIdx('T'), cU = colIdx('U');
+  let rows = [], total = 0;
+  if(sh){
+    const n = (sh.values||[]).length;
+    for(let r=0; r<n; r++){
+      const name = String(cellOf(sh,r,cS).d ?? cellOf(sh,r,cS).v ?? '').trim();
+      const tv = cellOf(sh,r,cT).v, td = cellOf(sh,r,cT).d;
+      const num = toNum(tv);
+      if(!name || !/\d/.test(String(tv ?? td ?? ''))) continue;            // 標題列、空白列略過
+      if(/sub-?total|合計|總計|小計|total/i.test(name)){ continue; }
+      if(num <= 0) continue;
+      const ud = String(cellOf(sh,r,cU).d ?? '').trim(), uv = cellOf(sh,r,cU).v;
+      let pct = null;
+      if(/%/.test(ud)) pct = ud;
+      else if(typeof uv === 'number') pct = (uv <= 1 ? uv*100 : uv);
+      rows.push({ name, n:num, pct });
+    }
+  }
+  const sample = rows.length === 0;
+  if(sample) rows = SAMPLE_TOP_ITEMS.map(([name,n])=>({ name, n, pct:null }));
+  total = rows.reduce((a,x)=>a+x.n, 0) || 1;
+  rows.sort((a,b)=>b.n-a.n);
+  const top = rows.slice(0,10).map(x=>{
+    let pctTxt;
+    if(typeof x.pct === 'string') pctTxt = x.pct;
+    else { const v = (x.pct ?? x.n/total*100); pctTxt = (v < 1 ? '<1' : (v < 10 ? (Math.round(v*10)/10) : Math.round(v))) + '%'; }
+    return { ...x, pctTxt };
+  });
+  return { top, sample };
+}
+function buildTopItems(top){
+  if(!top.length) return '';
+  const max = top[0].n || 1;
+  return `<div class="iv2-rank" data-rv>${top.map((x,i)=>`
+    <div class="iv2-rk" data-rk="${i}">
+      <span class="iv2-rk-i">${i+1}</span>
+      <span class="iv2-rk-n" title="${escH(x.name)}">${escH(x.name)}</span>
+      <span class="iv2-rk-bar"><span class="iv2-rk-fill" style="--w:${Math.max(2, x.n/max*100).toFixed(1)}%;--d:${150+i*90}ms"></span></span>
+      <span class="iv2-rk-v"><b>${cnt(x.n.toLocaleString('en-US'))}</b>件・${escH(x.pctTxt)}</span>
+    </div>`).join('')}</div>`;
+}
+function bindTopItems(root){
+  const box = root.querySelector('.iv2-rank'); if(!box) return;
+  box.addEventListener('pointerover', e=>{
+    if(e.pointerType==='touch') return;
+    const r = e.target.closest('.iv2-rk'); if(!r) return;
+    box.classList.add('hl'); box.querySelectorAll('.iv2-rk').forEach(x=>x.classList.toggle('on', x===r));
+  });
+  box.addEventListener('pointerleave', ()=>{ box.classList.remove('hl'); box.querySelectorAll('.iv2-rk.on').forEach(x=>x.classList.remove('on')); });
+}
+
 let _introSig = '';
 function renderIntro(force){
   const root = document.getElementById('intro-root');
@@ -3913,6 +4011,7 @@ function renderIntro(force){
   const top = fp.places[0];
   const cityCount = new Set(fp.places.map(p=>String(p.key).slice(0,3))).size;   // 依縣市計算：新北市、台北市各算一個
   const far = farthestFromTaipei(fp.places);
+  const topItems = getTopItems();
   const yearsTxt = fp.yMin ? (fp.yMin===fp.yMax ? `${fp.yMin}` : `${fp.yMin}–${fp.yMax}`) : '';
 
   // 圓餅細項資訊（給互動用）
@@ -3953,7 +4052,7 @@ function renderIntro(force){
   <section class="iv2-sec">
     <div class="iv2-eyebrow" data-rv>02　一路走來</div>
     <div class="iv2-h" data-rv style="--d:80ms">一卡維修工具出發！用維修串起每一個角落</div>
-    <div class="iv2-lead" data-rv style="--d:140ms">維修，不必只待在固定的地方。我們拉著一卡維修工具主動出擊，走進<b>藝廊</b>、<b>海科館</b>、<b>校園</b>，甚至 <b>patagonia</b> 門市。哪裡需要修理，哪裡就是我們的維修站。每一次跨界合作，都讓維修變得更日常、更有溫度，也讓更多人願意把壞掉的東西帶來，再給它一次機會。</div>
+    <div class="iv2-lead" data-rv style="--d:140ms">維修不必待在固定據點。我們拉著一卡工具主動出擊，每一次跨界合作，都讓維修變得更日常、更有溫度，也讓更多人願意把壞掉的東西帶來，再給它一次機會。</div>
     <div class="iv2-tiles">
       <div class="iv2-tile" data-rv style="--d:120ms;background:var(--i-green-t);color:var(--i-green);">
         ${ICONS.clinic}
@@ -4034,18 +4133,23 @@ function renderIntro(force){
     <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
     <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
     ${buildRepairDonut(rep.ok, rep.no)}
-    <div class="iv2-readout">將滑鼠移到圓餅上查看各項細節</div>
+    <div class="iv2-readout">將滑鼠移到圓餅上查看各項</div>
     </div>
     <div class="iv2-lg" data-rv>
       ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
       ${legendGroup('失敗', rep.no, NO_SHADES, 'no')}
     </div>
     </div>
+
+    <div class="iv2-h iv2-h2" data-rv>最常維修的家電 Top 10${topItems.sample ? sampleTag : ''}</div>
+    <div class="iv2-p" data-rv style="--d:80ms">依送修件數排序，看看大家最常把哪些小家電帶來給家電醫生。</div>
+    ${buildTopItems(topItems.top)}
     ${notes.length ? `<div class="iv2-note">${notes.join('<br>')}</div>` : ''}
   </section>`;
 
   bindDonut(root);
   bindLogos(root);
+  bindTopItems(root);
   initIntroMotion(root);
 }
 
