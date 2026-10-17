@@ -629,7 +629,7 @@ body:has(#page-intro.active){background:#fff;}
 /* ── 01 封面 + 關於我們 ── */
 .iv2-hero{text-align:center;margin-bottom:clamp(56px,5vw,88px);}
 .iv2-hero img{width:clamp(104px,6vw + 80px,160px);height:auto;aspect-ratio:1/1;object-fit:contain;}
-.iv2-hero-t{font-size:var(--fs-display);font-weight:700;margin-top:18px;letter-spacing:.08em;line-height:1.2;}
+.iv2-hero-t{font-size:var(--fs-display);font-weight:700;margin-top:18px;letter-spacing:.08em;line-height:1.2;white-space:nowrap;}
 .iv2-hero-s{font-size:var(--fs-small);color:var(--i-gray2);letter-spacing:.32em;margin-top:10px;}
 .iv2-about{display:grid;gap:var(--sp-block);}
 .iv2-about-t{font-size:var(--fs-h);line-height:1.6;font-weight:500;color:var(--i-ink);}
@@ -659,7 +659,7 @@ body:has(#page-intro.active){background:#fff;}
 .iv2-tile-x .iv2-num{color:var(--i-ink);font-weight:700;}
 
 /* ── 02 一路走來：合作夥伴 Logo ── */
-.iv2-logos{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.5vw + 4px,10px);max-width:720px;}
+.iv2-logos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,.6vw + 5px,12px);max-width:560px;}
 .iv2-logo{
   position:relative;aspect-ratio:3/2;border-radius:10px;background:var(--i-soft);overflow:hidden;cursor:pointer;
   display:flex;align-items:center;justify-content:center;color:#c3c8c4;transition:transform .3s cubic-bezier(.2,.65,.2,1);
@@ -766,11 +766,11 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
 .iv2-segc button[data-v="com"].on{color:var(--i-green);}
 .iv2-cap{display:grid;}
 .iv2-cap-hd{display:none;}
-.iv2-cap-row{display:grid;gap:12px;padding:clamp(18px,2.2vh,26px) 0;border-top:1px solid #edf0ec;}
+.iv2-cap-row{display:grid;gap:12px;padding:clamp(14px,1.8vh,24px) 0;border-top:1px solid #edf0ec;}
 .iv2-cap-row:last-child{border-bottom:1px solid #edf0ec;}
 .iv2-cap-k{display:flex;align-items:center;gap:12px;}
 .iv2-cap-ico{flex-shrink:0;width:clamp(38px,1.2vw + 32px,48px);aspect-ratio:1/1;border-radius:14px;background:var(--i-green-t);color:var(--i-green);display:flex;align-items:center;justify-content:center;}
-.iv2-cap-ico svg{width:52%;height:52%;}
+.iv2-cap-ico svg,.iv2-cap-ico .iv2-tile-ico{display:block;width:50%;height:50%;margin:0;flex-shrink:0;}
 .iv2-cap-name{font-size:var(--fs-lead);font-weight:700;color:var(--i-ink);line-height:1.35;}
 .iv2-cap-proof{font-size:var(--fs-small);color:var(--i-green);font-weight:600;margin-top:3px;}
 .iv2-cap-proof:empty{display:none;}
@@ -788,9 +788,7 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
 .iv2-cap[data-view="biz"] .iv2-cap-co .iv2-cap-lbl{color:#a96c12;}
 .iv2-nw{display:inline-block;}
 @media (min-width:1000px){
-  .iv2-s7-top{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:var(--sp-head);}
-  .iv2-s7-top .iv2-head,.iv2-s7-top .iv2-view{margin-bottom:0;}
-  .iv2-s7-top .iv2-view{flex-shrink:0;}
+  .iv2-s7 .iv2-view{margin-bottom:14px;}
 }
 @media (min-width:1000px) and (max-height:780px){
   .iv2-s7 .iv2-p{display:none;}
@@ -824,6 +822,7 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
   .iv2-s1 .iv2-photo{aspect-ratio:4/5;max-height:calc(var(--slide-h, 100vh) - 120px);width:100%;}
 
   /* 02：左 文案＋數字，右 合作夥伴 */
+  .iv2-s2 .iv2-cols{align-items:end;}           /* Logo 最底排與左欄底部切齊 */
   .iv2-s2 .iv2-logos{max-width:none;}
 
   /* 03：大數字在左、兩個方塊在右 */
@@ -837,8 +836,10 @@ body.tb-hidden .iv2-logo:not(.has){visibility:hidden;}
   .iv2-map svg.pv-map{height:100%;}
 
   /* 05：左 維修率＋圓餅，右 圖例 */
-  .iv2-rate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(48px,5vw,88px);align-items:center;}
-  .iv2-s5 .iv2-head{margin-bottom:var(--sp-block);}
+  .iv2-rate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"h ." "l r";column-gap:clamp(48px,5vw,88px);align-items:start;}
+  .iv2-rate-grid > .iv2-head{grid-area:h;margin-bottom:var(--sp-block);}
+  .iv2-rate-l{grid-area:l;}
+  .iv2-rate-grid > .iv2-lg{grid-area:r;}
   .pv-donut{width:min(80%, calc(var(--slide-h, 100vh) - 470px), 360px);min-width:220px;margin:var(--sp-block) auto 8px;}
   .iv2-lg-i{padding:clamp(2px,.45vh,6px) 10px;}
   .iv2-lg{gap:clamp(10px,2vh,26px);}
@@ -1670,7 +1671,7 @@ function mapCard(raw){
 }
 
 // ══ GAS API 設定 ══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbznGztxmXfumkm6A8Pu3J7lFKqltndEb6Kd49papWPdVVjio9vbtZ6MUbextM8ugqud/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwyP-zNakbjFbr35qvYJpZfHXtLCGsM9SBryF3olIHjuQRaKGvL30DJkjMNFwa3bOwr/exec';
 
 // ══ 資料同步（版本號輪詢：表單有變動才下載整份資料）══
 // 每 3 秒只問 Google「資料版本」（很小、很快），版本變了才重新抓整份；
@@ -4017,7 +4018,7 @@ function farthestFromTaipei(places){
 }
 
 // ── 02 合作夥伴 Logo 牆（20 格，存到 Google Drive，所有裝置共用）──
-const LOGO_COUNT = 18;
+const LOGO_COUNT = 20;
 function logoInner(i){
   const p = slotPhoto('logo'+i);
   if(!p) return ICONS.plus;
@@ -4236,7 +4237,7 @@ function renderIntro(force){
       </div>
     </div>
     <div class="iv2-partners">
-      <div class="iv2-sub" data-rv>曾經合作與參與的夥伴</div>
+      <div class="iv2-sub" data-rv>曾經合作的夥伴</div>
       <div class="iv2-logos">
         ${Array.from({length:LOGO_COUNT},(_,i)=>`<div class="iv2-logo" data-logo="${i}" data-rv style="--d:${Math.min(i*35,500)}ms">${logoInner(i)}</div>`).join('')}
       </div>
@@ -4295,12 +4296,12 @@ function renderIntro(force){
 
   <section class="iv2-slide iv2-s5" data-slide="4"><div class="iv2-wrap">
     <div class="iv2-rate-grid">
+      ${head('05　維修成果', '整體維修率', '', rep.source==='sample' ? sampleTag : '')}
       <div class="iv2-rate-l">
-        ${head('05　維修成果', '整體維修率', '', rep.source==='sample' ? sampleTag : '')}
         <div class="iv2-rate-n iv2-num" data-rv style="--d:140ms">${cnt(rateNum)}${hasPct ? '<small>%</small>' : ''}</div>
         <div class="iv2-rate-s" data-rv style="--d:200ms">成功 <span class="iv2-num">${cnt(okTxt)}</span> 件・失敗 <span class="iv2-num">${cnt(noTxt)}</span> 件</div>
         ${buildRepairDonut(rep.ok, rep.no)}
-        <div class="iv2-readout">滑鼠移到圓餅上查看各項細節</div>
+        <div class="iv2-readout">將滑鼠移到圓餅上查看各項細節</div>
       </div>
       <div class="iv2-lg" data-rv>
         ${legendGroup('成功', rep.ok, OK_SHADES, 'ok')}
@@ -4316,15 +4317,13 @@ function renderIntro(force){
   </div></section>
 
   <section class="iv2-slide iv2-s7" data-slide="6"><div class="iv2-wrap">
-    <div class="iv2-s7-top">
-    ${head('07　我們能做什麼？', '<span class="iv2-nw">三種核心能力，</span><span class="iv2-nw">一起把維修做得更遠</span>', '從一場活動到長期合作，我們都能和你一起完成。選擇你的角度，看看可以怎麼合作。')}
+    ${head('07　我們能做什麼？', '<span class="iv2-nw">三種核心能力，</span><span class="iv2-nw">一起把維修做得更遠</span>', '從一場活動到長期合作，我們都能和你一起完成。<br>選擇你的角度，看看可以怎麼合作。')}
     <div class="iv2-view" data-rv style="--d:120ms">
       <span class="iv2-view-l">我是</span>
       <div class="iv2-segc" role="tablist" aria-label="選擇閱讀角度">
         <button type="button" data-v="com" role="tab" class="${introView==='com'?'on':''}" onclick="setIntroView('com',true)">維修社群</button>
         <button type="button" data-v="biz" role="tab" class="${introView==='biz'?'on':''}" onclick="setIntroView('biz',true)">企業</button>
       </div>
-    </div>
     </div>
     <div class="iv2-cap" data-view="${introView}">
       <div class="iv2-cap-hd"><span>核心能力</span><span>我們的專長</span><span id="iv2-cap-co-hd">${introView==='biz'?'和企業一起做':'和維修社群一起做'}</span></div>
