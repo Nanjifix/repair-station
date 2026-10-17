@@ -3900,7 +3900,7 @@ function introHighlight(key){
   lg.classList.toggle('hl', !!key);
   const info = key && INTRO_SEG_INFO[key];
   if(ro) ro.innerHTML = info ? `<b>${escH(info.label)}</b><span class="iv2-num">${info.n.toLocaleString('en-US')}</span> 件・<span class="iv2-num">${info.pct}</span>`
-                             : '將滑鼠移到圓餅上（手機請點選），查看各項細節';
+                             : '將滑鼠移到圓餅上查看各項細節';
   if(info && !isGrp){
     const item = lg.querySelector(`.iv2-lg-i[data-seg="${key}"]`);
     if(item && window.matchMedia('(hover:none)').matches) item.scrollIntoView({block:'nearest', behavior:'smooth'});
